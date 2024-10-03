@@ -1,8 +1,8 @@
-import { postRouter } from "~/server/api/routers/post";
+import { businessRouter } from "~/server/api/routers/business";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 export const appRouter = createTRPCRouter({
-  post: postRouter,
+  business: businessRouter,
 });
 
 export type AppRouter = typeof appRouter;
