@@ -15,20 +15,31 @@ import {
   users,
   verificationTokens,
 } from "~/server/db/schema";
+import { type userRoleEnum } from "./server.types";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      role: userRoleEnum;
+      email: string;
+      name?: string | null;
+      profile?: string | null;
+      stripeCustomerId?: string | null;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    id: string;
+    name?: string | null;
+    email: string;
+    emailVerified?: Date | null;
+    profile?: string | null;
+    role: userRoleEnum;
+    stripeCustomerId?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -40,13 +51,18 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+    async redirect({ baseUrl }) {
+      return baseUrl;
+    },
   },
+
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }) as Adapter,
+
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,

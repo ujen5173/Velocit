@@ -5,14 +5,15 @@ const links = {
   github: "https://github.com/ujen5173/velocit",
   twitter: "https://twitter.com/ujen_basi",
   linkedin: "https://www.linkedin.com/in/ujen-basi-167a4522a/",
-  discord: "",
+  facebook: "https://www.facebook.com/velocit",
+  instagram: "https://www.instagram.com/velocit",
   authorsWebsite: "https://ujenbasi.vercel.app",
   authorsGitHub: "https://github.com/ujen5173",
-  openGraphImage: env.NEXT_PUBLIC_APP_URL + "/og-image.png",
+  openGraphImage: env.NEXT_PUBLIC_APP_URL + "/api/og",
 };
 
 export function getBaseUrl() {
-  if (typeof window !== undefined) {
+  if (typeof window !== "undefined") {
     return window.location.origin;
   }
 
@@ -22,34 +23,44 @@ export function getBaseUrl() {
 
   return `http://localhost:3000`;
 }
+
 export const siteConfig = {
   name: "Velocit",
   namelower: "velocit",
-  title: "Velocit - Quick and Easy Cycle, Bike, Scooter, and Car Rentals",
+  title:
+    "Affordable Vehicle Rentals | Cycles, Bikes, Scooters & Cars - Velocit",
   description:
-    "Velocit offers seamless rentals for cycles, bikes, scooters, and cars. Find the perfect vehicle for your journey with fast booking and competitive rates.",
-  tagline: "Seamless rentals for cycles, bikes, scooters, and cars.",
+    "Velocit offers convenient and affordable rentals for cycles, bikes, scooters, and cars. Book your perfect ride instantly for daily commutes, weekend adventures, or city exploration. Experience hassle-free mobility with Velocit.",
+  tagline: "Your go-to for quick, easy, and affordable vehicle rentals",
   links,
   url: "https://velocit.vercel.app",
   ogImage: links.openGraphImage,
   author: "ujen5173",
   keywords: [
     "Velocit rentals",
-    "cycle rental service",
-    "bike rental service",
-    "scooter rental service",
-    "car rental service",
-    "vehicle hire",
     "affordable vehicle rentals",
-    "rent cycles bikes scooters cars",
-    "easy vehicle rentals",
+    "cycle rental",
+    "bike rental",
+    "scooter rental",
+    "car rental",
+    "rental near me",
+    "bike rental near me",
+    "urban mobility",
+    "eco-friendly transportation",
+    "short-term vehicle hire",
+    "city exploration",
+    "weekend getaway vehicles",
+    "convenient transportation options",
+    "flexible rental durations",
+    "instant booking",
+    "transportation solutions",
   ],
 };
 
 export function constructMetadata({
   title = siteConfig.title,
   description = siteConfig.description,
-  image = `${getBaseUrl()}/og-image.png`,
+  image = `${getBaseUrl()}/api/og`,
   icons = [
     {
       rel: "apple-touch-icon",
@@ -88,29 +99,44 @@ export function constructMetadata({
       title,
       description,
       url,
+      siteName: siteConfig.name,
+      locale: "en_US",
       publishedTime,
       ...(image && {
         images: [
           {
             url: image,
+            width: 1200,
+            height: 630,
+            alt: `${siteConfig.name} - ${siteConfig.tagline}`,
           },
         ],
       }),
     },
     twitter: {
+      card: "summary_large_image",
       title,
       description,
-      ...(image && {
-        card: "summary_large_image",
-        images: [image],
-      }),
-      creator: "ujen_basi",
+      site: "@velocit",
+      creator: "@ujen_basi",
+      ...(image && { images: [image] }),
     },
     icons,
     metadataBase: new URL(getBaseUrl()),
     robots: {
       index: !noIndex,
       follow: !noIndex,
+      googleBot: {
+        index: !noIndex,
+        follow: !noIndex,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
+    alternates: {
+      canonical: url,
+    },
+    keywords: siteConfig.keywords.join(", "),
   };
 }
