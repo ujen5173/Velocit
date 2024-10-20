@@ -60,24 +60,17 @@ export const siteConfig = {
 export function constructMetadata({
   title = siteConfig.title,
   description = siteConfig.description,
-  image = `${getBaseUrl()}/api/og`,
+  image = `${getBaseUrl()}/logo.svg`,
   icons = [
     {
       rel: "apple-touch-icon",
       sizes: "32x32",
-      url: "/apple-touch-icon.png",
+      url: "/logo.png",
     },
     {
       rel: "icon",
-      type: "image/png",
-      sizes: "32x32",
-      url: "/favicon-32x32.png",
-    },
-    {
-      rel: "icon",
-      type: "image/png",
-      sizes: "16x16",
-      url: "/favicon-16x16.png",
+      type: "image/x-icon",
+      url: "/favicon.ico",
     },
   ],
   noIndex = false,

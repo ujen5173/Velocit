@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
+import TailwindIndicator from "./_components/_/TailwindIndicator";
 import RootContext from "./_components/contexts/root";
 import { nunito } from "./utils/font";
 import { constructMetadata } from "./utils/site";
@@ -20,6 +21,7 @@ export default function RootLayout({
             <RootContext>{children}</RootContext>
           </HydrateClient>
         </TRPCReactProvider>
+        <TailwindIndicator />
       </body>
     </html>
   );
