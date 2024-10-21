@@ -35,7 +35,7 @@ export const rentalStatusEnum = pgEnum("rental_status", [
   "completed",
 ]);
 
-export const userRoleEnum = pgEnum("user_role", ["user", "vendor"]);
+export const userRoleEnum = pgEnum("user_role", ["USER", "VENDOR"]);
 
 export const paymentStatusEnum = pgEnum("payment_status", [
   "pending",
@@ -60,7 +60,7 @@ export const users = createTable(
       withTimezone: true,
     }),
     image: varchar("image", { length: 255 }),
-    role: userRoleEnum("role").notNull().default("user"),
+    role: userRoleEnum("role").notNull().default("USER"),
     stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

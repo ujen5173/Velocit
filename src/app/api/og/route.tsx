@@ -4,7 +4,6 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 
 // Image metadata
-export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
@@ -25,7 +24,7 @@ export async function GET() {
       <div tw="w-full h-full bg-pink-500 flex items-center justify-center px-6">
         <div tw="flex-col items-center gap-4 flex">
           <svg
-            width="750" // 479 + ?? = 500 -> 21px
+            width="750"
             height="150"
             viewBox="0 0 958 168"
             fill="none"

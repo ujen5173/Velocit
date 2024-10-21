@@ -1,1 +1,1 @@
-export type userRoleEnum = "vendor" | "user";
+export type userRoleEnum = "VENDOR" | "USER";
