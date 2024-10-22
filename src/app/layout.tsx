@@ -12,7 +12,9 @@ export const metadata: Metadata = constructMetadata();
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${nunito.className}`}>
       <body>

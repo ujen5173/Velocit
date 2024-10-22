@@ -31,16 +31,16 @@ const Header = () => {
         pth === "/" ? "border-transparent" : "border-border shadow-sm",
       )}
     >
-      <div className="mx-auto flex max-w-[1440px] justify-between gap-6 border-b border-border px-4 py-6 md:border-none md:py-4">
+      <div className="mx-auto flex h-20 max-w-[1440px] justify-between gap-6 px-4 py-4 md:border-none md:py-4">
         <div className="flex flex-1 items-center space-x-6">
           <Logo tw={cn("h-6", pth === "/" ? "fill-white" : "fill-secondary")} />
 
           <div className="hidden md:block">
             <ul className="flex items-center">
-              <li className={cn(`px-2 hover:underline`, theme)}>
+              <li className={cn(`px-2 text-sm hover:underline`, theme)}>
                 <Link href="/">Explore</Link>
               </li>
-              <li className={cn(`px-2 hover:underline`, theme)}>
+              <li className={cn(`px-2 text-sm hover:underline`, theme)}>
                 <Link href="/">Locations</Link>
               </li>
             </ul>
@@ -165,7 +165,10 @@ const Header = () => {
 
                 <div className="space-y-2">
                   <LoginButton>
-                    <Button className="w-full uppercase" variant={"outline"}>
+                    <Button
+                      className="w-full text-sm uppercase"
+                      variant={"outline"}
+                    >
                       Login / Sign up
                     </Button>
                   </LoginButton>

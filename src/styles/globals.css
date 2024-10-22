@@ -21,7 +21,7 @@
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 356 100% 97%;
     --border: 213 27% 84%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
@@ -55,4 +55,50 @@
     ),
     linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 16.41%),
     linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.react-datepicker__month-container {
+  @apply w-full border-none;
+}
+
+.react-datepicker__header.react-datepicker__header--custom {
+  @apply bg-white p-0;
+}
+
+.react-datepicker {
+  border: 0 !important;
+}
+
+.react-datepicker__day-names {
+  margin-bottom: 0 !important;
+  @apply grid grid-cols-7 gap-1;
+}
+
+.react-datepicker__day-name {
+  width: 100% !important;
+}
+.react-datepicker__week {
+  @apply grid grid-cols-7 gap-1;
+}
+
+.react-datepicker__day {
+  width: 100% !important;
+  @apply rounded-md p-2 text-center;
+}
+
+.react-datepicker__day--disabled,
+.react-datepicker__month-text--disabled,
+.react-datepicker__quarter-text--disabled,
+.react-datepicker__year-text--disabled {
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.react-datepicker__day--today {
+  background: hsl(var(--secondary)) !important;
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+.disabled-day {
+  color: hsl(var(--destructive-foreground)) !important;
 }

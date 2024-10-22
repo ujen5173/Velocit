@@ -187,18 +187,16 @@ const Footer = () => {
           </div>
 
           <div className="flex justify-center pt-20">
-            <Logo tw="h-20 sm:h-24 md:h-26 lg:h-32 fill-pink-400" />
+            <Logo tw="h-14 sm:h-20 md:h-26 lg:h-32 fill-pink-400" />
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-between gap-8 py-10 md:flex-row">
           <div className="text-center">
-            <Button variant={"outline"} className="text-slate-100">
-              रु Nepali Ruppee (NPR)
-            </Button>
+            <Button variant={"outline"}>रु Nepali Ruppee (NPR)</Button>
           </div>
 
-          <ul className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-100 sm:flex-nowrap sm:justify-normal">
+          <ul className="flex flex-wrap items-center justify-center text-sm text-slate-100 sm:flex-nowrap sm:justify-normal">
             <li>Terms of use</li>
             <Dot className="hidden md:block" size={20} />
             <li>Privacy Policy</li>
