@@ -13,7 +13,7 @@ import { vendorDetail } from "~/types";
 
 const Locations = () => {
   return (
-    <section className="bg-white px-4 py-6 sm:py-10 md:py-20">
+    <section className="bg-white px-4 py-10">
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10">
           <h1
@@ -24,10 +24,10 @@ const Locations = () => {
           >
             Visit Us
           </h1>
-          <p className="lg:7/12 w-full text-lg text-slate-600 md:w-9/12">
-            Visit us at one of our conveniently located branches for quick and
-            personalized service. Find the nearest location below, and drop by
-            for a seamless experience catered to your needs.
+          <p className="lg:7/12 hidden w-full text-lg text-slate-600 sm:block md:w-9/12">
+            Visit one of our convenient branches for quick, personalized
+            service. Find your nearest location below and enjoy a seamless
+            experience tailored to you.
           </p>
         </div>
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -39,7 +39,7 @@ const Locations = () => {
               <p className="text-base text-foreground">
                 Locations (<span className="underline">2</span>)
               </p>
-              <p className="text-base text-foreground">
+              <p className="text-base font-medium text-slate-600">
                 {vendorDetail.location
                   .map((location) => location.address)
                   .join(", ")}
@@ -52,7 +52,7 @@ const Locations = () => {
             </div>
             <div>
               <p className="text-base text-foreground">Phone Number</p>
-              <p className="text-base text-foreground">
+              <p className="text-base font-medium text-slate-600">
                 {vendorDetail.phoneNumbers.join(", ")}
               </p>
             </div>
@@ -86,7 +86,9 @@ const Locations = () => {
               </div>
               <div>
                 <p className="text-base text-foreground">Socials</p>
-                <p className="text-base text-foreground">@epicmountainbike</p>
+                <p className="text-base font-medium text-slate-600">
+                  @epicmountainbike
+                </p>
               </div>
             </div>
           )}

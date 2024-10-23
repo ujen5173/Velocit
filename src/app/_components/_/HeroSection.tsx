@@ -41,7 +41,7 @@ const HeroSection = () => {
       />
 
       <div className="absolute inset-0 flex h-full w-full items-end">
-        <div className="mx-auto max-w-[1440px] px-4 py-16">
+        <div className="mx-auto max-w-[1440px] px-4 pb-10 pt-16 xs:py-16">
           <h1
             className={cn(
               "mb-6 text-4xl font-semibold leading-tight text-slate-100 md:text-5xl lg:text-6xl",
@@ -95,7 +95,7 @@ const HeroSection = () => {
                     "relative flex items-center gap-2 rounded-lg bg-slate-100/20 px-4",
                   )}
                 >
-                  <SelectValue placeholder="Which Vechile?" />
+                  <SelectValue placeholder="Select Vehicle Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

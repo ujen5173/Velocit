@@ -43,7 +43,7 @@ const VendorPage = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.5 }}
-          className="fixed bottom-4 right-4"
+          className="fixed bottom-4 right-4 z-50"
         >
           <Button className="share-button w-full" variant={"outline"}>
             <ExternalLink size={16} className="mr-2" />

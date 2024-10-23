@@ -2,17 +2,19 @@
 import { Dot, ListFilter, Star } from "lucide-react";
 import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
-import { chakra_petch, nunito } from "~/app/utils/font";
+import { nunito } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { vendorDetail, vendorVehicles } from "~/types";
 
 const Accessories = () => {
   return (
-    <section className="px-4 py-6 sm:py-10 md:py-20">
+    <section className="bg-white px-4 py-10">
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10 flex items-center justify-between gap-10">
-          <h1 className={cn("text-4xl font-semibold", chakra_petch.className)}>
+          <h1
+            className={cn("text-2xl font-bold xs:text-3xl", nunito.className)}
+          >
             Accessories
           </h1>
           <Button variant={"outline"} className="hover:bg-slate-50">
@@ -21,7 +23,7 @@ const Accessories = () => {
           </Button>
         </div>
 
-        <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <section className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {vendorVehicles.slice(0, 7).map((vehicle, index) => (
             <div key={vehicle.id} className="flex flex-col gap-2">
               <div className="relative flex items-center justify-center">
@@ -43,8 +45,8 @@ const Accessories = () => {
                 <h3 className="text-lg font-semibold text-slate-600">
                   {vehicle.brand} {vehicle.model}
                 </h3>
-                <div className="mb-4 flex items-center">
-                  <div className="ga-2 flex items-center">
+                <div className="mb-4 flex flex-col gap-2 xs:flex-row xs:items-center xs:gap-0">
+                  <div className="flex items-center gap-2">
                     <Star
                       size={16}
                       className="fill-yellow-500 stroke-yellow-500"
@@ -53,8 +55,8 @@ const Accessories = () => {
                       {vendorDetail.rating} ({vendorDetail.ratingCount})
                     </span>
                   </div>
-                  <div className="ga-2 flex items-center">
-                    <Dot size={16} />
+                  <Dot size={16} className="hidden text-foreground xs:block" />
+                  <div className="">
                     <span className="text-sm">
                       {vendorDetail.ratingCount * 100}+ Items Sold
                     </span>

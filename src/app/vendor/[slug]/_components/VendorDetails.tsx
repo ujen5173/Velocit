@@ -1,4 +1,3 @@
-"use client";
 import { format, isSameDay } from "date-fns";
 import {
   CalendarDays,
@@ -14,7 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { type DateRange } from "react-day-picker";
 import { Button } from "~/components/ui/button";
@@ -40,6 +39,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { ScrollArea } from "~/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -52,9 +52,51 @@ import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
 import { vendorDetail } from "~/types";
 
+const VehicleType = {
+  BICYCLE: "bicycle",
+  MOTORCYCLE: "motorcycle",
+  SCOOTER: "scooter",
+  ELECTRIC_BICYCLE: "electric-bicycle",
+} as const;
+
+const vehicles = [
+  {
+    type: VehicleType.BICYCLE,
+    label: "Cycle",
+    price: 500,
+    models: ["Trek Domane SL 6", "Giant Contend 1", "Specialized Allez"],
+  },
+  {
+    type: VehicleType.MOTORCYCLE,
+    label: "Motorcycle",
+    price: 1500,
+    models: ["Yamaha MT-15", "KTM Duke 200", "Honda CB Hornet"],
+  },
+  {
+    type: VehicleType.SCOOTER,
+    label: "Scooter",
+    price: 800,
+    models: ["Honda Activa 6G", "TVS Jupiter", "Suzuki Access"],
+  },
+  {
+    type: VehicleType.ELECTRIC_BICYCLE,
+    label: "Electric Cycle",
+    price: 1000,
+    models: ["RadCity 5 Plus", "Ride1Up Core-5", "Aventon Pace 500"],
+  },
+];
+
 const VendorDetails = () => {
-  const [api, setApi] = useState<CarouselApi>();
   const [open, setOpen] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
+
+  const [selectedVehicleType, setSelectedVehicleType] = useState<
+    (typeof VehicleType)[keyof typeof VehicleType]
+  >(VehicleType.BICYCLE);
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedModel, setSelectedModel] = useState("");
+  const [message, setMessage] = useState("");
 
   const [imageOrientation, setImageOrientation] = useState<
     "horizontal" | "vertical"
@@ -74,7 +116,20 @@ const VendorDetails = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const handleQuantityChange = (action: "increment" | "decrement") => {
+    if (action === "increment" && quantity < 10) {
+      setQuantity(quantity + 1);
+    } else if (action === "decrement" && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= 10) {
+      setQuantity(value);
+    }
+  };
 
   const disabledDays = [
     new Date().setDate(new Date().getDate() + 2),
@@ -83,211 +138,205 @@ const VendorDetails = () => {
     new Date().setDate(new Date().getDate() + 9),
   ];
 
-  // Function to check if a date should be disabled
   const isDateDisabled = (date: Date) => {
-    // Disable dates before today
     if (date < new Date()) {
       return true;
     }
-
-    // Disable specific dates
     return disabledDays.some((disabledDate) => isSameDay(date, disabledDate));
   };
+
+  const currentVehicle = vehicles.find((v) => v.type === selectedVehicleType);
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl p-4">
-          <DialogHeader className="border-b border-border">
-            <DialogTitle className="pb-2 text-center text-lg font-medium text-foreground">
+        <DialogContent className="flex h-[90vh] max-h-[800px] w-[90vw] flex-col gap-4 p-4 md:w-[80vw] lg:max-w-2xl">
+          <DialogHeader className="flex-none border-b border-border pb-2">
+            <DialogTitle className="text-center text-lg font-medium text-foreground">
               Reserve a Vehicle
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Pick up Date</Label>
-              <div className={cn("grid gap-2")}>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start gap-2 border px-4 text-left font-normal",
-                        !date && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarDays size={18} className="text-slate-700" />
-                      {date?.from ? (
-                        date.to ? (
-                          <>
-                            {format(date.from, "LLL dd, y")} -{" "}
-                            {format(date.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(date.from, "LLL dd, y")
-                        )
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      disabled={isDateDisabled}
-                      defaultMonth={date?.from}
-                      selected={date}
-                      showOutsideDays={false}
-                      classNames={{
-                        cell: "w-[36px] text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                      }}
-                      onSelect={setDate}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            <div className="space-y-2 pb-4">
-              <Label>Vehicle Type</Label>
-              <div className="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-3">
-                <div className="relative rounded-md bg-[#f1f0f5] p-4 text-slate-800">
-                  <span className="text-sm font-medium">Cycle</span>
-                  <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
-                    NPR 500
-                  </div>
-                </div>
-                <div className="relative rounded-md bg-[#f1f0f5] p-4 text-slate-800">
-                  <span className="text-sm font-medium">Motocycle</span>
-                  <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
-                    NPR 500
-                  </div>
-                </div>
-                <div className="relative rounded-md bg-[#f1f0f5] p-4 text-slate-800">
-                  <span className="text-sm font-medium">Scooter</span>
-                  <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
-                    NPR 500
-                  </div>
-                </div>
-                <div className="relative rounded-md bg-[#f1f0f5] p-4 text-slate-800">
-                  <span className="text-sm font-medium">Electric Cycle</span>
-                  <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
-                    NPR 500
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Free Accessories with Vehicle</Label>
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <CircleCheck size={16} className="text-green-600" />
-                  <span className="text-xs font-medium text-slate-700">
-                    Helmet
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <CircleCheck size={16} className="text-green-600" />
-                  <span className="text-xs font-medium text-slate-700">
-                    Lock
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <CircleCheck size={16} className="text-green-600" />
-                  <span className="text-xs font-medium text-slate-700">
-                    Gloves
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <CircleCheck size={16} className="text-green-600" />
-                  <span className="text-xs font-medium text-slate-700">
-                    Jacket
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <CircleCheck size={16} className="text-green-600" />
-                  <span className="text-xs font-medium text-slate-700">
-                    Bag
-                  </span>
-                </div>
-              </div>
-            </div>
-            <Separator />
-            <div className="grid grid-cols-1 gap-2 space-y-2 sm:grid-cols-2">
+
+          <ScrollArea className="flex-1 px-1">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label>No of Vehicle</Label>
-                <div className="flex items-center justify-start gap-2">
-                  <div>
-                    <button className="flex size-6 items-center justify-center rounded-full bg-slate-400">
+                <Label>Pick up Date</Label>
+                <div className="grid gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="date"
+                        variant="outline"
+                        className={`w-full justify-start gap-2 border px-4 text-left font-normal ${
+                          !date && "text-muted-foreground"
+                        }`}
+                      >
+                        <CalendarDays size={18} className="text-slate-700" />
+                        {date?.from ? (
+                          date.to ? (
+                            <>
+                              {format(date.from, "LLL dd, y")} -{" "}
+                              {format(date.to, "LLL dd, y")}
+                            </>
+                          ) : (
+                            format(date.from, "LLL dd, y")
+                          )
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        disabled={isDateDisabled}
+                        defaultMonth={date?.from}
+                        selected={date}
+                        showOutsideDays={false}
+                        onSelect={setDate}
+                        numberOfMonths={2}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div className="space-y-2 pb-4">
+                <Label>Vehicle Type</Label>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-5 px-1 sm:grid-cols-3">
+                  {vehicles.map((vehicle) => (
+                    <div
+                      key={vehicle.type}
+                      className={`relative cursor-pointer rounded-md bg-[#f1f0f5] p-4 text-slate-800 transition-all hover:bg-slate-200 ${
+                        selectedVehicleType === vehicle.type
+                          ? "ring-2 ring-secondary"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedVehicleType(vehicle.type)}
+                    >
+                      <span className="text-sm font-medium">
+                        {vehicle.label}
+                      </span>
+                      <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
+                        NPR {vehicle.price}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Free Accessories with Vehicle</Label>
+                <div className="flex flex-wrap items-center gap-4">
+                  {["Helmet", "Lock", "Gloves", "Jacket", "Bag"].map(
+                    (accessory) => (
+                      <div key={accessory} className="flex items-center gap-1">
+                        <CircleCheck size={16} className="text-green-600" />
+                        <span className="text-xs font-medium text-slate-700">
+                          {accessory}
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Number of Vehicles</Label>
+                  <div className="flex items-center justify-start gap-2">
+                    <button
+                      className="flex size-6 items-center justify-center rounded-full bg-slate-400"
+                      onClick={() => handleQuantityChange("decrement")}
+                    >
                       <Minus size={18} className="text-white" />
                     </button>
-                  </div>
-                  <div className="w-20">
-                    <Input
-                      type="text"
-                      pattern="[1-9]"
-                      defaultValue={1}
-                      className="h-10 text-center"
-                    />
-                  </div>
-                  <div>
-                    <button className="flex size-6 items-center justify-center rounded-full bg-slate-700">
+                    <div className="w-20">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={quantity}
+                        onChange={handleQuantityInput}
+                        className="h-10 text-center"
+                      />
+                    </div>
+                    <button
+                      className="flex size-6 items-center justify-center rounded-full bg-slate-700"
+                      onClick={() => handleQuantityChange("increment")}
+                    >
                       <Plus size={18} className="text-white" />
                     </button>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Choose Vehicle</Label>
+                  <Select
+                    value={selectedModel}
+                    onValueChange={setSelectedModel}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Vehicle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currentVehicle?.models.map((model) => (
+                        <SelectItem key={model} value={model}>
+                          {model}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
               <div className="space-y-2">
-                <Label>Choose of Vehicle</Label>
-                <Select>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Vehicle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Trek Domane SL 6</SelectItem>
-                    <SelectItem value="dark">Yamaha MT-15</SelectItem>
-                    <SelectItem value="system">Honda Activa 6G</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Message to vendor</Label>
+                <Textarea
+                  className="h-32"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Any message to the vendor?</Label>
-              <Textarea className="h-32" />
-            </div>
-          </div>
+          </ScrollArea>
+
           <div className="flex w-full items-center justify-end gap-4">
             <Button
               onClick={() => setOpen(false)}
-              className="border-secondary text-secondary"
-              variant={"outline"}
+              // className="border-secondary text-secondary"
+              variant="outline"
             >
               Cancel
             </Button>
-            <Button className="" variant={"primary"}>
-              Reserve
-            </Button>
+            <Button variant="primary">Reserve</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <section className="mx-auto max-w-[1240px] px-4">
         <div className="flex flex-col gap-5 py-6 md:flex-row md:py-10 lg:gap-10">
-          <div className="mx-auto flex h-fit w-full flex-col-reverse gap-2 sm:w-10/12 md:w-7/12 lg:flex-row">
+          <div className="mx-auto flex h-fit w-full flex-col-reverse gap-0 sm:w-10/12 md:w-7/12 lg:flex-row lg:gap-2">
             <div>
               <Carousel
                 orientation={imageOrientation}
                 setApi={setApi}
                 className="w-full"
               >
-                <CarouselContent className="max-h-[625px] py-2">
+                <CarouselContent
+                  className={cn(
+                    "max-h-[625px] py-2",
+                    imageOrientation === "horizontal" ? "px-3" : "",
+                  )}
+                >
                   {vendorDetail.shopImages.map((image, index) => (
                     <CarouselItem
                       key={index}
                       className="relative basis-auto px-1 pt-2"
                     >
-                      {/* <div className="absolute z-20 aspect-square bg-slate-900/10"></div> */}
                       <button className="rounded-md hover:ring-2 hover:ring-secondary hover:ring-offset-2">
                         <Image
                           onClick={() => {
@@ -333,6 +382,7 @@ const VendorDetails = () => {
               </div>
             </div>
           </div>
+
           <div className="flex flex-1 flex-col">
             <div className="mb-2 flex items-center">
               <Link href="/" className="block">

@@ -101,7 +101,20 @@ const UpcomingEvent = () => {
     <section className="w-full bg-slate-50">
       <div className="mx-auto max-w-[1200px] px-4 py-16">
         <div className="mb-10 flex items-center justify-between gap-4">
-          <h2 className={cn("text-3xl font-bold", nunito.className)}>
+          <h2
+            className={cn(
+              "block text-2xl font-bold xs:hidden",
+              nunito.className,
+            )}
+          >
+            Upcoming Events
+          </h2>
+          <h2
+            className={cn(
+              "hidden text-2xl font-bold xs:block xs:text-3xl",
+              nunito.className,
+            )}
+          >
             Participate on Upcoming Events
           </h2>
 
@@ -139,7 +152,7 @@ const UpcomingEvent = () => {
               {slides.map((event, index) => (
                 <CarouselItem
                   key={index}
-                  className="xs:basis-1/2 basis-full space-y-4 md:basis-1/3 lg:basis-1/4"
+                  className="basis-full space-y-4 xs:basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
                   <div className="relative">
                     <Image
@@ -166,7 +179,7 @@ const UpcomingEvent = () => {
                       <Dot size={20} className="text-slate-600" />
                       <div className="flex items-center gap-1">
                         <MapPin size={18} className="text-slate-600" />
-                        <span className="text-sm text-foreground">
+                        <span className="line-clamp-1 text-sm text-foreground">
                           {event.meetinglocation}
                         </span>
                       </div>

@@ -2,17 +2,19 @@
 import { ListFilter, Star } from "lucide-react";
 import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
-import { chakra_petch, nunito } from "~/app/utils/font";
+import { nunito } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { vendorDetail, vendorVehicles } from "~/types";
 
 const Vehicles = () => {
   return (
-    <section className="bg-slate-50 px-4 py-6 sm:py-10 md:py-20">
+    <section className="bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10 flex items-center justify-between gap-10">
-          <h1 className={cn("text-4xl font-semibold", chakra_petch.className)}>
+          <h1
+            className={cn("text-2xl font-bold xs:text-3xl", nunito.className)}
+          >
             Pick Your Ride
           </h1>
           <Button variant={"outline"} className="hover:bg-slate-50">
@@ -21,7 +23,7 @@ const Vehicles = () => {
           </Button>
         </div>
 
-        <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <section className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {vendorVehicles.map((vehicle) => (
             <div
               key={vehicle.id}
@@ -42,7 +44,7 @@ const Vehicles = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-lg font-semibold text-slate-700">
                   {vehicle.brand} {vehicle.model}
                 </h3>
                 <div className="mb-4 flex items-center gap-2">

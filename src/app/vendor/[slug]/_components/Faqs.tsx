@@ -12,7 +12,7 @@ import { vendorDetail } from "~/types";
 
 const Faqs = () => {
   return (
-    <section className="bg-slate-50 px-4 py-6 sm:py-10 md:py-20">
+    <section className="bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10">
           <h1
@@ -33,7 +33,9 @@ const Faqs = () => {
           <Accordion type="multiple">
             {vendorDetail.faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger>{faq.question}</AccordionTrigger>
+                <AccordionTrigger className="text-left">
+                  {faq.question}
+                </AccordionTrigger>
                 <AccordionContent>{faq.answer}</AccordionContent>
               </AccordionItem>
             ))}

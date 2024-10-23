@@ -11,7 +11,7 @@ export default {
     },
     extend: {
       screens: {
-        xs: "420px",
+        xs: "460px",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],

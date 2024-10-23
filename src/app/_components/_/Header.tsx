@@ -172,7 +172,7 @@ const Header = () => {
                       Login / Sign up
                     </Button>
                   </LoginButton>
-                  <Button className="w-full uppercase" variant={"secondary"}>
+                  <Button className="w-full uppercase" variant={"primary"}>
                     Start Renting
                   </Button>
                 </div>
