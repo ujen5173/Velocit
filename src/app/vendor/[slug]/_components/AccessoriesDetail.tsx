@@ -30,7 +30,7 @@ import {
   SheetTitle,
 } from "~/components/ui/sheet";
 import { cn } from "~/lib/utils";
-import { vendorDetail, vendorVehicles } from "../page";
+import { vendorDetail, vendorVehicles } from "~/types";
 
 const AccessoriesDetail = () => {
   const [open, setOpen] = useState(false);

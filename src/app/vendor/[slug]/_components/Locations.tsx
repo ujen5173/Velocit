@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { cn } from "~/lib/utils";
-import { vendorDetail } from "../page";
+import { vendorDetail } from "~/types";
 
 const Locations = () => {
   return (

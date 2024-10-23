@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { chakra_petch, nunito } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { vendorDetail, vendorVehicles } from "../page";
+import { vendorDetail, vendorVehicles } from "~/types";
 
 const Vehicles = () => {
   return (
