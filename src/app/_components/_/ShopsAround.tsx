@@ -117,7 +117,7 @@ const ShopsAround = () => {
   return (
     <section className="w-full">
       <div className="mx-auto max-w-[1200px] px-4 py-16">
-        <div className="mb-10 flex items-center justify-between gap-4">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className={cn("text-3xl font-bold", nunito.className)}>
             Popular Shops
           </h2>

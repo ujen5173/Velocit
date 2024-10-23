@@ -3,16 +3,14 @@ import { ImageResponse } from "next/og";
 // Route segment config
 export const runtime = "edge";
 
-// Image metadata
-export const size = {
-  width: 1200,
-  height: 630,
-};
-
-export const contentType = "image/png";
-
 // Image generation
 export async function GET() {
+  // Define size and content type inside the function
+  const size = {
+    width: 1200,
+    height: 630,
+  };
+
   // Font
   const kalamFont = fetch(new URL("./Kalam-Bold.ttf", import.meta.url)).then(
     (res) => res.arrayBuffer(),
@@ -20,7 +18,6 @@ export async function GET() {
 
   return new ImageResponse(
     (
-      // ImageResponse JSX element
       <div tw="w-full h-full bg-pink-500 flex items-center justify-center px-6">
         <div tw="flex-col items-center gap-4 flex">
           <svg
@@ -68,7 +65,7 @@ export async function GET() {
               d="M602.81 81.2693C606.07 140.209 625.725 167.003 680.529 163.989C700.225 162.905 717.472 156.445 729.025 147.518L704.237 110.915C697.197 115.687 688.598 119.603 676.189 120.286C659.481 121.205 645.838 114.958 645.838 81.2693L602.81 81.2693Z"
               fill="#f1f1f1"
             />
-          </svg>
+          </svg>{" "}
           <h1 tw="text-4xl font-semibold text-slate-200">
             Get your Rental Ride Now!
           </h1>
