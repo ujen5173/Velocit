@@ -157,9 +157,9 @@ const VendorDetails = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 px-1">
-            <div className="space-y-4">
-              <div className="space-y-2">
+          <ScrollArea className="flex-1 pr-2">
+            <div className="space-y-4 py-2">
+              <div className="space-y-2 px-1">
                 <Label>Pick up Date</Label>
                 <div className="grid gap-2">
                   <Popover>
@@ -202,7 +202,7 @@ const VendorDetails = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 pb-4">
+              <div className="space-y-2 px-1 pb-4">
                 <Label>Vehicle Type</Label>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-5 px-1 sm:grid-cols-3">
                   {vehicles.map((vehicle) => (
@@ -226,7 +226,7 @@ const VendorDetails = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 px-1">
                 <Label>Free Accessories with Vehicle</Label>
                 <div className="flex flex-wrap items-center gap-4">
                   {["Helmet", "Lock", "Gloves", "Jacket", "Bag"].map(
@@ -245,7 +245,7 @@ const VendorDetails = () => {
               <Separator />
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div className="space-y-2">
+                <div className="space-y-2 px-1">
                   <Label>Number of Vehicles</Label>
                   <div className="flex items-center justify-start gap-2">
                     <button
@@ -256,7 +256,9 @@ const VendorDetails = () => {
                     </button>
                     <div className="w-20">
                       <Input
-                        type="number"
+                        type="text"
+                        pattern="[0-9]+"
+                        inputMode="numeric"
                         min="1"
                         max="10"
                         value={quantity}
@@ -273,7 +275,7 @@ const VendorDetails = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 px-1">
                   <Label>Choose Vehicle</Label>
                   <Select
                     value={selectedModel}
@@ -293,7 +295,7 @@ const VendorDetails = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 px-1">
                 <Label>Message to vendor</Label>
                 <Textarea
                   className="h-32"
@@ -329,7 +331,7 @@ const VendorDetails = () => {
                 <CarouselContent
                   className={cn(
                     "max-h-[625px] py-2",
-                    imageOrientation === "horizontal" ? "px-3" : "",
+                    imageOrientation === "horizontal" ? "px-3" : "py-3",
                   )}
                 >
                   {vendorDetail.shopImages.map((image, index) => (

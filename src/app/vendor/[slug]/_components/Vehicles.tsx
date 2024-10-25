@@ -2,7 +2,7 @@
 import { ListFilter, Star } from "lucide-react";
 import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
-import { nunito } from "~/app/utils/font";
+import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { vendorDetail, vendorVehicles } from "~/types";
@@ -13,7 +13,10 @@ const Vehicles = () => {
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10 flex items-center justify-between gap-10">
           <h1
-            className={cn("text-2xl font-bold xs:text-3xl", nunito.className)}
+            className={cn(
+              "text-2xl font-bold xs:text-3xl",
+              bricolage.className,
+            )}
           >
             Pick Your Ride
           </h1>
@@ -62,7 +65,10 @@ const Vehicles = () => {
                   </h4>
                   <div className="flex items-end gap-2">
                     <span
-                      className={cn("text-xl font-semibold", nunito.className)}
+                      className={cn(
+                        "text-xl font-semibold",
+                        bricolage.className,
+                      )}
                     >
                       रु {(vehicle.price_per_hour ?? 1) * 65}{" "}
                       <span className="text-base font-normal">/day</span>

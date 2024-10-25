@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Dot, MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { nunito } from "~/app/utils/font";
+import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
@@ -17,7 +17,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
 
-interface Slide {
+export interface Slide {
   name: string;
   rating: number;
   slug: string;
@@ -25,8 +25,9 @@ interface Slide {
     bicycle: number;
   };
   satisfiedCustomers: number;
-  location: string;
+  address: string;
   images: string[];
+  lonlat?: [number, number];
 }
 
 const slides: Slide[] = [
@@ -38,7 +39,7 @@ const slides: Slide[] = [
       bicycle: 100,
     },
     satisfiedCustomers: 200,
-    location: "Kathmandu, Nepal",
+    address: "Kathmandu, Nepal",
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img3.jpg",
@@ -54,7 +55,7 @@ const slides: Slide[] = [
       bicycle: 120,
     },
     satisfiedCustomers: 350,
-    location: "Pokhara, Nepal",
+    address: "Pokhara, Nepal",
     images: [
       "/images/shops/img2.jpg",
       "/images/shops/img1.jpg",
@@ -70,7 +71,7 @@ const slides: Slide[] = [
       bicycle: 110,
     },
     satisfiedCustomers: 180,
-    location: "Bhaktapur, Nepal",
+    address: "Bhaktapur, Nepal",
     images: ["/images/shops/img1.jpg", "/images/shops/img3.jpg"],
   },
   {
@@ -81,7 +82,7 @@ const slides: Slide[] = [
       bicycle: 150,
     },
     satisfiedCustomers: 400,
-    location: "Kathmandu, Nepal",
+    address: "Kathmandu, Nepal",
     images: ["/images/shops/img4.jpg"],
   },
   {
@@ -92,7 +93,7 @@ const slides: Slide[] = [
       bicycle: 100,
     },
     satisfiedCustomers: 200,
-    location: "Kathmandu, Nepal",
+    address: "Kathmandu, Nepal",
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img3.jpg",
@@ -119,7 +120,7 @@ const ShopsAround = () => {
       <div className="mx-auto max-w-[1200px] px-4 py-16">
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2
-            className={cn("text-2xl font-bold xs:text-3xl", nunito.className)}
+            className={cn("text-2xl font-bold xs:text-3xl", bricolage.className)}
           >
             Popular Shops
           </h2>
@@ -182,47 +183,49 @@ const ShopsAround = () => {
                     </Carousel>
                   </div>
 
-                  <div>
-                    <Link href={`/vendor/${shop.slug}`}>
+                  <Link href={`/vendor/${shop.slug}`}>
+                    <div className="py-4">
                       <h1 className="mb-2 line-clamp-1 text-lg font-medium">
                         {shop.name}
                       </h1>
-                    </Link>
-                    <div className="cursor-grab select-none">
-                      <div className="mb-4 flex flex-wrap items-center">
-                        <div className="flex items-center gap-1">
-                          <Star
-                            size={18}
-                            className="fill-yellow-500 stroke-yellow-500"
-                          />
-                          <span className="text-sm">{shop.rating}</span>
+                      <div className="select-none">
+                        <div className="mb-4 flex flex-wrap items-center">
+                          <div className="flex items-center gap-1">
+                            <Star
+                              size={18}
+                              className="fill-yellow-500 stroke-yellow-500"
+                            />
+                            <span className="text-sm">{shop.rating}</span>
+                          </div>
+                          <Dot size={18} />
+                          <div className="flex items-center gap-1">
+                            <MapPin size={18} />
+                            <span className="text-sm">{shop.address}</span>
+                          </div>
                         </div>
-                        <Dot size={18} />
-                        <div className="flex items-center gap-1">
-                          <MapPin size={18} />
-                          <span className="text-sm">{shop.location}</span>
+                        <div>
+                          <h4 className="mb-1 text-sm uppercase">
+                            Starting At
+                          </h4>
+                          <h1
+                            className={cn(
+                              "text-2xl font-semibold",
+                              bricolage.className,
+                            )}
+                          >
+                            रु {shop.perDay.bicycle}{" "}
+                            <span className="text-base font-normal">/day</span>
+                          </h1>
                         </div>
-                      </div>
-                      <div>
-                        <h4 className="mb-1 text-sm uppercase">Starting At</h4>
-                        <h1
-                          className={cn(
-                            "text-2xl font-semibold",
-                            nunito.className,
-                          )}
-                        >
-                          रु {shop.perDay.bicycle}{" "}
-                          <span className="text-base font-normal">/day</span>
-                        </h1>
-                      </div>
-                      <Separator className="mt-4 h-1 bg-pink-500" />
-                      <div className="py-2">
-                        <span className="text-sm">
-                          {shop.satisfiedCustomers}+ satisfied customers
-                        </span>
+                        <Separator className="mt-4 h-1 bg-pink-500" />
+                        <div className="py-2">
+                          <span className="text-sm">
+                            {shop.satisfiedCustomers}+ satisfied customers
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </CarouselItem>
               ))}
             </CarouselContent>

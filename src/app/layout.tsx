@@ -5,7 +5,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import TailwindIndicator from "./_components/_/TailwindIndicator";
 import RootContext from "./_components/contexts/root";
-import { nunito } from "./utils/font";
+import { lato } from "./utils/font";
 import { constructMetadata } from "./utils/site";
 
 export const metadata: Metadata = constructMetadata();
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${nunito.className}`}>
+    <html lang="en" className={`${lato.className}`}>
       <body>
         <TRPCReactProvider>
           <HydrateClient>

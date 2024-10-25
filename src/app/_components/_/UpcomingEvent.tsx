@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { nunito } from "~/app/utils/font";
+import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
@@ -104,7 +104,7 @@ const UpcomingEvent = () => {
           <h2
             className={cn(
               "block text-2xl font-bold xs:hidden",
-              nunito.className,
+              bricolage.className,
             )}
           >
             Upcoming Events
@@ -112,7 +112,7 @@ const UpcomingEvent = () => {
           <h2
             className={cn(
               "hidden text-2xl font-bold xs:block xs:text-3xl",
-              nunito.className,
+              bricolage.className,
             )}
           >
             Participate on Upcoming Events

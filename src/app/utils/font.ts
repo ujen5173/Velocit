@@ -1,7 +1,9 @@
 import {
+  Bricolage_Grotesque,
   Chakra_Petch,
-  Inter,
+  Lato,
   Merienda,
+  Nunito,
   Playfair_Display,
 } from "next/font/google";
 
@@ -14,11 +16,28 @@ export const playfair = Playfair_Display({
   preload: true,
 });
 
-export const nunito = Inter({
-  weight: ["400", "500", "700", "300"],
+export const lato = Lato({
+  weight: ["400", "700", "900", "100", "300"],
   style: "normal",
   display: "swap",
-  variable: "--nunito",
+  variable: "--lato",
+  subsets: ["latin"],
+  preload: true,
+});
+export const nunito = Nunito({
+  weight: ["400", "700", "900", "500", "600", "200", "300"],
+  style: "normal",
+  display: "swap",
+  variable: "--lato",
+  subsets: ["latin"],
+  preload: true,
+});
+
+export const bricolage = Bricolage_Grotesque({
+  weight: ["400", "500", "700", "300", "200", "600", "800"],
+  style: "normal",
+  display: "swap",
+  variable: "--bricolage",
   subsets: ["latin"],
   preload: true,
 });

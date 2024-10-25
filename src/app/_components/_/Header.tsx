@@ -4,6 +4,7 @@ import { ArrowRight, Menu, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { merienda } from "~/app/utils/font";
+import { HEADER_HEIGHT } from "~/app/utils/helpers";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -27,12 +28,18 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "absolute left-0 top-0 z-50 h-20 w-full border-b",
+        "left-0 top-0 z-[160] w-full border-b",
+        pth === "/search" ? "fixed bg-white" : "absolute",
         pth === "/" ? "border-transparent" : "border-border shadow-sm",
       )}
     >
-      <div className="mx-auto flex h-20 max-w-[1440px] justify-between gap-6 px-4 py-4 md:border-none md:py-4">
-        <div className="flex flex-1 items-center space-x-6">
+      <div
+        className={cn(
+          "mx-auto flex max-w-[1440px] items-stretch justify-between gap-6 px-4 py-2 md:border-none md:py-4",
+          HEADER_HEIGHT,
+        )}
+      >
+        <div className="flex h-auto flex-1 items-center space-x-6">
           <Logo tw={cn("h-6", pth === "/" ? "fill-white" : "fill-secondary")} />
 
           <div className="hidden md:block">
@@ -95,86 +102,87 @@ const Header = () => {
                     <Logo tw="h-6 fill-pink-500" />
                   </SheetTitle>
                 </SheetHeader>
+                <div>
+                  <ul className={cn(merienda.className)}>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                      >
+                        <span>Explore</span>
+                        <ArrowRight className="text-slate-800" />
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                      >
+                        <span>Locations</span>
+                        <ArrowRight className="text-slate-800" />
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                      >
+                        <span>For Business</span>
+                        <ArrowRight className="text-slate-800" />
+                      </Link>
+                    </li>
+                  </ul>
 
-                <ul className={cn(merienda.className)}>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
-                    >
-                      <span>Explore</span>
-                      <ArrowRight className="text-slate-800" />
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
-                    >
-                      <span>Locations</span>
-                      <ArrowRight className="text-slate-800" />
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
-                    >
-                      <span>For Business</span>
-                      <ArrowRight className="text-slate-800" />
-                    </Link>
-                  </li>
-                </ul>
+                  <Separator />
 
-                <Separator />
+                  <ul className={cn("mb-10 flex-1", merienda.className)}>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-block py-2 text-base font-medium text-slate-700 hover:underline"
+                      >
+                        Reserve bicycle
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-block py-2 text-base font-medium text-slate-700 hover:underline"
+                      >
+                        Reserve Bike
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-block py-2 text-base font-medium text-slate-700 hover:underline"
+                      >
+                        Reserve Scooter
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/"
+                        className="inline-block py-2 text-base font-medium text-slate-700 hover:underline"
+                      >
+                        <span>Reserve Car</span>
+                      </Link>
+                    </li>
+                  </ul>
 
-                <ul className={cn("mb-10 flex-1", merienda.className)}>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-block py-2 text-xl font-semibold text-slate-700 hover:underline"
-                    >
-                      Reserve bicycle
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-block py-2 text-xl font-semibold text-slate-700 hover:underline"
-                    >
-                      Reserve Bike
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-block py-2 text-xl font-semibold text-slate-700 hover:underline"
-                    >
-                      Reserve Scooter
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="inline-block py-2 text-xl font-semibold text-slate-700 hover:underline"
-                    >
-                      <span>Reserve Car</span>
-                    </Link>
-                  </li>
-                </ul>
-
-                <div className="space-y-2">
-                  <LoginButton>
-                    <Button
-                      className="w-full text-sm uppercase"
-                      variant={"outline"}
-                    >
-                      Login / Sign up
+                  <div className="space-y-2">
+                    <LoginButton>
+                      <Button
+                        className="w-full text-sm uppercase"
+                        variant={"outline"}
+                      >
+                        Login / Sign up
+                      </Button>
+                    </LoginButton>
+                    <Button className="w-full uppercase" variant={"primary"}>
+                      Start Renting
                     </Button>
-                  </LoginButton>
-                  <Button className="w-full uppercase" variant={"primary"}>
-                    Start Renting
-                  </Button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

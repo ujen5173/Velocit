@@ -33,7 +33,7 @@ export const siteConfig = {
     "Velocit offers convenient and affordable rentals for cycles, bikes, scooters, and cars. Book your perfect ride instantly for daily commutes, weekend adventures, or city exploration. Experience hassle-free mobility with Velocit.",
   tagline: "Your go-to for quick, easy, and affordable vehicle rentals",
   links,
-  url: "https://velocit.vercel.app",
+  url: getBaseUrl(),
   ogImage: links.openGraphImage,
   author: "ujen5173",
   keywords: [
@@ -60,7 +60,7 @@ export const siteConfig = {
 export function constructMetadata({
   title = siteConfig.title,
   description = siteConfig.description,
-  image = `${getBaseUrl()}/logo.svg`,
+  image = `${getBaseUrl()}/favicon.ico`,
   icons = [
     {
       rel: "apple-touch-icon",

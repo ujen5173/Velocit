@@ -24,9 +24,13 @@
     --destructive-foreground: 356 100% 97%;
     --border: 213 27% 84%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --ring: 333 71% 51%;
     --radius: 0.7rem;
   }
+}
+
+a {
+  outline: none;
 }
 
 @layer base {
