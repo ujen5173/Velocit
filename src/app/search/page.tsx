@@ -1,26 +1,15 @@
 "use client";
 
-import { Dot, MapIcon, MapPin, Star } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { MapIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
-import {
-  Carousel,
-  type CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "~/components/ui/carousel";
-import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
 import { type Slide } from "../_components/_/ShopsAround";
-import { bricolage, chakra_petch } from "../utils/font";
-import { HEADER_HEIGHT } from "../utils/helpers";
+import VendorCard from "../_components/_/VendorCard";
+import { chakra_petch } from "../utils/font";
 import MapArea from "./_components/MapArea";
 
-const searchedData: Slide[] = [
+export const searchedData: Slide[] = [
   {
     name: "Mountain Biker's Haven",
     rating: 4.8,
@@ -344,7 +333,6 @@ const searchedData: Slide[] = [
 ];
 
 const Search = () => {
-  const [api, setApi] = useState<CarouselApi | undefined>();
   const [showingArea, setShowingArea] = useState<"places" | "map" | "both">(
     "places",
   );
@@ -366,7 +354,7 @@ const Search = () => {
 
   return (
     <>
-      <div className={HEADER_HEIGHT}></div>
+      <div className={"h-16 md:h-20"}></div>
       <section className="relative w-full">
         <div className="fixed bottom-4 left-1/2 z-[100] block -translate-x-1/2 lg:hidden">
           <Button
@@ -396,7 +384,7 @@ const Search = () => {
             <div className="mb-2">
               <span
                 className={cn(
-                  "text-base font-medium text-foreground",
+                  "text-lg font-medium text-foreground",
                   chakra_petch.className,
                 )}
               >
@@ -409,7 +397,12 @@ const Search = () => {
                   className={cn("relative", chakra_petch.className)}
                   key={shop.slug}
                 >
-                  <div className={"relative"}>
+                  <VendorCard
+                    shop={shop}
+                    separatorColor="bg-slate-200"
+                    separatorHeight="h-[3px]"
+                  />
+                  {/* <div className={"relative"}>
                     <Carousel setApi={setApi} className="w-full">
                       <CarouselPrevious />
                       <CarouselNext />
@@ -480,7 +473,7 @@ const Search = () => {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </Link> */}
                 </div>
               ))}
             </div>

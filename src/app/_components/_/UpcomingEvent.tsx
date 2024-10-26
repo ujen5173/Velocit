@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Dot,
-  IndianRupee,
-  MapPin,
-  Users,
-} from "lucide-react";
-import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
@@ -20,8 +11,9 @@ import {
   CarouselItem,
 } from "~/components/ui/carousel";
 import { cn } from "~/lib/utils";
+import EventCard from "./EventCard";
 
-type Slide = {
+export type EventSlide = {
   thumbnail: string;
   title: string;
   hostedBy: string;
@@ -32,7 +24,7 @@ type Slide = {
   maxParticipants: number;
 };
 
-const slides: Slide[] = [
+const slides: EventSlide[] = [
   {
     thumbnail: "/images/events/img-event-2.webp",
     title: "Mountain Bike Ride to Sarangkot",
@@ -154,54 +146,7 @@ const UpcomingEvent = () => {
                   key={index}
                   className="basis-full space-y-4 xs:basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
-                  <div className="relative">
-                    <Image
-                      width={800}
-                      height={800}
-                      className="pointer-events-none aspect-[4/3] h-full rounded-md object-cover"
-                      src={event.thumbnail}
-                      alt={`${event.thumbnail}, ${event.meetinglocation}`}
-                    />
-                  </div>
-
-                  <div className="">
-                    <h1 className="mb-2 line-clamp-1 text-lg font-medium text-slate-800">
-                      {event.title}
-                    </h1>
-
-                    <div className="mb-4 flex items-center">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={18} className="text-slate-600" />
-                        <span className="text-sm text-foreground">
-                          {event.date}
-                        </span>
-                      </div>
-                      <Dot size={20} className="text-slate-600" />
-                      <div className="flex items-center gap-1">
-                        <MapPin size={18} className="text-slate-600" />
-                        <span className="line-clamp-1 text-sm text-foreground">
-                          {event.meetinglocation}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mb-4 flex items-center">
-                      <div className="flex items-center gap-1">
-                        <Users size={18} className="text-slate-600" />
-                        <span className="text-sm text-foreground">
-                          {event.participants}
-                        </span>
-                      </div>
-                      <Dot size={20} className="text-slate-600" />
-                      <div className="flex items-center gap-1">
-                        <IndianRupee size={18} className="text-slate-600" />
-
-                        <span className="text-sm text-foreground">
-                          {event.entryFee}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <EventCard event={event} />
                 </CarouselItem>
               ))}
             </CarouselContent>

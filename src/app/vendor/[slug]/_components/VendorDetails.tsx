@@ -497,10 +497,7 @@ const VendorDetails = () => {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    className="w-full border-secondary text-secondary"
-                    variant={"outline"}
-                  >
+                  <Button className="w-full" variant={"outline-secondary"}>
                     <Heart size={16} className="mr-2" />
                     Add to Favroite
                   </Button>

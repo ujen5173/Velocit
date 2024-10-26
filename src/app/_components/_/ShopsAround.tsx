@@ -1,8 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Dot, MapPin, Star } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
@@ -11,11 +9,9 @@ import {
   type CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "~/components/ui/carousel";
-import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
+import VendorCard from "./VendorCard";
 
 export interface Slide {
   name: string;
@@ -120,7 +116,10 @@ const ShopsAround = () => {
       <div className="mx-auto max-w-[1200px] px-4 py-16">
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2
-            className={cn("text-2xl font-bold xs:text-3xl", bricolage.className)}
+            className={cn(
+              "text-2xl font-bold xs:text-3xl",
+              bricolage.className,
+            )}
           >
             Popular Shops
           </h2>
@@ -158,74 +157,7 @@ const ShopsAround = () => {
                   key={index}
                   className="basis-full space-y-4 xs:basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
-                  <div className="relative">
-                    <Carousel className="w-full">
-                      <CarouselPrevious />
-                      <CarouselNext />
-                      <CarouselContent className="">
-                        {shop.images.map((image, index) => (
-                          <CarouselItem key={index} className="relative pt-2">
-                            <Image
-                              onClick={() => {
-                                api?.scrollTo(index);
-                              }}
-                              alt={`${shop.name}'s Images`}
-                              width={450}
-                              height={450}
-                              layout="fixed"
-                              className="aspect-[4/3] cursor-pointer rounded-md object-cover"
-                              key={index}
-                              src={image}
-                            />
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                    </Carousel>
-                  </div>
-
-                  <Link href={`/vendor/${shop.slug}`}>
-                    <div className="py-4">
-                      <h1 className="mb-2 line-clamp-1 text-lg font-medium">
-                        {shop.name}
-                      </h1>
-                      <div className="select-none">
-                        <div className="mb-4 flex flex-wrap items-center">
-                          <div className="flex items-center gap-1">
-                            <Star
-                              size={18}
-                              className="fill-yellow-500 stroke-yellow-500"
-                            />
-                            <span className="text-sm">{shop.rating}</span>
-                          </div>
-                          <Dot size={18} />
-                          <div className="flex items-center gap-1">
-                            <MapPin size={18} />
-                            <span className="text-sm">{shop.address}</span>
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="mb-1 text-sm uppercase">
-                            Starting At
-                          </h4>
-                          <h1
-                            className={cn(
-                              "text-2xl font-semibold",
-                              bricolage.className,
-                            )}
-                          >
-                            रु {shop.perDay.bicycle}{" "}
-                            <span className="text-base font-normal">/day</span>
-                          </h1>
-                        </div>
-                        <Separator className="mt-4 h-1 bg-pink-500" />
-                        <div className="py-2">
-                          <span className="text-sm">
-                            {shop.satisfiedCustomers}+ satisfied customers
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  <VendorCard shop={shop} />
                 </CarouselItem>
               ))}
             </CarouselContent>

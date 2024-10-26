@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { HEADER_HEIGHT } from "~/app/utils/helpers";
 import { Button } from "~/components/ui/button";
 import Accessories from "./_components/Accessories";
 import Faqs from "./_components/Faqs";
@@ -33,7 +32,7 @@ const VendorPage = () => {
 
   return (
     <>
-      <div className={HEADER_HEIGHT}></div>
+      <div className={"h-16 md:h-20"}></div>
 
       {/* For shopping... */}
 

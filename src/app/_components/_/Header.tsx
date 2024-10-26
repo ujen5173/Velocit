@@ -4,7 +4,6 @@ import { ArrowRight, Menu, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { merienda } from "~/app/utils/font";
-import { HEADER_HEIGHT } from "~/app/utils/helpers";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -29,14 +28,13 @@ const Header = () => {
     <header
       className={cn(
         "left-0 top-0 z-[160] w-full border-b",
-        pth === "/search" ? "fixed bg-white" : "absolute",
-        pth === "/" ? "border-transparent" : "border-border shadow-sm",
+        pth === "/search" ? "fixed" : "absolute",
+        pth === "/" ? "border-transparent" : "border-border bg-white shadow-sm",
       )}
     >
       <div
         className={cn(
           "mx-auto flex max-w-[1440px] items-stretch justify-between gap-6 px-4 py-2 md:border-none md:py-4",
-          HEADER_HEIGHT,
         )}
       >
         <div className="flex h-auto flex-1 items-center space-x-6">

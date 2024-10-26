@@ -42,11 +42,11 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                     chakra_petch.className,
                   )}
                 >
-                  Join the community
+                  Welcome Back to Velocit
                 </h1>
                 <p className="text-center text-base text-slate-600">
-                  Where early adopters and innovation seekers find lively,
-                  imaginative tech before it hits the mainstream.
+                  Log in to rent or list vehicles for rent. Convenient rentals,
+                  all in one place.
                 </p>
               </div>
               <Button
