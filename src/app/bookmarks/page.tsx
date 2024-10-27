@@ -1,8 +1,8 @@
 "use client";
 
+import { searchedData } from "~/lib/data";
 import { cn } from "~/lib/utils";
 import VendorCard from "../_components/_/VendorCard";
-import { searchedData } from "../search/page";
 import { bricolage } from "../utils/font";
 
 const Bookmarks = () => {

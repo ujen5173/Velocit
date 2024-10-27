@@ -4,8 +4,8 @@ import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
 import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
+import { vendorDetail, vendorVehicles } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import { vendorDetail, vendorVehicles } from "~/types";
 
 const Vehicles = () => {
   return (

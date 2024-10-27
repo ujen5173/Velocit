@@ -11,7 +11,7 @@ import {
 } from "~/components/ui/carousel";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
-import { type Slide } from "./ShopsAround";
+import { type Slide } from "~/types";
 
 type Props = {
   shop: Slide;

@@ -15,6 +15,13 @@
       "when": 1728208574675,
       "tag": "0001_fuzzy_smiling_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1729963123060,
+      "tag": "0002_damp_silver_surfer",
+      "breakpoints": true
     }
   ]
 }

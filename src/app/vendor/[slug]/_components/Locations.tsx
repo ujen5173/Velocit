@@ -8,8 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import { vendorDetail } from "~/types";
 
 const Locations = () => {
   return (

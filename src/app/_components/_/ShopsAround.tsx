@@ -10,96 +10,16 @@ import {
   CarouselContent,
   CarouselItem,
 } from "~/components/ui/carousel";
+import { slides } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import { api as trpc } from "~/trpc/react";
 import VendorCard from "./VendorCard";
 
-export interface Slide {
-  name: string;
-  rating: number;
-  slug: string;
-  perDay: {
-    bicycle: number;
-  };
-  satisfiedCustomers: number;
-  address: string;
-  images: string[];
-  lonlat?: [number, number];
-}
-
-const slides: Slide[] = [
-  {
-    name: "Bike Farm Nepal",
-    slug: "bike-farm-nepal",
-    rating: 4.5,
-    perDay: {
-      bicycle: 100,
-    },
-    satisfiedCustomers: 200,
-    address: "Kathmandu, Nepal",
-    images: [
-      "/images/shops/img1.jpg",
-      "/images/shops/img3.jpg",
-      "/images/shops/img2.jpg",
-      "/images/shops/img4.jpg",
-    ],
-  },
-  {
-    name: "Epic Mountain Bike",
-    slug: "epic-mountian-bike",
-    rating: 4.8,
-    perDay: {
-      bicycle: 120,
-    },
-    satisfiedCustomers: 350,
-    address: "Pokhara, Nepal",
-    images: [
-      "/images/shops/img2.jpg",
-      "/images/shops/img1.jpg",
-      "/images/shops/img4.jpg",
-      "/images/shops/img3.jpg",
-    ],
-  },
-  {
-    name: "Saddle Bike Store",
-    slug: "saddle-bike-store",
-    rating: 4.3,
-    perDay: {
-      bicycle: 110,
-    },
-    satisfiedCustomers: 180,
-    address: "Bhaktapur, Nepal",
-    images: ["/images/shops/img1.jpg", "/images/shops/img3.jpg"],
-  },
-  {
-    name: "Himalayan Single Track",
-    slug: "himalayan-single-track",
-    rating: 4.7,
-    perDay: {
-      bicycle: 150,
-    },
-    satisfiedCustomers: 400,
-    address: "Kathmandu, Nepal",
-    images: ["/images/shops/img4.jpg"],
-  },
-  {
-    name: "B.B Cycle Center",
-    slug: "bb-cycle-center",
-    rating: 4.5,
-    perDay: {
-      bicycle: 100,
-    },
-    satisfiedCustomers: 200,
-    address: "Kathmandu, Nepal",
-    images: [
-      "/images/shops/img1.jpg",
-      "/images/shops/img3.jpg",
-      "/images/shops/img2.jpg",
-      "/images/shops/img4.jpg",
-    ],
-  },
-];
-
 const ShopsAround = () => {
+  const { data } = trpc.business.getPopularShops.useQuery(undefined, {
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
   const [api, setApi] = useState<CarouselApi | undefined>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);

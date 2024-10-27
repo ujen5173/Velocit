@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  decimal,
   index,
   integer,
   jsonb,
@@ -45,30 +46,22 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "refunded",
 ]);
 
-// Tables
+// Optimized users table
 export const users = createTable(
   "user",
   {
-    id: varchar("id", { length: 255 })
+    id: varchar("id", { length: 36 })
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    name: varchar("name", { length: 255 }),
-    email: varchar("email", { length: 255 }).notNull(),
-    emailVerified: timestamp("email_verified", {
-      mode: "date",
-      withTimezone: true,
-    }),
+    name: varchar("name", { length: 100 }),
+    email: varchar("email", { length: 100 }).notNull(),
+    emailVerified: timestamp("email_verified", { mode: "date" }),
     image: varchar("image", { length: 255 }),
     role: userRoleEnum("role").notNull().default("USER"),
-    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`)
-      .$onUpdate(() => new Date()),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     emailIdx: uniqueIndex("user_email_idx").on(table.email),
@@ -76,18 +69,18 @@ export const users = createTable(
   }),
 );
 
-// rental shop
+// Optimized businesses table
 export const businesses = createTable(
   "business",
   {
-    id: varchar("id", { length: 255 })
+    id: varchar("id", { length: 36 })
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    ownerId: varchar("owner_id", { length: 255 })
+    ownerId: varchar("owner_id", { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    name: varchar("name", { length: 256 }).notNull(),
+    name: varchar("name", { length: 100 }).notNull(),
     description: text("description"),
     location: jsonb("location").notNull(),
     phoneNumbers: varchar("phone_numbers", { length: 20 })
@@ -95,7 +88,7 @@ export const businesses = createTable(
       .notNull()
       .default(sql`'{}'::varchar[]`),
     businessHours: jsonb("business_hours").notNull(),
-    rating: integer("rating").default(0),
+    rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
     ratingCount: integer("rating_count").default(0),
     bannerImage: text("banner_image"),
     logoImage: text("logo_image"),
@@ -103,37 +96,34 @@ export const businesses = createTable(
       .array()
       .default(sql`'{}'::text[]`),
     longRidesAvailable: boolean("long_rides_available").notNull().default(true),
-    stripeAccountId: varchar("stripe_account_id", { length: 255 }),
+    stripeAccountId: varchar("stripe_account_id", { length: 100 }),
     features: jsonb("features").default(sql`'{}'::jsonb`),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`)
-      .$onUpdate(() => new Date()),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     nameIdx: index("business_name_idx").on(table.name),
     ownerIdx: index("business_owner_idx").on(table.ownerId),
     locationIdx: index("business_location_idx").on(table.location),
+    ratingIdx: index("business_rating_idx").on(table.rating, table.ratingCount),
   }),
 );
 
+// Optimized vehicles table with availability tracking
 export const vehicles = createTable(
   "vehicle",
   {
-    id: varchar("id", { length: 255 })
+    id: varchar("id", { length: 36 })
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    businessId: varchar("business_id", { length: 255 })
+    businessId: varchar("business_id", { length: 36 })
       .notNull()
       .references(() => businesses.id, { onDelete: "cascade" }),
-    name: varchar("name", { length: 256 }).notNull(),
+    name: varchar("name", { length: 100 }).notNull(),
     type: vehicleTypeEnum("type").notNull(),
-    make: varchar("make", { length: 100 }),
-    model: varchar("model", { length: 100 }),
+    make: varchar("make", { length: 50 }),
+    model: varchar("model", { length: 50 }),
     year: integer("year"),
     images: text("images")
       .array()
@@ -143,56 +133,55 @@ export const vehicles = createTable(
     currency: varchar("currency", { length: 3 }).notNull().default("USD"),
     discountedPrice: integer("discounted_price"),
     isAvailable: boolean("is_available").notNull().default(true),
+    // New availability tracking fields
+    lastMaintenanceDate: timestamp("last_maintenance_date"),
+    nextMaintenanceDate: timestamp("next_maintenance_date"),
+    currentRentalId: varchar("current_rental_id", { length: 36 }),
+    availabilitySchedule: jsonb("availability_schedule").default(
+      sql`'{}'::jsonb`,
+    ),
+    currentLocation: jsonb("current_location"),
+    mileage: integer("mileage").default(0),
+    status: varchar("status", { length: 20 }).notNull().default("available"),
     features: jsonb("features").default(sql`'{}'::jsonb`),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`)
-      .$onUpdate(() => new Date()),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     businessIdx: index("vehicle_business_idx").on(table.businessId),
     typeIdx: index("vehicle_type_idx").on(table.type),
-    availabilityIdx: index("vehicle_availability_idx").on(table.isAvailable),
+    availabilityIdx: index("vehicle_availability_idx").on(
+      table.isAvailable,
+      table.status,
+      table.businessId,
+    ),
+    locationIdx: index("vehicle_location_idx").on(table.currentLocation),
   }),
 );
 
-// a vehicle is rented by a user
+// Optimized rentals table
 export const rentals = createTable(
   "rental",
   {
-    id: varchar("id", { length: 255 })
+    id: varchar("id", { length: 36 })
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    userId: varchar("user_id", { length: 255 })
+    userId: varchar("user_id", { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    vehicleId: varchar("vehicle_id", { length: 255 })
+    vehicleId: varchar("vehicle_id", { length: 36 })
       .notNull()
       .references(() => vehicles.id, { onDelete: "cascade" }),
-    rentalStart: timestamp("rental_start", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-    rentalEnd: timestamp("rental_end", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
+    rentalStart: timestamp("rental_start").notNull(),
+    rentalEnd: timestamp("rental_end").notNull(),
     status: rentalStatusEnum("status").notNull().default("pending"),
     totalPrice: integer("total_price").notNull(),
     currency: varchar("currency", { length: 3 }).notNull().default("USD"),
     additionalCharges: jsonb("additional_charges").default(sql`'{}'::jsonb`),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`)
-      .$onUpdate(() => new Date()),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     userIdx: index("rental_user_idx").on(table.userId),

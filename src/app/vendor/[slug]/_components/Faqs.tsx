@@ -7,8 +7,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import { vendorDetail } from "~/types";
 
 const Faqs = () => {
   return (

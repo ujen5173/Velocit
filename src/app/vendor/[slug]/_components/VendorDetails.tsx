@@ -49,8 +49,8 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
+import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import { vendorDetail } from "~/types";
 
 const VehicleType = {
   BICYCLE: "bicycle",

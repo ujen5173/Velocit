@@ -196,7 +196,7 @@ const Footer = () => {
             <Button variant={"outline"}>रु Nepali Ruppee (NPR)</Button>
           </div>
 
-          <ul className="flex flex-wrap items-center justify-center text-sm text-slate-100 sm:flex-nowrap sm:justify-normal">
+          <ul className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-100 sm:flex-nowrap sm:justify-normal sm:gap-0">
             <li>Terms of use</li>
             <Dot className="hidden md:block" size={20} />
             <li>Privacy Policy</li>
