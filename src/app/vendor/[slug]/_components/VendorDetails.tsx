@@ -121,7 +121,7 @@ const VendorDetails = () => {
             <div className="mb-2 flex items-center">
               <Link href="/" className="block">
                 <h6 className="text-sm font-medium uppercase text-green-600 underline">
-                  {vendorDetail.location[0].address}
+                  {vendorDetail?.location[0]?.address}
                 </h6>
               </Link>
             </div>
