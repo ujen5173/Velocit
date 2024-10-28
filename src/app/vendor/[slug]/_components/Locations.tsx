@@ -13,7 +13,7 @@ import { cn } from "~/lib/utils";
 
 const Locations = () => {
   return (
-    <section className="bg-white px-4 py-10">
+    <section>
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-10">
           <h1

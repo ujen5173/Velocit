@@ -27,7 +27,7 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "left-0 top-0 z-[160] w-full border-b",
+        "left-0 top-0 z-[40] w-full border-b",
         pth === "/search" ? "fixed" : "absolute",
         pth === "/" ? "border-transparent" : "border-border bg-white shadow-sm",
       )}
@@ -51,7 +51,7 @@ const Header = () => {
             </ul>
           </div>
         </div>
-
+        {/* 
         <div className="hidden h-auto flex-1 py-[0.25rem] md:block lg:flex-[2]">
           <div className="flex h-full w-full items-center justify-center">
             <div
@@ -73,7 +73,7 @@ const Header = () => {
               />
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="flex flex-1 items-center justify-end">
           <div className="flex items-center gap-2 md:hidden">

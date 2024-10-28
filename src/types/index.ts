@@ -32,5 +32,5 @@ export interface Slide {
   satisfiedCustomers: number;
   address: string;
   images: string[];
-  lonlat?: [number, number];
+  lonlat?: number[];
 }

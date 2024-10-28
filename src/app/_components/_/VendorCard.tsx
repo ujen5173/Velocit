@@ -26,18 +26,20 @@ const VendorCard = ({ separatorHeight, separatorColor, shop }: Props) => {
         <Carousel className="w-full">
           <CarouselPrevious />
           <CarouselNext />
-          <CarouselContent className="">
+          <CarouselContent>
             {shop.images.map((image, index) => (
               <CarouselItem key={index} className="relative pt-2">
-                <Image
-                  alt={`${shop.name}'s Images`}
-                  width={450}
-                  height={450}
-                  layout="fixed"
-                  className="aspect-[4/3] cursor-pointer rounded-md object-cover"
-                  key={index}
-                  src={image}
-                />
+                <Link href={`/vendor/${shop.slug}`}>
+                  <Image
+                    alt={`${shop.name}'s Images`}
+                    width={450}
+                    height={450}
+                    layout="fixed"
+                    className="aspect-[4/3] cursor-pointer rounded-md object-cover"
+                    key={index}
+                    src={image}
+                  />
+                </Link>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -45,7 +47,7 @@ const VendorCard = ({ separatorHeight, separatorColor, shop }: Props) => {
       </div>
 
       <Link href={`/vendor/${shop.slug}`}>
-        <div className="py-4">
+        <div className="pt-4">
           <h1 className="mb-2 line-clamp-1 text-lg font-medium">{shop.name}</h1>
           <div className="select-none">
             <div className="mb-4 flex items-center">

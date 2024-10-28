@@ -5,6 +5,12 @@
 await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  compress: true,
+  swcMinify: true,
+  experimental: {
+    optimizeCss: true,
+  },
+};
 
 export default config;

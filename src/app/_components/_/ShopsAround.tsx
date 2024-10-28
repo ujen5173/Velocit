@@ -12,14 +12,9 @@ import {
 } from "~/components/ui/carousel";
 import { slides } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import { api as trpc } from "~/trpc/react";
 import VendorCard from "./VendorCard";
 
 const ShopsAround = () => {
-  const { data } = trpc.business.getPopularShops.useQuery(undefined, {
-    staleTime: 1000 * 60 * 60 * 24,
-  });
-
   const [api, setApi] = useState<CarouselApi | undefined>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -34,7 +29,7 @@ const ShopsAround = () => {
   return (
     <section className="w-full">
       <div className="mx-auto max-w-[1200px] px-4 py-16">
-        <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <h2
             className={cn(
               "text-2xl font-bold xs:text-3xl",
@@ -82,7 +77,7 @@ const ShopsAround = () => {
               ))}
             </CarouselContent>
           </Carousel>
-          <Button variant="outline">Explore all Rental Shops</Button>
+          <Button variant="outline">Explore Shops Around you</Button>
         </div>
       </div>
     </section>

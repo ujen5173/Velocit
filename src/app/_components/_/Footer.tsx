@@ -93,7 +93,7 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex w-full flex-col gap-16 sm:flex-row md:w-auto">
-              <div className="">
+              <div>
                 <h2 className="text-lg text-slate-300">Discover</h2>
                 <ul className="mt-4 flex flex-col gap-2 text-slate-100">
                   <li>
@@ -146,7 +146,7 @@ const Footer = () => {
                   </li>
                 </ul>
               </div>
-              <div className="">
+              <div>
                 <h2 className="text-lg text-slate-300">Contact</h2>
                 <ul className="mt-4 flex flex-col gap-2 text-slate-100">
                   <li>

@@ -21,6 +21,7 @@ export const env = createEnv({
 
   client: {
     NEXT_PUBLIC_APP_URL: z.string(),
+    NEXT_PUBLIC_LOCATIONIQ_API_KEY: z.string(),
   },
 
   runtimeEnv: {
@@ -31,6 +32,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_LOCATIONIQ_API_KEY: process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -1,5 +1,6 @@
 import { Calendar, Dot, IndianRupee, MapPin, Users } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { type EventSlide } from "./UpcomingEvent";
 
 type Props = {
@@ -8,8 +9,8 @@ type Props = {
 
 const EventCard = ({ event }: Props) => {
   return (
-    <div>
-      <div className="relative">
+    <Link href={`/event/${event.hostedBy}/${event.title}`}>
+      <div className="relative mb-4">
         <Image
           width={800}
           height={800}
@@ -19,7 +20,7 @@ const EventCard = ({ event }: Props) => {
         />
       </div>
 
-      <div className="">
+      <div>
         <h1 className="mb-2 line-clamp-1 text-lg font-medium text-slate-800">
           {event.title}
         </h1>
@@ -47,13 +48,13 @@ const EventCard = ({ event }: Props) => {
           </div>
           <Dot size={20} className="text-slate-600" />
           <div className="flex items-center gap-1">
-            <IndianRupee size={18} className="text-slate-600" />
+            <IndianRupee size={15} className="text-slate-600" />
 
             <span className="text-sm text-foreground">{event.entryFee}</span>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

@@ -70,7 +70,7 @@ const Accessories = () => {
                       size={16}
                       className="hidden text-foreground xs:block"
                     />
-                    <div className="">
+                    <div>
                       <span className="text-sm">
                         {vendorDetail.ratingCount * 100}+ Items Sold
                       </span>

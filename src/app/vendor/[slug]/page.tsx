@@ -4,7 +4,6 @@ import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Button } from "~/components/ui/button";
-import Accessories from "./_components/Accessories";
 import Faqs from "./_components/Faqs";
 import Locations from "./_components/Locations";
 import Vehicles from "./_components/Vehicles";
@@ -49,21 +48,18 @@ const VendorPage = () => {
             Share
           </Button>
         </motion.div>
-
         {/* Vendor Details */}
         <VendorDetails />
-
-        {/* Vehicles */}
-        <Vehicles />
-
-        {/* Accessories */}
-        <Accessories />
-
-        {/* Faqs */}
-        <Faqs />
-
-        {/* Location */}
-        <Locations />
+        <div className="[&>section:nth-child(odd)]:bg-slate-50 [&>section]:px-4 [&>section]:py-16">
+          {/* Vehicles */}
+          <Vehicles />
+          {/* Accessories */}
+          {/* <Accessories /> */}
+          {/* Faqs */}
+          <Faqs />
+          {/* Location */}
+          <Locations />
+        </div>
       </main>
     </>
   );

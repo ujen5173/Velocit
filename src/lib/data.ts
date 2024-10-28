@@ -1,6 +1,6 @@
-import { type Slide, type Vehicle } from "~/types";
+import { type ShopData } from "~/types/bookings";
 
-export const searchedData: Slide[] = [
+export const searchedData = [
   {
     name: "Mountain Biker's Haven",
     rating: 4.8,
@@ -323,7 +323,7 @@ export const searchedData: Slide[] = [
   },
 ];
 
-export const slides: Slide[] = [
+export const slides = [
   {
     name: "Bike Farm Nepal",
     slug: "bike-farm-nepal",
@@ -415,9 +415,9 @@ export const vendorDetail = {
     },
   ],
   socials: {
-    // facebook: "https://www.facebook.com/epicmountainbike",
-    // instagram: "https://www.instagram.com/epicmountainbike",
-    // twitter: "https://www.twitter.com/epicmountainbike",
+    facebook: "https://www.facebook.com/epicmountainbike",
+    instagram: "https://www.instagram.com/epicmountainbike",
+    twitter: "https://www.twitter.com/epicmountainbike",
     website: "https://www.epicmountainbike.com",
   },
   phoneNumbers: ["9812345678", "9812345679"],
@@ -494,9 +494,9 @@ export const vendorDetail = {
         "If the bike is damaged, please contact us immediately. You may be responsible for repair costs depending on the damage.",
     },
   ],
-} as const;
+};
 
-export const vendorVehicles: Vehicle[] = [
+export const vendorVehicles = [
   {
     id: "1f45a2d1-4c9b-4e8b-a348-9e15d3b2c1a2",
     type: "bicycle",
@@ -813,4 +813,122 @@ export const eventDetail = {
       lng: 85.3206,
     },
   },
+};
+
+// Mock API Data with bookings
+export const shopData: ShopData = {
+  vehicleTypes: {
+    bicycle: {
+      label: "Cycle",
+      startingPrice: 500,
+      types: [
+        {
+          name: "Mountain Bike",
+          vehicles: [
+            {
+              id: "781c0a6d-32b0-4404-95a4-1b3ce15e1838",
+              model: "Trek Marlin 7",
+              count: 3,
+              price: 800,
+            },
+            {
+              id: "d2a7925c-3c76-4eb7-924d-0efc33126e4d",
+              model: "Specialized Rockhopper",
+              count: 2,
+              price: 700,
+            },
+          ],
+        },
+        {
+          name: "Road Bike",
+          vehicles: [
+            {
+              id: "f3b8e8c0-1234-4567-89ab-cdef01234567",
+              model: "Giant Contend 1",
+              count: 4,
+              price: 600,
+            },
+            {
+              id: "a1b2c3d4-5678-90ef-ghij-klmnop123456",
+              model: "Trek Domane SL 6",
+              count: 1,
+              price: 900,
+            },
+          ],
+        },
+      ],
+    },
+    motorcycle: {
+      label: "Motorcycle",
+      startingPrice: 1500,
+      types: [
+        {
+          name: "Sport",
+          vehicles: [
+            {
+              id: "b2c3d4e5-6789-0123-4567-89abcdef0123",
+              model: "Kawasaki Ninja",
+              count: 2,
+              price: 2000,
+            },
+            {
+              id: "c3d4e5f6-7890-1234-5678-90abcdef1234",
+              model: "Honda CBR",
+              count: 3,
+              price: 1800,
+            },
+          ],
+        },
+        {
+          name: "Cruiser",
+          vehicles: [
+            {
+              id: "d4e5f6g7-8901-2345-6789-0abcdef12345",
+              model: "Harley Davidson Iron 883",
+              count: 1,
+              price: 2500,
+            },
+            {
+              id: "e5f6g7h8-9012-3456-7890-1abcdef23456",
+              model: "Royal Enfield Classic",
+              count: 4,
+              price: 1600,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  bookings: [
+    {
+      vehicleId: "781c0a6d-32b0-4404-95a4-1b3ce15e1838",
+      startDate: "2024-10-28",
+      endDate: "2024-10-29",
+      quantity: 3,
+    },
+    {
+      vehicleId: "781c0a6d-32b0-4404-95a4-1b3ce15e1838",
+      startDate: "2024-11-03",
+      endDate: "2024-11-05",
+      quantity: 3,
+    },
+    {
+      vehicleId: "781c0a6d-32b0-4404-95a4-1b3ce15e1838",
+      startDate: "2024-11-15",
+      endDate: "2024-11-20",
+      quantity: 3,
+    },
+    {
+      vehicleId: "781c0a6d-32b0-4404-95a4-1b3ce15e1838",
+      startDate: "2024-10-28",
+      endDate: "2024-10-29",
+      quantity: 3,
+    },
+    {
+      vehicleId: "d2a7925c-3c76-4eb7-924d-0efc33126e4d",
+      startDate: "2024-10-30",
+      endDate: "2024-10-31",
+      quantity: 1,
+    },
+  ],
 };

@@ -45,7 +45,7 @@ const EventPage = () => {
         </div>
 
         <div className="relative">
-          <div className="bg-slate-100 py-8 md:py-12">
+          <div className="bg-slate-50 py-8 md:py-12">
             <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 lg:flex-row lg:gap-20">
               <div className={cn("flex-1", nunito.className)}>
                 {eventDetail.details.content.map((block, index) => {
@@ -70,7 +70,7 @@ const EventPage = () => {
                   return null;
                 })}
               </div>
-              <div className="space-y-8">
+              <div className="w-full space-y-8 lg:w-96">
                 <div className="rounded-lg bg-white p-6 shadow-md">
                   <h1 className="mb-4 text-2xl font-bold">
                     Participate this event
@@ -95,7 +95,7 @@ const EventPage = () => {
                   {/* Map */}
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3119.1624748120644!2d85.3040208749192!3d27.67988217619825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1836464c6a77%3A0x17dcfae97cc9d583!2sThe%20Bike%20Farm%20Nepal!5e1!3m2!1sen!2snp!4v1729957562437!5m2!1sen!2snp"
-                    className="h-96 w-full md:h-72 lg:h-60"
+                    className="h-96 w-full md:h-72"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>

@@ -1,29 +1,114 @@
-# Create T3 App
+# 🏍️ Velocit - Modern Vehicle Rental Platform 🚲
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A full-stack vehicle rental platform that connects vendors and customers, automating the entire rental process from booking to return. The platform supports multiple vehicle types and provides real-time location-based services.
 
-## What's next? How do I make an app with this?
+## ✨ Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- **Multi-vendor Platform**
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+  - Vendors can create and manage their rental shops
+  - Complete inventory management system
+  - Real-time booking tracking
+  - Analytics dashboard
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- **Customer Features**
+  - Location-based shop discovery
+  - Multiple vehicle categories (Cycles, E-cycles, Bikes, E-bikes, Cars)
+  - Seamless booking process
+  - Secure payment integration
+  - Real-time vehicle tracking
+  - Rating and review system
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- [Next.js 14](https://nextjs.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [tRPC](https://trpc.io/)
+- [Drizzle ORM](https://orm.drizzle.team/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [NextAuth.js](https://next-auth.js.org/)
+- [UploadThing](https://uploadthing.com/)
+- [Google Maps API](https://developers.google.com/maps)
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## 📝 Prerequisites
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- Node.js 18+
+- PostgreSQL
+- Google Maps API key
+- UploadThing account
+- bun
 
-## How do I deploy this?
+## 🚀 Getting Started
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/ujen5173/velocit.git
+cd Velocit
+```
+
+2. **Install dependencies**
+
+```bash
+bun install
+```
+
+3. **Set up environment variables**
+
+```bash
+cp .env.example .env
+```
+
+4. **Set up the database**
+
+```bash
+bun db:push
+```
+
+5. **Run the development server**
+
+```bash
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 🤝 Contributing
+
+We love your input! We want to make contributing to Velocit as easy and transparent as possible. Please follow these steps:
+
+1. Fork the repo and create your branch from `main`.
+
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+
+2. Commit your changes following [Conventional Commits](https://www.conventionalcommits.org/):
+
+   ```bash
+   git commit -m "feat: add amazing feature"
+   ```
+
+3. Push to your branch:
+
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+
+4. Open a Pull Request!
+
+### Contribution Guidelines
+
+- Follow the existing code style and conventions
+- Write clear, descriptive commit messages
+- Update documentation as needed
+- Ensure your PR solves a specific issue or adds value
+
+## 📞 Get in touch
+
+For contact, email ujenbasi1122@gmail.com.
+
+---
+
+Made with ❤️ for a change in society.
