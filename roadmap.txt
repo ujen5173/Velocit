@@ -1,1 +1,13 @@
- 
+- role setting
+  - signin as vendor -> redirect -> /setup-vendor [BUSINESS PROFILE SETUP]
+    - /setup-vendor 
+      - redirect to /vendor/profile if already setup from the database
+  - signin as normal user -> redirect -> / 
+- settings
+- bookmarks
+- accessories page (shop gear page)
+- business profile
+- orders
+- get google map -> [TEMPORARY] -> react-leaflet
+- dashboard
+- change location api

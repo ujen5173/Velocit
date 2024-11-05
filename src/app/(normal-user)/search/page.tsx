@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { searchedData } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import VendorCard from "../_components/_/VendorCard";
-import { chakra_petch } from "../utils/font";
+import VendorCard from "../../_components/_/VendorCard";
+import { chakra_petch } from "../../utils/font";
 import MapArea from "./_components/MapArea";
 
 const Search = () => {

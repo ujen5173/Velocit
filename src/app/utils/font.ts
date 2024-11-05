@@ -1,6 +1,6 @@
 import {
+  Bitter,
   Bricolage_Grotesque,
-  Chakra_Petch,
   Lato,
   Merienda,
   Nunito,
@@ -42,7 +42,7 @@ export const bricolage = Bricolage_Grotesque({
   preload: true,
 });
 
-export const chakra_petch = Chakra_Petch({
+export const chakra_petch = Bitter({
   weight: ["400", "500", "700"],
   style: "normal",
   display: "swap",
@@ -50,6 +50,14 @@ export const chakra_petch = Chakra_Petch({
   subsets: ["latin"],
   preload: true,
 });
+// export const chakra_petch = Chakra_Petch({
+//   weight: ["400", "500", "700"],
+//   style: "normal",
+//   display: "swap",
+//   variable: "--chakra-petch",
+//   subsets: ["latin"],
+//   preload: true,
+// });
 
 export const merienda = Merienda({
   weight: ["400", "700"],

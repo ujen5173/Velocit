@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1728046888816,
-      "tag": "0000_equal_gideon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1728208574675,
-      "tag": "0001_fuzzy_smiling_tiger",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1729963123060,
-      "tag": "0002_damp_silver_surfer",
+      "when": 1730830303987,
+      "tag": "0000_little_the_hand",
       "breakpoints": true
     }
   ]

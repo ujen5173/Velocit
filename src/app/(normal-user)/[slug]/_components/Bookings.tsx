@@ -1,3 +1,4 @@
+"use client";
 import { differenceInDays, format } from "date-fns";
 import { CalendarDays, CircleCheck, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
@@ -29,6 +30,7 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
+import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { shopData } from "~/lib/data";
 import { cn } from "~/lib/utils";
 import { type Vehicle } from "~/types/bookings";
@@ -39,7 +41,10 @@ interface BookingsProps {
 }
 
 const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
-  const [selectedVehicleType, setSelectedVehicleType] = useState<string>("");
+  console.log({ vt: shopData.vehicleTypes });
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string>(
+    Object.keys(shopData.vehicleTypes)[0]!,
+  );
   const [selectedVehicleSubType, setSelectedVehicleSubType] =
     useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -194,6 +199,7 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
     const availableCount = getAvailableQuantity(vehicle.id, date.from, date.to);
     return `(${availableCount} available)`;
   };
+  const { width } = useWindowDimensions();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -213,30 +219,32 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                   <Label>Vehicle Type</Label>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-5 px-1 sm:grid-cols-3">
                     {Object.entries(shopData.vehicleTypes).map(
-                      ([type, data]) => (
-                        <div
-                          key={type}
-                          className={`relative cursor-pointer rounded-md bg-[#f1f0f5] p-4 text-slate-800 transition-all hover:bg-slate-200 ${
-                            selectedVehicleType === type
-                              ? "ring-2 ring-secondary"
-                              : ""
-                          }`}
-                          onClick={() => {
-                            setSelectedVehicleType(type);
-                            setSelectedVehicleSubType("");
-                            setSelectedModel("");
-                            setDate(undefined);
-                            setQuantity(1);
-                          }}
-                        >
-                          <span className="text-sm font-medium">
-                            {data.label}
-                          </span>
-                          <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
-                            From ${data.startingPrice}
+                      ([type, data]) => {
+                        return (
+                          <div
+                            key={type}
+                            className={`relative cursor-pointer rounded-md bg-[#f1f0f5] p-4 text-slate-800 transition-all hover:bg-slate-200 ${
+                              selectedVehicleType === type
+                                ? "ring-2 ring-secondary"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedVehicleType(type);
+                              setSelectedVehicleSubType("");
+                              setSelectedModel("");
+                              setDate(undefined);
+                              setQuantity(1);
+                            }}
+                          >
+                            <span className="text-sm font-medium">
+                              {data.label}
+                            </span>
+                            <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
+                              From ${data.startingPrice}
+                            </div>
                           </div>
-                        </div>
-                      ),
+                        );
+                      },
                     )}
                   </div>
                 </div>
@@ -290,8 +298,6 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                   </div>
                 )}
 
-                {/* Rest of the component remains the same until the quantity section */}
-
                 <div className="space-y-2 px-1">
                   <Label>Pick up Date</Label>
                   <Popover>
@@ -341,10 +347,9 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                         showOutsideDays={false}
                         onSelect={(newDate) => {
                           setDate(newDate);
-                          // Reset quantity when date changes to ensure it's within new limits
                           setQuantity(1);
                         }}
-                        numberOfMonths={2}
+                        numberOfMonths={width < 640 ? 1 : 2}
                         classNames={{
                           cell: "relative w-[36px] p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
                           head_cell: "font-normal text-sm w-[36px]",
@@ -377,13 +382,15 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 <div className="space-y-2 px-1">
                   <Label>Number of Vehicles</Label>
                   <div className="flex w-min items-center gap-2">
-                    <button
-                      className="flex size-6 items-center justify-center rounded-full bg-slate-400"
+                    <Button
+                      variant={"outline"}
+                      size={"icon"}
+                      className="flex size-6 items-center justify-center rounded-full border-slate-400 bg-slate-400 hover:bg-slate-300"
                       onClick={() => handleQuantityChange("decrement")}
                       disabled={quantity <= 1}
                     >
                       <Minus size={18} className="text-white" />
-                    </button>
+                    </Button>
                     <div className="w-20">
                       <Input
                         type="text"
@@ -391,25 +398,22 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                         inputMode="numeric"
                         min="1"
                         max={getMaxAllowedQuantity()}
+                        readOnly
+                        disabled={!!date}
                         value={quantity}
-                        onChange={(e) => {
-                          const newQuantity = parseInt(e.target.value) || 1;
-                          const maxQuantity = getMaxAllowedQuantity();
-                          setQuantity(
-                            Math.min(Math.max(1, newQuantity), maxQuantity),
-                          );
-                        }}
                         className="h-10 text-center"
                       />
                     </div>
 
-                    <button
-                      className="flex size-6 items-center justify-center rounded-full bg-slate-700"
+                    <Button
+                      variant={"outline"}
+                      size={"icon"}
+                      className="flex size-6 items-center justify-center rounded-full border-slate-700 bg-slate-700 hover:bg-slate-600"
                       onClick={() => handleQuantityChange("increment")}
                       disabled={quantity >= getMaxAllowedQuantity()}
                     >
                       <Plus size={18} className="text-white" />
-                    </button>
+                    </Button>
                   </div>
                   {date?.from && date?.to && (
                     <p className="text-sm text-muted-foreground">
@@ -452,10 +456,13 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
             </ScrollArea>
 
             <div className="flex w-full items-center justify-between gap-4">
-              <div className="text-lg font-semibold">
-                Total: ${getSelectedVehiclePrice()}
+              <div className="flex flex-wrap gap-1 text-lg font-semibold">
+                <span className="text-nowrap">
+                  Total: ${getSelectedVehiclePrice()}
+                </span>
+
                 {date?.from && date?.to && (
-                  <span className="ml-2 text-sm text-gray-500">
+                  <span className="text-nowrap text-sm text-gray-500">
                     for {getRentalDays()} days
                   </span>
                 )}
@@ -497,7 +504,7 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 </p>
               </div>
 
-              <div className="w-full space-y-2 rounded-lg border p-4">
+              <div className="w-full space-y-2 rounded-md border p-4">
                 <div className="flex justify-between">
                   <span>Vehicle:</span>
                   <span className="font-medium">{selectedModel}</span>
@@ -531,21 +538,17 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 className="rounded-lg object-contain"
                 priority
               />
+
+              {/* Dropzone */}
             </div>
 
             <div className="w-full space-y-4">
               <div className="space-y-2">
                 <Label>Upload Payment Screenshot</Label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="cursor-pointer leading-[2.5]"
-                />
               </div>
 
               <div className="flex justify-end gap-4">
-                <Button variant="secondary" onClick={() => setShowQR(false)}>
+                <Button variant="outline" onClick={() => setShowQR(false)}>
                   Back
                 </Button>
                 <Button

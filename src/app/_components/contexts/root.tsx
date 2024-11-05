@@ -1,6 +1,7 @@
 "use client";
 
 import { type User } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 import { type ReactNode, createContext } from "react";
 import Footer from "../_/Footer";
 import Header from "../_/Header";
@@ -15,13 +16,13 @@ export const Context = createContext<RootContextProps>({
 
 const RootContext = ({ children }: { children: ReactNode }) => {
   return (
-    <Context.Provider value={{ user: null }}>
-      <>
+    <SessionProvider>
+      <Context.Provider value={{ user: null }}>
         <Header />
         {children}
         <Footer />
-      </>
-    </Context.Provider>
+      </Context.Provider>
+    </SessionProvider>
   );
 };
 

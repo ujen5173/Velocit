@@ -1,10 +1,19 @@
 "use client";
 
 import { ArrowRight, Menu, Search } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { merienda } from "~/app/utils/font";
 import { Button, buttonVariants } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { Separator } from "~/components/ui/separator";
 import {
   Sheet,
@@ -18,10 +27,12 @@ import Logo from "~/svg/logo";
 import LoginButton from "./LoginButton";
 
 const Header = () => {
+  const { data } = useSession();
+
   const pth = usePathname();
   const theme =
     pth === "/"
-      ? "text-slate-100 hover:text-slate-200"
+      ? "text-slate-700 hover:text-slate-600 sm:text-slate-100 sm:hover:text-slate-200"
       : "text-slate-800 hover:text-slate-700";
 
   return (
@@ -38,7 +49,12 @@ const Header = () => {
         )}
       >
         <div className="flex h-auto flex-1 items-center space-x-6">
-          <Logo tw={cn("h-6", pth === "/" ? "fill-white" : "fill-secondary")} />
+          <Logo
+            tw={cn(
+              "h-6",
+              pth === "/" ? "fill-secondary sm:fill-white" : "fill-secondary",
+            )}
+          />
 
           <div className="hidden md:block">
             <ul className="flex items-center">
@@ -51,29 +67,6 @@ const Header = () => {
             </ul>
           </div>
         </div>
-        {/* 
-        <div className="hidden h-auto flex-1 py-[0.25rem] md:block lg:flex-[2]">
-          <div className="flex h-full w-full items-center justify-center">
-            <div
-              className={cn(
-                "flex h-full w-full max-w-44 items-center rounded-md px-3 backdrop-blur-sm md:max-w-60 lg:max-w-80",
-                pth === "/" ? "bg-white/30" : "bg-slate-900/10",
-              )}
-            >
-              <Search size={18} className={theme} />
-              <input
-                type="text"
-                className={cn(
-                  pth === "/"
-                    ? "text-slate-100 placeholder:text-slate-100"
-                    : "text-slate-800 placeholder-slate-800",
-                  "h-full w-full bg-transparent px-2 text-sm outline-none",
-                )}
-                placeholder="Search rentals..."
-              />
-            </div>
-          </div>
-        </div> */}
 
         <div className="flex flex-1 items-center justify-end">
           <div className="flex items-center gap-2 md:hidden">
@@ -100,12 +93,12 @@ const Header = () => {
                     <Logo tw="h-6 fill-pink-500" />
                   </SheetTitle>
                 </SheetHeader>
-                <div>
-                  <ul className={cn(merienda.className)}>
+                <div className="flex h-full flex-col">
+                  <ul className="pb-5">
                     <li>
                       <Link
                         href="/"
-                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                        className="inline-flex w-full items-center justify-between py-2 text-base font-medium text-slate-800 hover:underline"
                       >
                         <span>Explore</span>
                         <ArrowRight className="text-slate-800" />
@@ -114,7 +107,7 @@ const Header = () => {
                     <li>
                       <Link
                         href="/"
-                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                        className="inline-flex w-full items-center justify-between py-2 text-base font-medium text-slate-800 hover:underline"
                       >
                         <span>Locations</span>
                         <ArrowRight className="text-slate-800" />
@@ -123,7 +116,7 @@ const Header = () => {
                     <li>
                       <Link
                         href="/"
-                        className="inline-flex w-full items-center justify-between py-2 text-xl font-semibold text-slate-800 hover:underline"
+                        className="inline-flex w-full items-center justify-between py-2 text-base font-medium text-slate-800 hover:underline"
                       >
                         <span>For Business</span>
                         <ArrowRight className="text-slate-800" />
@@ -133,7 +126,7 @@ const Header = () => {
 
                   <Separator />
 
-                  <ul className={cn("mb-10 flex-1", merienda.className)}>
+                  <ul className={cn("mb-10 flex-1 py-5")}>
                     <li>
                       <Link
                         href="/"
@@ -176,10 +169,7 @@ const Header = () => {
                       >
                         Login / Sign up
                       </Button>
-                    </LoginButton>
-                    <Button className="w-full uppercase" variant={"primary"}>
-                      Start Renting
-                    </Button>
+                    </LoginButton>{" "}
                   </div>
                 </div>
               </SheetContent>
@@ -188,24 +178,95 @@ const Header = () => {
 
           <div className="hidden items-center md:flex">
             <div className="px-4">
-              <LoginButton>
-                <button
-                  className={cn(
-                    theme,
-                    "whitespace-nowrap text-sm font-medium hover:underline",
-                  )}
-                >
-                  Login / Sign up
-                </button>
-              </LoginButton>
+              {data ? (
+                data.user.role === "VENDOR" ? (
+                  <div className="flex items-center gap-2">
+                    <Link href="/dashboard">
+                      <Button variant={"outline"} size="sm">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Image
+                          src={data.user.image!}
+                          alt={data.user.name!}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        <div>
+                          <DropdownMenuLabel className="flex flex-col">
+                            <div className="">
+                              <span>{data.user.name}</span>
+                            </div>
+                            <div className="">
+                              <span className="text-xs">{data.user.email}</span>
+                            </div>
+                          </DropdownMenuLabel>
+                        </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Business Profile</DropdownMenuItem>
+                        <DropdownMenuItem>Analytics</DropdownMenuItem>
+                        <DropdownMenuItem>Orders</DropdownMenuItem>
+                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => {
+                            void signOut();
+                          }}
+                        >
+                          Log out
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Image
+                          src={data.user.image!}
+                          alt={data.user.name!}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        <div>
+                          <DropdownMenuLabel>
+                            <div className="flex items-center justify-between">
+                              <span>{data.user.name}</span>
+                            </div>
+                          </DropdownMenuLabel>
+                        </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        <DropdownMenuItem>Bookmarks</DropdownMenuItem>
+                        <DropdownMenuItem>Orders</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => {
+                            void signOut();
+                          }}
+                        >
+                          Log out
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )
+              ) : (
+                <LoginButton>
+                  <Button className={cn(theme)} variant={"outline-primary"}>
+                    Start Renting
+                  </Button>
+                </LoginButton>
+              )}
             </div>
-
-            <Button
-              variant={pth === "/" ? "outline-primary" : "primary"}
-              className={"text-slate-100"}
-            >
-              Start Renting
-            </Button>
           </div>
         </div>
       </div>

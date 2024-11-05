@@ -1,6 +1,11 @@
+import { TRPCError } from "@trpc/server";
 import { and, desc, ilike, sql } from "drizzle-orm";
-import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { z, ZodError } from "zod";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { businesses, vehicles } from "~/server/db/schema";
 
 // Helper function to calculate distance using Haversine formula
@@ -32,13 +37,10 @@ export const businessRouter = createTRPCRouter({
       .select({
         id: businesses.id,
         name: businesses.name,
-        description: businesses.description,
         location: businesses.location,
         rating: businesses.rating,
         ratingCount: businesses.ratingCount,
-        bannerImage: businesses.bannerImage,
-        logoImage: businesses.logoImage,
-        features: businesses.features,
+        logo: businesses.logo,
       })
       .from(businesses)
       .where(
@@ -75,13 +77,10 @@ export const businessRouter = createTRPCRouter({
         .select({
           id: businesses.id,
           name: businesses.name,
-          description: businesses.description,
           location: businesses.location,
           rating: businesses.rating,
           ratingCount: businesses.ratingCount,
-          bannerImage: businesses.bannerImage,
-          logoImage: businesses.logoImage,
-          features: businesses.features,
+          logo: businesses.logo,
           availableVehicles: sql<number>`(
             SELECT COUNT(*)::integer 
             FROM VehicleRental_vehicle v 
@@ -165,13 +164,10 @@ export const businessRouter = createTRPCRouter({
         .select({
           id: businesses.id,
           name: businesses.name,
-          description: businesses.description,
           location: businesses.location,
           rating: businesses.rating,
           ratingCount: businesses.ratingCount,
-          bannerImage: businesses.bannerImage,
-          logoImage: businesses.logoImage,
-          features: businesses.features,
+          logo: businesses.logo,
           availableVehicles: sql<number>`(
             SELECT COUNT(*)::integer 
             FROM VehicleRental_vehicle v 
@@ -210,6 +206,64 @@ export const businessRouter = createTRPCRouter({
         .select()
         .from(vehicles)
         .where(sql`${vehicles.id} = ANY(${input.ids})`);
+    }),
+
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        location: z.object({
+          latitude: z.number(),
+          longitude: z.number(),
+          address: z.string(),
+          map: z.string(),
+        }),
+        phoneNumbers: z.string().array(),
+        businessHours: z.record(z.string(), z.set(z.string()).size(2)),
+        availableVehicleTypes: z.array(
+          z.enum([
+            "bike",
+            "e-bike",
+            "scooter",
+            "e-scooter",
+            "car",
+            "e-car",
+            "others",
+          ]),
+        ),
+        logo: z.string(),
+        images: z.string().array(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const business = await ctx.db.insert(businesses).values({
+          name: input.name,
+          location: input.location,
+          phoneNumbers: input.phoneNumbers,
+          businessHours: input.businessHours,
+          availableVehicleTypes: input.availableVehicleTypes,
+          logo: input.logo,
+          images: input.images,
+          ownerId: ctx.session.user.id,
+        });
+
+        return business;
+      } catch (error) {
+        // check for zod error, trpc error, database error, etc.
+        if (error instanceof TRPCError) {
+          throw error;
+        } else if (error instanceof ZodError) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid input",
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Unknown error",
+        });
+      }
     }),
 });
 

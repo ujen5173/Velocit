@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { CalendarDays, MapPin } from "lucide-react";
+import { Bike, CalendarDays, Car, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -34,6 +34,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { env } from "~/env";
+import useWindowDimensions from "~/hooks/useWindowDimensions";
+import { Icons } from "~/lib/Icons";
 import { cn } from "~/lib/utils";
 
 type Location = {
@@ -59,6 +61,8 @@ type Location = {
 };
 
 const HeroSection = () => {
+  const { width } = useWindowDimensions();
+
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -96,26 +100,29 @@ const HeroSection = () => {
     retry: 1,
   });
 
-  console.log({ locations });
-
   return (
-    <section className="relative w-full">
+    <section
+      className={cn(
+        "relative w-full",
+        "h-[70vh] max-h-[1240px] min-h-[650px] w-full object-cover",
+      )}
+    >
       <div className="overlay" />
       <Image
         src={"/main-bg-2.jpg"}
         alt="Background Main Image"
         width={1920}
-        priority
         height={1080}
         layout="cover"
         className="h-[70vh] max-h-[1240px] min-h-[650px] w-full object-cover"
+        priority
       />
 
-      <div className="absolute inset-0 flex h-full w-full items-end">
+      <div className="absolute inset-0 flex h-full w-full items-end bg-[#7b7c7d08] sm:bg-transparent">
         <div className="mx-auto max-w-[1440px] px-4 pb-10 pt-16 xs:py-16">
           <h1
             className={cn(
-              "mb-10 text-4xl font-semibold text-slate-100 md:text-5xl lg:text-6xl",
+              "mb-5 text-4xl font-semibold text-slate-900 sm:text-slate-100 md:mb-10 md:text-5xl lg:text-6xl",
               chakra_petch.className,
             )}
           >
@@ -130,11 +137,11 @@ const HeroSection = () => {
                 <button
                   aria-expanded={open}
                   className={cn(
-                    "flex h-12 w-full flex-1 items-center gap-2 bg-slate-100/20 text-slate-100 md:max-w-80",
-                    "rounded-lg bg-slate-100/20 px-4 py-3 text-base text-slate-100 outline-none placeholder:text-slate-100 md:max-w-80",
+                    "flex h-12 w-full flex-1 items-center gap-2 bg-slate-900/20 text-slate-900 sm:bg-slate-100/20 sm:text-slate-100 md:max-w-80",
+                    "rounded-lg bg-slate-900/20 px-4 py-3 text-base text-slate-900 outline-none placeholder:text-slate-900 sm:bg-slate-100/20 sm:text-slate-100 placeholder:sm:text-slate-100 md:max-w-80",
                   )}
                 >
-                  <MapPin className="h-4 w-4 shrink-0 text-slate-100" />
+                  <MapPin className="h-4 w-4 shrink-0 text-slate-900 sm:text-slate-100" />
                   <span className="line-clamp-1 w-full text-left">
                     {selectedLocation || "Search locations..."}
                   </span>
@@ -177,12 +184,15 @@ const HeroSection = () => {
               <PopoverTrigger asChild>
                 <button
                   className={cn(
-                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-100/20 px-4 py-3 text-base text-slate-100 outline-none placeholder:text-slate-100 md:max-w-80",
+                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-900/20 px-4 py-3 text-base text-slate-900 outline-none placeholder:text-slate-900 sm:bg-slate-100/20 sm:text-slate-100 sm:placeholder:sm:text-slate-100 md:max-w-80",
                     `justify-between px-4 ${!date && "text-muted-foreground"}`,
                   )}
                 >
-                  <div className="flex items-center gap-2 text-slate-100">
-                    <CalendarDays size={18} className="text-slate-100" />
+                  <div className="flex items-center gap-2 text-slate-900 sm:text-slate-100">
+                    <CalendarDays
+                      size={18}
+                      className="text-slate-900 sm:text-slate-100"
+                    />
                     <span className="line-clamp-1 w-full text-left">
                       {date?.from ? (
                         date.to ? (
@@ -216,7 +226,7 @@ const HeroSection = () => {
                   onSelect={(newDate) => {
                     setDate(newDate);
                   }}
-                  numberOfMonths={2}
+                  numberOfMonths={width < 640 ? 1 : 2}
                   classNames={{
                     cell: "relative w-9 p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
                     head_cell: "font-normal text-sm w-9",
@@ -234,20 +244,45 @@ const HeroSection = () => {
             <Select onValueChange={(value) => setVehicleType(value)}>
               <SelectTrigger
                 className={cn(
-                  "h-12 w-full flex-1 border-none bg-slate-100/20 text-base text-slate-100 md:max-w-80",
+                  "h-12 w-full flex-1 border-none bg-slate-900/20 text-base text-slate-900 sm:bg-slate-100/20 sm:text-slate-100 md:max-w-80",
                   "focus:ring-0 focus-visible:ring-0",
                 )}
               >
-                <SelectValue placeholder="Select Vehicle Type" />
+                <div className="flex items-center gap-2">
+                  <SelectValue
+                    placeholder="Select Vehicle Type"
+                    className="text-slate-900 sm:text-slate-100"
+                  />
+                </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
+                <SelectGroup className="text-slate-900">
                   <SelectLabel>Vehicle Type</SelectLabel>
                   <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="bicycle">Bicycle</SelectItem>
-                  <SelectItem value="bike">Bike</SelectItem>
-                  <SelectItem value="scooter">Scooter</SelectItem>
-                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="bicycle">
+                    <div className="flex items-center gap-1">
+                      <Bike className="h-4 w-4 shrink-0 text-inherit" />
+                      Bicycle
+                    </div>
+                  </SelectItem>
+                  <SelectItem className="flex items-center gap-1" value="bike">
+                    <div className="flex items-center gap-1">
+                      <Icons.bike className="h-4 w-4 shrink-0 text-inherit" />
+                      Bike
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="scooter">
+                    <div className="flex items-center gap-1">
+                      <Icons.scooter className="h-4 w-4 shrink-0 text-inherit" />
+                      Scooter
+                    </div>
+                  </SelectItem>
+                  <SelectItem className="flex items-center gap-1" value="car">
+                    <div className="flex items-center gap-1">
+                      <Car className="h-4 w-4 shrink-0 text-inherit" />
+                      Car
+                    </div>
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

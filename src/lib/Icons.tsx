@@ -21,4 +21,88 @@ export const Icons = {
       ></path>
     </svg>
   ),
+  bike: (props: LucideProps) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      {...props}
+      fill="none"
+      data-src="https://cdn.hugeicons.com/icons/motorbike-02-stroke-standard.svg"
+      role="img"
+    >
+      <path
+        d="M20.2343 7.86957C21.5158 9.42897 21.961 10.9117 21.9989 11.6957C21.3288 11.3893 20.5765 11.2174 19.7816 11.2174C17.3364 11.2174 14.4995 13 14.4995 16H9.49947C9.49947 13 7 11 4 11L2 9.66597V8L10.0038 9.66597L10.9732 9.10614C12.2615 8.22518 14.3032 7.39305 16.3384 8.12822L17.5 8.5L20.2343 7.86957ZM20.2343 7.86957C19.431 6.89211 18.2992 5.88452 16.7331 5"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <circle
+        cx="19.5"
+        cy="16.5"
+        r="2.5"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></circle>
+      <circle
+        cx="4.5"
+        cy="16.5"
+        r="2.5"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></circle>
+    </svg>
+  ),
+  scooter: (props: LucideProps) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      data-src="https://cdn.hugeicons.com/icons/scooter-02-stroke-standard.svg"
+      role="img"
+    >
+      <path
+        d="M2 16C2 12.8182 4.23858 11 7 11C9.76142 11 12 12.8182 12 16H2Z"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <path
+        d="M5 8H9"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <path
+        d="M10 16C10 17.6569 8.65685 19 7 19C5.34315 19 4 17.6569 4 16"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <circle
+        cx="20"
+        cy="17"
+        r="2"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></circle>
+      <path
+        d="M16 8C17.3333 8.63768 20 11.1739 20 15M16 8L19 8C19 7.06812 19 6.60218 18.8478 6.23463C18.6448 5.74458 18.2554 5.35523 17.7654 5.15224C17.3978 5 16.9285 5 15.9899 5M16 8L15.9899 8M15.9899 8C15.9899 9.91304 15.7776 16 12 16H18M15.9899 8V5M15.9899 5H13.5"
+        stroke="#000000"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+  ),
 };

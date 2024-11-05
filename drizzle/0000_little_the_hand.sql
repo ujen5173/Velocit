@@ -11,7 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."user_role" AS ENUM('user', 'shop_owner', 'admin');
+ CREATE TYPE "public"."user_role" AS ENUM('USER', 'VENDOR');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -38,28 +38,26 @@ CREATE TABLE IF NOT EXISTS "VehicleRental_account" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_business" (
-	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"owner_id" varchar(255) NOT NULL,
-	"name" varchar(256) NOT NULL,
-	"description" text,
+	"id" varchar(36) PRIMARY KEY NOT NULL,
+	"owner_id" varchar(36) NOT NULL,
+	"name" varchar(100) NOT NULL,
 	"location" jsonb NOT NULL,
 	"phone_numbers" varchar(20)[] DEFAULT '{}'::varchar[] NOT NULL,
 	"business_hours" jsonb NOT NULL,
-	"rating" integer DEFAULT 0,
+	"rating" numeric(3, 2) DEFAULT '0',
 	"rating_count" integer DEFAULT 0,
-	"banner_image" text,
-	"logo_image" text,
+	"available_vehicle_types" vehicle_type[] DEFAULT '{}'::vehicle_type[],
+	"logo" text,
 	"shop_images" text[] DEFAULT '{}'::text[],
-	"long_rides_available" boolean DEFAULT true NOT NULL,
-	"stripe_account_id" varchar(255),
-	"features" jsonb DEFAULT '{}'::jsonb,
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+	"rental_accessories" varchar(100)[] DEFAULT '{}'::varchar[],
+	"stripe_account_id" varchar(100),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_faq" (
 	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"business_id" varchar(255) NOT NULL,
+	"business_id" varchar(36) NOT NULL,
 	"question" text NOT NULL,
 	"answer" text NOT NULL,
 	"order" integer DEFAULT 0 NOT NULL,
@@ -83,30 +81,19 @@ CREATE TABLE IF NOT EXISTS "VehicleRental_payment" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_rental" (
-	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"user_id" varchar(255) NOT NULL,
-	"vehicle_id" varchar(255) NOT NULL,
-	"rental_start" timestamp with time zone NOT NULL,
-	"rental_end" timestamp with time zone NOT NULL,
+	"id" varchar(36) PRIMARY KEY NOT NULL,
+	"user_id" varchar(36) NOT NULL,
+	"vehicle_id" varchar(36) NOT NULL,
+	"business_id" varchar(36) NOT NULL,
+	"rental_start" timestamp NOT NULL,
+	"rental_end" timestamp NOT NULL,
+	"number_of_vehicles" integer DEFAULT 1 NOT NULL,
 	"status" "rental_status" DEFAULT 'pending' NOT NULL,
 	"total_price" integer NOT NULL,
-	"currency" varchar(3) DEFAULT 'USD' NOT NULL,
-	"additional_charges" jsonb DEFAULT '{}'::jsonb,
 	"notes" text,
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "VehicleRental_review" (
-	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"user_id" varchar(255) NOT NULL,
-	"business_id" varchar(255) NOT NULL,
-	"rental_id" varchar(255) NOT NULL,
-	"rating" integer NOT NULL,
-	"comment" text,
-	"response" text,
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+	"payment_screenshot" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_session" (
@@ -116,33 +103,36 @@ CREATE TABLE IF NOT EXISTS "VehicleRental_session" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_user" (
-	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"name" varchar(255),
-	"email" varchar(255) NOT NULL,
-	"email_verified" timestamp with time zone,
-	"profile_url" varchar(255),
-	"role" "user_role" DEFAULT 'user' NOT NULL,
-	"stripe_customer_id" varchar(255),
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+	"id" varchar(36) PRIMARY KEY NOT NULL,
+	"name" varchar(100),
+	"email" varchar(100) NOT NULL,
+	"email_verified" timestamp,
+	"image" varchar(255),
+	"role" "user_role" DEFAULT 'USER',
+	"deleted" boolean DEFAULT false,
+	"vendor_setup_complete" boolean DEFAULT false,
+	"stripe_customer_id" varchar(100),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_vehicle" (
-	"id" varchar(255) PRIMARY KEY NOT NULL,
-	"business_id" varchar(255) NOT NULL,
-	"name" varchar(256) NOT NULL,
+	"id" varchar(36) PRIMARY KEY NOT NULL,
+	"business_id" varchar(36) NOT NULL,
+	"name" varchar(100) NOT NULL,
 	"type" "vehicle_type" NOT NULL,
-	"make" varchar(100),
-	"model" varchar(100),
-	"year" integer,
 	"images" text[] DEFAULT '{}'::text[] NOT NULL,
 	"base_price" integer NOT NULL,
-	"currency" varchar(3) DEFAULT 'USD' NOT NULL,
+	"number_of_vehicles" integer DEFAULT 1 NOT NULL,
 	"discounted_price" integer,
-	"is_available" boolean DEFAULT true NOT NULL,
+	"long_rides_available" boolean DEFAULT true NOT NULL,
+	"unavailability_dates" timestamp[] DEFAULT '{}'::timestamp[] NOT NULL,
+	"mileage" integer DEFAULT 0,
+	"model" varchar(100) NOT NULL,
+	"year" integer NOT NULL,
 	"features" jsonb DEFAULT '{}'::jsonb,
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "VehicleRental_verification_token" (
@@ -195,19 +185,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "VehicleRental_review" ADD CONSTRAINT "VehicleRental_review_user_id_VehicleRental_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."VehicleRental_user"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "VehicleRental_review" ADD CONSTRAINT "VehicleRental_review_business_id_VehicleRental_business_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."VehicleRental_business"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "VehicleRental_review" ADD CONSTRAINT "VehicleRental_review_rental_id_VehicleRental_rental_id_fk" FOREIGN KEY ("rental_id") REFERENCES "public"."VehicleRental_rental"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "VehicleRental_rental" ADD CONSTRAINT "VehicleRental_rental_business_id_VehicleRental_business_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."VehicleRental_business"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -228,6 +206,7 @@ CREATE INDEX IF NOT EXISTS "account_user_id_idx" ON "VehicleRental_account" USIN
 CREATE INDEX IF NOT EXISTS "business_name_idx" ON "VehicleRental_business" USING btree ("name");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "business_owner_idx" ON "VehicleRental_business" USING btree ("owner_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "business_location_idx" ON "VehicleRental_business" USING btree ("location");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "business_rating_idx" ON "VehicleRental_business" USING btree ("rating","rating_count");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "faq_business_idx" ON "VehicleRental_faq" USING btree ("business_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "faq_order_idx" ON "VehicleRental_faq" USING btree ("order");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "payment_rental_idx" ON "VehicleRental_payment" USING btree ("rental_id");--> statement-breakpoint
@@ -235,15 +214,11 @@ CREATE INDEX IF NOT EXISTS "payment_user_idx" ON "VehicleRental_payment" USING b
 CREATE INDEX IF NOT EXISTS "payment_status_idx" ON "VehicleRental_payment" USING btree ("status");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "rental_user_idx" ON "VehicleRental_rental" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "rental_vehicle_idx" ON "VehicleRental_rental" USING btree ("vehicle_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "rental_business_idx" ON "VehicleRental_rental" USING btree ("business_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "rental_status_idx" ON "VehicleRental_rental" USING btree ("status");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "rental_date_range_idx" ON "VehicleRental_rental" USING btree ("rental_start","rental_end");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "review_user_idx" ON "VehicleRental_review" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "review_business_idx" ON "VehicleRental_review" USING btree ("business_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "review_rental_idx" ON "VehicleRental_review" USING btree ("rental_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "review_rating_idx" ON "VehicleRental_review" USING btree ("rating");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "session_user_id_idx" ON "VehicleRental_session" USING btree ("user_id");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "user_email_idx" ON "VehicleRental_user" USING btree ("email");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "user_role_idx" ON "VehicleRental_user" USING btree ("role");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "vehicle_business_idx" ON "VehicleRental_vehicle" USING btree ("business_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "vehicle_type_idx" ON "VehicleRental_vehicle" USING btree ("type");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "vehicle_availability_idx" ON "VehicleRental_vehicle" USING btree ("is_available");
+CREATE INDEX IF NOT EXISTS "vehicle_type_idx" ON "VehicleRental_vehicle" USING btree ("type");

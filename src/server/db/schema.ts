@@ -15,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
-export const createTable = pgTableCreator((name) => `VehicleRental_${name}`);
+export const createTable = pgTableCreator((name) => `${name}`);
 
 // Enums
 export const vehicleTypeEnum = pgEnum("vehicle_type", [
@@ -58,7 +58,9 @@ export const users = createTable(
     email: varchar("email", { length: 100 }).notNull(),
     emailVerified: timestamp("email_verified", { mode: "date" }),
     image: varchar("image", { length: 255 }),
-    role: userRoleEnum("role").notNull().default("USER"),
+    role: userRoleEnum("role").default("USER"),
+    deleted: boolean("deleted").default(false),
+    vendorSetupComplete: boolean("vendor_setup_complete").default(false),
     stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -81,7 +83,6 @@ export const businesses = createTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
-    description: text("description"),
     location: jsonb("location").notNull(),
     phoneNumbers: varchar("phone_numbers", { length: 20 })
       .array()
@@ -90,14 +91,17 @@ export const businesses = createTable(
     businessHours: jsonb("business_hours").notNull(),
     rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
     ratingCount: integer("rating_count").default(0),
-    bannerImage: text("banner_image"),
-    logoImage: text("logo_image"),
-    shopImages: text("shop_images")
+    availableVehicleTypes: vehicleTypeEnum("available_vehicle_types")
+      .array()
+      .default(sql`'{}'::vehicle_type[]`),
+    logo: text("logo"),
+    images: text("shop_images")
       .array()
       .default(sql`'{}'::text[]`),
-    longRidesAvailable: boolean("long_rides_available").notNull().default(true),
+    rentalAccessories: varchar("rental_accessories", { length: 100 })
+      .array()
+      .default(sql`'{}'::varchar[]`),
     stripeAccountId: varchar("stripe_account_id", { length: 100 }),
-    features: jsonb("features").default(sql`'{}'::jsonb`),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -122,27 +126,24 @@ export const vehicles = createTable(
       .references(() => businesses.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
     type: vehicleTypeEnum("type").notNull(),
-    make: varchar("make", { length: 50 }),
-    model: varchar("model", { length: 50 }),
-    year: integer("year"),
     images: text("images")
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
     basePrice: integer("base_price").notNull(),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    numberOfVehicles: integer("number_of_vehicles").notNull().default(1),
     discountedPrice: integer("discounted_price"),
-    isAvailable: boolean("is_available").notNull().default(true),
-    // New availability tracking fields
-    lastMaintenanceDate: timestamp("last_maintenance_date"),
-    nextMaintenanceDate: timestamp("next_maintenance_date"),
-    currentRentalId: varchar("current_rental_id", { length: 36 }),
-    availabilitySchedule: jsonb("availability_schedule").default(
-      sql`'{}'::jsonb`,
-    ),
-    currentLocation: jsonb("current_location"),
+    longRidesAvailable: boolean("long_rides_available").notNull().default(true),
+    unavailabilityDates: timestamp("unavailability_dates", {
+      mode: "date",
+    })
+      .array()
+      .notNull()
+      .default(sql`'{}'::timestamp[]`),
+
     mileage: integer("mileage").default(0),
-    status: varchar("status", { length: 20 }).notNull().default("available"),
+    model: varchar("model", { length: 100 }).notNull(),
+    year: integer("year").notNull(),
     features: jsonb("features").default(sql`'{}'::jsonb`),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -150,16 +151,8 @@ export const vehicles = createTable(
   (table) => ({
     businessIdx: index("vehicle_business_idx").on(table.businessId),
     typeIdx: index("vehicle_type_idx").on(table.type),
-    availabilityIdx: index("vehicle_availability_idx").on(
-      table.isAvailable,
-      table.status,
-      table.businessId,
-    ),
-    locationIdx: index("vehicle_location_idx").on(table.currentLocation),
   }),
 );
-
-// Optimized rentals table
 export const rentals = createTable(
   "rental",
   {
@@ -173,19 +166,23 @@ export const rentals = createTable(
     vehicleId: varchar("vehicle_id", { length: 36 })
       .notNull()
       .references(() => vehicles.id, { onDelete: "cascade" }),
+    businessId: varchar("business_id", { length: 36 }) // Add this field
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
     rentalStart: timestamp("rental_start").notNull(),
     rentalEnd: timestamp("rental_end").notNull(),
+    numberOfVehicles: integer("number_of_vehicles").notNull().default(1),
     status: rentalStatusEnum("status").notNull().default("pending"),
     totalPrice: integer("total_price").notNull(),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
-    additionalCharges: jsonb("additional_charges").default(sql`'{}'::jsonb`),
     notes: text("notes"),
+    paymentScreenshot: text("payment_screenshot"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     userIdx: index("rental_user_idx").on(table.userId),
     vehicleIdx: index("rental_vehicle_idx").on(table.vehicleId),
+    businessIdx: index("rental_business_idx").on(table.businessId), // Add this index
     statusIdx: index("rental_status_idx").on(table.status),
     dateRangeIdx: index("rental_date_range_idx").on(
       table.rentalStart,
@@ -229,41 +226,6 @@ export const payments = createTable(
   }),
 );
 
-export const reviews = createTable(
-  "review",
-  {
-    id: varchar("id", { length: 255 })
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    businessId: varchar("business_id", { length: 255 })
-      .notNull()
-      .references(() => businesses.id, { onDelete: "cascade" }),
-    rentalId: varchar("rental_id", { length: 255 })
-      .notNull()
-      .references(() => rentals.id, { onDelete: "cascade" }),
-    rating: integer("rating").notNull(),
-    comment: text("comment"),
-    response: text("response"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`)
-      .$onUpdate(() => new Date()),
-  },
-  (table) => ({
-    userIdx: index("review_user_idx").on(table.userId),
-    businessIdx: index("review_business_idx").on(table.businessId),
-    rentalIdx: index("review_rental_idx").on(table.rentalId),
-    ratingIdx: index("review_rating_idx").on(table.rating),
-  }),
-);
-
 export const faq = createTable(
   "faq",
   {
@@ -271,7 +233,7 @@ export const faq = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    businessId: varchar("business_id", { length: 255 })
+    businessId: varchar("business_id", { length: 36 }) // Changed length to match businesses table
       .notNull()
       .references(() => businesses.id, { onDelete: "cascade" }),
     question: text("question").notNull(),
@@ -360,7 +322,6 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   rentals: many(rentals),
-  reviews: many(reviews),
   business: one(businesses, {
     fields: [users.id],
     references: [businesses.ownerId],
@@ -372,7 +333,6 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
   faqs: many(faq),
   vehicles: many(vehicles),
   rentals: many(rentals),
-  reviews: many(reviews),
 }));
 
 export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
@@ -389,8 +349,11 @@ export const rentalsRelations = relations(rentals, ({ one, many }) => ({
     fields: [rentals.vehicleId],
     references: [vehicles.id],
   }),
+  business: one(businesses, {
+    fields: [rentals.businessId],
+    references: [businesses.id],
+  }), // add this
   payments: many(payments),
-  review: one(reviews),
 }));
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
@@ -399,18 +362,6 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
     references: [rentals.id],
   }),
   user: one(users, { fields: [payments.userId], references: [users.id] }),
-}));
-
-export const reviewsRelations = relations(reviews, ({ one }) => ({
-  user: one(users, { fields: [reviews.userId], references: [users.id] }),
-  business: one(businesses, {
-    fields: [reviews.businessId],
-    references: [businesses.id],
-  }),
-  rental: one(rentals, {
-    fields: [reviews.rentalId],
-    references: [rentals.id],
-  }),
 }));
 
 export const faqRelations = relations(faq, ({ one }) => ({

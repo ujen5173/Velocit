@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
@@ -15,6 +16,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { Icons } from "~/lib/Icons";
 import { cn } from "~/lib/utils";
@@ -25,14 +27,6 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="py-12 sm:max-w-[655px]">
         <Tabs defaultValue="normal-user" className="min-w-[400px]">
-          {/* <TabsList className="grid h-12 w-full grid-cols-2">
-            <TabsTrigger className="h-full" value="account">
-              Normal use
-            </TabsTrigger>
-            <TabsTrigger className="h-full" value="password">
-              Business Owner
-            </TabsTrigger>
-          </TabsList> */}
           <TabsContent value="normal-user" className="py-16">
             <div className="mx-auto max-w-[455px]">
               <div className="mb-8">
@@ -42,26 +36,54 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                     chakra_petch.className,
                   )}
                 >
-                  Welcome Back to Velocit
+                  Welcome to Velocit
                 </h1>
                 <p className="text-center text-base text-slate-600">
                   Log in to rent or list vehicles for rent. Convenient rentals,
                   all in one place.
                 </p>
               </div>
-              <Button
-                className="w-full"
-                onClick={() => {
-                  void signIn("google", {
-                    callbackUrl: "/dashboard",
-                    redirect: false,
-                  });
-                }}
-                variant={"outline"}
-              >
-                <Icons.google className="mr-2 size-6" />
-                Continue with Google
-              </Button>
+              <div className="flex items-center gap-6">
+                <div className="flex flex-1 flex-col gap-2 text-center">
+                  <p className="font-medium">Normal Use</p>
+                  <Button
+                    className="w-full"
+                    onClick={async () => {
+                      await axios.post("/api/set-role", {
+                        role: "USER",
+                      });
+
+                      await signIn("google", {
+                        callbackUrl: "/",
+                      });
+                    }}
+                    variant={"outline"}
+                  >
+                    <Icons.google className="mr-2 size-6" />
+                    Continue with Google
+                  </Button>
+                </div>
+                <Separator orientation="vertical" className="h-16" />
+                <div className="flex flex-1 flex-col gap-2 text-center">
+                  <p className="font-medium">For Businesses</p>
+
+                  <Button
+                    className="w-full"
+                    onClick={async () => {
+                      await axios.post("/api/set-role", {
+                        role: "VENDOR",
+                      });
+                      await signIn("google", {
+                        callbackUrl: "/vendor-setup",
+                      });
+                    }}
+                    variant={"outline"}
+                  >
+                    <Icons.google className="mr-2 size-6" />
+                    Continue with Google
+                  </Button>
+                </div>
+              </div>
               <p className="mt-4 text-center">
                 By signing up, you agree to our{" "}
                 <Link href="/terms-and-service">

@@ -2,8 +2,8 @@
 
 import { searchedData } from "~/lib/data";
 import { cn } from "~/lib/utils";
-import VendorCard from "../_components/_/VendorCard";
-import { bricolage } from "../utils/font";
+import VendorCard from "../../_components/_/VendorCard";
+import { bricolage } from "../../utils/font";
 
 const Bookmarks = () => {
   return (
