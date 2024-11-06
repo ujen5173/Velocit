@@ -1,10 +1,6 @@
-"use client";
-
-import { ArrowRight, Menu, Search } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+import { ArrowRight, Menu } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -23,13 +19,13 @@ import {
   SheetTrigger,
 } from "~/components/ui/sheet";
 import { cn } from "~/lib/utils";
+import { getServerAuthSession } from "~/server/auth";
 import Logo from "~/svg/logo";
 import LoginButton from "./LoginButton";
 
-const Header = () => {
-  const { data } = useSession();
+const Header = async ({ pth = "/" }: { pth?: string }) => {
+  const data = await getServerAuthSession();
 
-  const pth = usePathname();
   const theme =
     pth === "/"
       ? "text-slate-700 hover:text-slate-600 sm:text-slate-100 sm:hover:text-slate-200"
@@ -70,13 +66,6 @@ const Header = () => {
 
         <div className="flex flex-1 items-center justify-end">
           <div className="flex items-center gap-2 md:hidden">
-            <Button
-              variant={"link"}
-              size="icon"
-              className="focus-visible:ring-0"
-            >
-              <Search size={24} className={cn(theme)} />
-            </Button>
             <Sheet>
               <SheetTrigger
                 className={buttonVariants({
@@ -85,7 +74,12 @@ const Header = () => {
                   className: "focus-visible:ring-0",
                 })}
               >
-                <Menu size={26} className={cn(theme)} />
+                <Menu
+                  size={26}
+                  className={cn(
+                    pth === "/" ? "text-slate-100" : "text-slate-600",
+                  )}
+                />
               </SheetTrigger>
               <SheetContent className="flex flex-col">
                 <SheetHeader>
@@ -169,13 +163,12 @@ const Header = () => {
                       >
                         Login / Sign up
                       </Button>
-                    </LoginButton>{" "}
+                    </LoginButton>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
-
           <div className="hidden items-center md:flex">
             <div className="px-4">
               {data ? (
@@ -187,36 +180,54 @@ const Header = () => {
                       </Button>
                     </Link>
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Image
-                          src={data.user.image!}
-                          alt={data.user.name!}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <span className={cn(theme, "text-sm font-semibold")}>
+                            {data.user.name}
+                          </span>
+                        </div>
+                        <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                          {data.user.image && (
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={data.user.image} />
+                              <AvatarFallback>{data.user.name}</AvatarFallback>
+                            </Avatar>
+                          )}
+                        </DropdownMenuTrigger>
+                      </div>
+                      <DropdownMenuContent align="end" className="w-56">
                         <div>
                           <DropdownMenuLabel className="flex flex-col">
                             <div className="">
-                              <span>{data.user.name}</span>
+                              <span className={cn("text-sm font-semibold")}>
+                                {data.user.name}
+                              </span>
                             </div>
                             <div className="">
-                              <span className="text-xs">{data.user.email}</span>
+                              <span className={cn("text-sm font-semibold")}>
+                                {data.user.email}
+                              </span>
                             </div>
                           </DropdownMenuLabel>
                         </div>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Business Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Analytics</DropdownMenuItem>
-                        <DropdownMenuItem>Orders</DropdownMenuItem>
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        <Link href="/vendor/profile">
+                          <DropdownMenuItem>Business Profile</DropdownMenuItem>
+                        </Link>
+                        <Link href="/vendor/analytics">
+                          <DropdownMenuItem>Analytics</DropdownMenuItem>
+                        </Link>
+                        <Link href="/vendor/orders">
+                          <DropdownMenuItem>Orders</DropdownMenuItem>
+                        </Link>
+                        <Link href="/settings">
+                          <DropdownMenuItem>Settings</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => {
-                            void signOut();
-                          }}
+                          className={cn(
+                            "hover:bg-destructive hover:text-destructive-foreground",
+                          )}
                         >
                           Log out
                         </DropdownMenuItem>
@@ -226,32 +237,56 @@ const Header = () => {
                 ) : (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Image
-                          src={data.user.image!}
-                          alt={data.user.name!}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <span className={cn(theme, "text-sm font-semibold")}>
+                            {data.user.name}
+                          </span>
+                        </div>
+                        <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                          {data.user.image && (
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={data.user.image} />
+                              <AvatarFallback className="font-semibold">
+                                {data.user.name
+                                  ?.split(" ")
+                                  .map((e) => e[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+                        </DropdownMenuTrigger>
+                      </div>
+                      <DropdownMenuContent align="end" className="w-56">
                         <div>
                           <DropdownMenuLabel>
-                            <div className="flex items-center justify-between">
-                              <span>{data.user.name}</span>
+                            <div className="">
+                              <div>
+                                <span>{data.user.name}</span>
+                              </div>
+                              <div className="">
+                                <span className="text-xs text-slate-600">
+                                  {data.user.email}
+                                </span>
+                              </div>
                             </div>
                           </DropdownMenuLabel>
                         </div>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                        <DropdownMenuItem>Bookmarks</DropdownMenuItem>
-                        <DropdownMenuItem>Orders</DropdownMenuItem>
+                        <Link href="/settings">
+                          <DropdownMenuItem>Settings</DropdownMenuItem>
+                        </Link>
+                        <Link href="/bookmarks">
+                          <DropdownMenuItem>Bookmarks</DropdownMenuItem>
+                        </Link>
+                        <Link href="/orders">
+                          <DropdownMenuItem>Orders</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => {
-                            void signOut();
-                          }}
+                          className={cn(
+                            "hover:bg-destructive hover:text-destructive-foreground",
+                          )}
                         >
                           Log out
                         </DropdownMenuItem>
@@ -261,7 +296,12 @@ const Header = () => {
                 )
               ) : (
                 <LoginButton>
-                  <Button className={cn(theme)} variant={"outline-primary"}>
+                  <Button
+                    className={cn(
+                      "font-semibold uppercase hover:sm:text-foreground",
+                    )}
+                    variant={"outline-primary"}
+                  >
                     Start Renting
                   </Button>
                 </LoginButton>

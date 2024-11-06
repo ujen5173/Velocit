@@ -42,13 +42,6 @@ a {
   }
 }
 
-.main-bg {
-  background-image: url("/main-bg-2.jpg");
-  background-position: center center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
 .overlay {
   position: absolute;
   inset: 0;
@@ -58,7 +51,11 @@ a {
       rgba(0, 0, 0, 0) 45.98%
     ),
     linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 16.41%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%);
+    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
+    url("/main-bg-1.webp");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .react-datepicker__month-container {
