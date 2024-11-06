@@ -1,12 +1,12 @@
 import "~/styles/globals.css";
 
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { type Metadata } from "next";
-import { headers } from "next/headers";
-import { env } from "~/env";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import Footer from "./_components/_/Footer";
-import Header from "./_components/_/Header";
 import TailwindIndicator from "./_components/_/TailwindIndicator";
 import AuthContext from "./_components/contexts/authContext";
 import RootContext from "./_components/contexts/root";
@@ -20,15 +20,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const url =
-    headers().get("x-url")?.replace(env.NEXT_PUBLIC_APP_URL, "") ?? "/";
-
   return (
     <html lang="en" className={`${lato.className}`}>
       <body>
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <TRPCReactProvider>
           <HydrateClient>
-            <Header pth={url} />
             <RootContext>
               <AuthContext>{children}</AuthContext>
             </RootContext>

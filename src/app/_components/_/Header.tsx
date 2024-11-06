@@ -22,6 +22,7 @@ import { cn } from "~/lib/utils";
 import { getServerAuthSession } from "~/server/auth";
 import Logo from "~/svg/logo";
 import LoginButton from "./LoginButton";
+import SignOut from "./signout";
 
 const Header = async ({ pth = "/" }: { pth?: string }) => {
   const data = await getServerAuthSession();
@@ -173,7 +174,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
             <div className="px-4">
               {data ? (
                 data.user.role === "VENDOR" ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4">
                     <Link href="/dashboard">
                       <Button variant={"outline"} size="sm">
                         Dashboard
@@ -188,7 +189,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                         </div>
                         <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                           {data.user.image && (
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10">
                               <AvatarImage src={data.user.image} />
                               <AvatarFallback>{data.user.name}</AvatarFallback>
                             </Avatar>
@@ -224,13 +225,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                           <DropdownMenuItem>Settings</DropdownMenuItem>
                         </Link>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className={cn(
-                            "hover:bg-destructive hover:text-destructive-foreground",
-                          )}
-                        >
-                          Log out
-                        </DropdownMenuItem>
+                        <SignOut />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -245,9 +240,9 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                         </div>
                         <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                           {data.user.image && (
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10">
                               <AvatarImage src={data.user.image} />
-                              <AvatarFallback className="font-semibold">
+                              <AvatarFallback className="border border-border text-xs font-semibold">
                                 {data.user.name
                                   ?.split(" ")
                                   .map((e) => e[0])
@@ -283,13 +278,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                           <DropdownMenuItem>Orders</DropdownMenuItem>
                         </Link>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className={cn(
-                            "hover:bg-destructive hover:text-destructive-foreground",
-                          )}
-                        >
-                          Log out
-                        </DropdownMenuItem>
+                        <SignOut />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -299,6 +288,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                   <Button
                     className={cn(
                       "font-semibold uppercase hover:sm:text-foreground",
+                      pth === "/" ? "text-slate-100" : "text-slate-600",
                     )}
                     variant={"outline-primary"}
                   >

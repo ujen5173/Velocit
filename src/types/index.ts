@@ -1,3 +1,5 @@
+import { type ClientUploadedFileData } from "uploadthing/types";
+
 export type VehicleType = "bicycle" | "bike" | "scooter" | "car" | "e-bike";
 
 export type VehicleUse = "rental" | "sale" | "both";
@@ -34,3 +36,5 @@ export interface Slide {
   images: string[];
   lonlat?: number[];
 }
+
+export type UploadedFile<T = unknown> = ClientUploadedFileData<T>;

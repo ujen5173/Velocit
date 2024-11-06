@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { db } from "~/server/db";
 import { users } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -12,9 +13,8 @@ export const userRouter = createTRPCRouter({
   update: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
-        email: z.string().email().optional(),
         name: z.string().min(2).optional(),
+        image: z.string().url().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -73,4 +73,14 @@ export const userRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return await ctx.db.select().from(users).where(eq(users.id, input.id));
     }),
+
+  getUserDetails: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+      });
+    } catch (err) {
+      console.log({ err });
+    }
+  }),
 });

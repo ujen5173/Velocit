@@ -26,7 +26,7 @@ declare module "next-auth" {
       role: userRoleEnum;
       email: string;
       name?: string | null;
-      profile?: string | null;
+      image?: string | null;
       vendorSetupComplete?: boolean;
       stripeCustomerId?: string | null;
     } & DefaultSession["user"];
@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
 
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, session: newData }) {
       token.id = token.sub;
       token.vendorSetupComplete =
         token.vendorSetupComplete ?? user.vendorSetupComplete ?? false;
@@ -76,18 +76,26 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      if (trigger === "update") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        token.name = newData.user.name;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        token.image = newData.user.picture;
+      }
+
       token.role = token.role ?? user.role ?? "USER";
 
       return token;
     },
 
     async session({ session, token }) {
-      // console.log({ session, token });
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id,
+          image: (token.image as string | undefined) ?? session.user.image,
           email: token.email,
           vendorSetupComplete: token.vendorSetupComplete,
           role: token.role,
