@@ -46,9 +46,14 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
         )}
       >
         <div className="flex h-auto flex-1 items-center space-x-6">
-          <Logo tw={cn("h-6", pth === "/" ? "fill-white" : "fill-secondary")} />
+          <Logo
+            tw={cn(
+              "h-6",
+              pth === "/" ? "fill-secondary md:fill-white" : "fill-secondary",
+            )}
+          />
 
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <ul className="flex items-center">
               <li className={cn(`px-2 text-sm hover:underline`, theme)}>
                 <Link href="/">Explore</Link>
@@ -57,7 +62,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                 <Link href="/">Locations</Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-1 items-center justify-end">
@@ -73,7 +78,9 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                 <Menu
                   size={26}
                   className={cn(
-                    pth === "/" ? "text-slate-100" : "text-slate-600",
+                    pth === "/"
+                      ? "text-slate-600 md:text-slate-100"
+                      : "text-slate-600",
                   )}
                 />
               </SheetTrigger>

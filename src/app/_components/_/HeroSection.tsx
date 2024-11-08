@@ -106,19 +106,25 @@ const HeroSection = () => {
         "h-[70vh] max-h-[1240px] min-h-[650px] w-full object-cover",
       )}
     >
-      <div className="overlay" />
+      <div className="overlay hidden md:block" />
+      <div className="overlay-mobile block md:hidden" />
 
       <div className="absolute inset-0 flex h-full w-full items-end bg-[#7b7c7d08] sm:bg-transparent">
-        <div className="mx-auto max-w-[1440px] px-4 pb-5 pt-16 md:py-16">
+        <div className="mx-auto w-full max-w-[1440px] px-4 pb-5 pt-10 md:py-10">
           <h1
             className={cn(
-              "mb-5 text-5xl font-semibold text-slate-100 md:mb-10 lg:text-6xl",
+              "mb-5 text-center text-5xl font-semibold text-slate-700 md:mb-7 md:text-left md:text-slate-100 lg:text-6xl",
               chakra_petch.className,
             )}
           >
-            <Balancer>
-              Rent Cycles, Cars, and Scooters from Local Shops Around You
-            </Balancer>
+            <div className="hidden md:flex">
+              <Balancer>
+                Rent Cycles, Cars, and Scooters from Local Shops Around You
+              </Balancer>
+            </div>
+            <div className="flex md:hidden">
+              <Balancer>Rent Any Vehicles Right Now Around You</Balancer>
+            </div>
           </h1>
 
           <div className="flex flex-col gap-4 md:flex-row">
@@ -127,8 +133,8 @@ const HeroSection = () => {
                 <button
                   aria-expanded={open}
                   className={cn(
-                    "sn:text-slate-100 flex h-12 w-full flex-1 items-center gap-2 bg-slate-100 text-slate-600 md:max-w-80 md:bg-slate-100/30",
-                    "rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-100 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
+                    "sn:text-slate-100 flex h-12 w-full flex-1 items-center gap-2 bg-slate-200 text-slate-600 md:max-w-80 md:bg-slate-100/30",
+                    "rounded-lg bg-slate-200 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-100 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
                   )}
                 >
                   <MapPin className="h-4 w-4 shrink-0 text-slate-600 md:text-slate-100" />
@@ -174,7 +180,7 @@ const HeroSection = () => {
               <PopoverTrigger asChild>
                 <button
                   className={cn(
-                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100 placeholder:md:text-slate-100",
+                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-200 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100 placeholder:md:text-slate-100",
                     `justify-between px-4 ${!date && "text-muted-foreground"}`,
                   )}
                 >
@@ -234,7 +240,7 @@ const HeroSection = () => {
             <Select onValueChange={(value) => setVehicleType(value)}>
               <SelectTrigger
                 className={cn(
-                  "w-full flex-1 border-none bg-slate-100 text-base text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
+                  "w-full flex-1 border-none bg-slate-200 text-base text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
                   "h-12 focus:ring-0 focus-visible:ring-0",
                 )}
               >
