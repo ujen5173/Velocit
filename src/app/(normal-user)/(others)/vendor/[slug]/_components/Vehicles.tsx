@@ -6,7 +6,6 @@ import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { vendorDetail, vendorVehicles } from "~/lib/data";
 import { cn } from "~/lib/utils";
-
 const Vehicles = () => {
   return (
     <section>

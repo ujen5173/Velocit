@@ -26,6 +26,7 @@ import SignOut from "./signout";
 
 const Header = async ({ pth = "/" }: { pth?: string }) => {
   const data = await getServerAuthSession();
+  console.log({ data });
 
   const theme =
     pth === "/"

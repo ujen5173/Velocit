@@ -270,7 +270,7 @@ export const businessRouter = createTRPCRouter({
   update: protectedProcedure
     .input(
       z.object({
-        name: z.string().min(2),
+        name: z.string().nullable(),
         location: z.object({
           map: z.string().url().optional(),
           lat: z.number().optional(),
@@ -291,7 +291,7 @@ export const businessRouter = createTRPCRouter({
         availableVehicleTypes: z
           .array(z.enum(vehicleTypeEnum.enumValues))
           .default([]),
-        logo: z.string().url(),
+        logo: z.string().url().nullable(),
         images: z.array(z.string().url()),
       }),
     )
@@ -304,7 +304,7 @@ export const businessRouter = createTRPCRouter({
           .returning();
         await ctx.db
           .update(users)
-          .set({ vendorSetupComplete: true })
+          .set({ vendor_setup_complete: null })
           .where(eq(users.id, ctx.session.user.id));
         return updatedBusiness[0];
       } catch (error) {

@@ -35,7 +35,7 @@ const WEEK_DAYS = [
 ];
 
 export const formSchema = z.object({
-  name: z.string().min(2).max(50),
+  name: z.string().nullable(),
   location: z.object({
     map: z.string().url(),
     lat: z.number(),
@@ -54,7 +54,7 @@ export const formSchema = z.object({
       .nullable(),
   ),
   availableVehicleTypes: z.array(z.enum(vehicleTypeEnum.enumValues)),
-  logo: z.string().url(),
+  logo: z.string().url().nullable(),
   images: z.array(z.string().url()),
 });
 
@@ -93,15 +93,15 @@ const BusinessProfile = ({ business }: { business: CurrentBusinessType }) => {
     try {
       await mutateAsync(result);
 
-      const res = await update({
+      await update({
         ...data,
         user: {
           ...data!.user,
-          vendorSetupComplete: data?.user.role === "VENDOR" ? true : false,
+          vendor_setup_complete: true,
         },
       });
 
-      router.push("/");
+      router.push("/dashboard");
 
       toast({
         title: "Profile updated successfully",

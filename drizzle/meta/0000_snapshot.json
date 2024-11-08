@@ -1,11 +1,11 @@
 {
-  "id": "2afd1c5e-28b4-44dd-ab99-f130557917c6",
+  "id": "cea04d20-8cde-4c6d-99ce-6012b79f4118",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.VehicleRental_account": {
-      "name": "VehicleRental_account",
+    "public.account": {
+      "name": "account",
       "schema": "",
       "columns": {
         "user_id": {
@@ -93,10 +93,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_account_user_id_VehicleRental_user_id_fk": {
-          "name": "VehicleRental_account_user_id_VehicleRental_user_id_fk",
-          "tableFrom": "VehicleRental_account",
-          "tableTo": "VehicleRental_user",
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -108,8 +108,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "VehicleRental_account_provider_provider_account_id_pk": {
-          "name": "VehicleRental_account_provider_provider_account_id_pk",
+        "account_provider_provider_account_id_pk": {
+          "name": "account_provider_provider_account_id_pk",
           "columns": [
             "provider",
             "provider_account_id"
@@ -118,8 +118,8 @@
       },
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_business": {
-      "name": "VehicleRental_business",
+    "public.business": {
+      "name": "business",
       "schema": "",
       "columns": {
         "id": {
@@ -138,13 +138,14 @@
           "name": "name",
           "type": "varchar(100)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "location": {
           "name": "location",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "phone_numbers": {
           "name": "phone_numbers",
@@ -157,7 +158,8 @@
           "name": "business_hours",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "rating": {
           "name": "rating",
@@ -177,7 +179,7 @@
           "name": "available_vehicle_types",
           "type": "vehicle_type[]",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'{}'::vehicle_type[]"
         },
         "logo": {
@@ -190,15 +192,8 @@
           "name": "shop_images",
           "type": "text[]",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'{}'::text[]"
-        },
-        "rental_accessories": {
-          "name": "rental_accessories",
-          "type": "varchar(100)[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::varchar[]"
         },
         "stripe_account_id": {
           "name": "stripe_account_id",
@@ -290,10 +285,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_business_owner_id_VehicleRental_user_id_fk": {
-          "name": "VehicleRental_business_owner_id_VehicleRental_user_id_fk",
-          "tableFrom": "VehicleRental_business",
-          "tableTo": "VehicleRental_user",
+        "business_owner_id_user_id_fk": {
+          "name": "business_owner_id_user_id_fk",
+          "tableFrom": "business",
+          "tableTo": "user",
           "columnsFrom": [
             "owner_id"
           ],
@@ -307,8 +302,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_faq": {
-      "name": "VehicleRental_faq",
+    "public.faq": {
+      "name": "faq",
       "schema": "",
       "columns": {
         "id": {
@@ -390,10 +385,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_faq_business_id_VehicleRental_business_id_fk": {
-          "name": "VehicleRental_faq_business_id_VehicleRental_business_id_fk",
-          "tableFrom": "VehicleRental_faq",
-          "tableTo": "VehicleRental_business",
+        "faq_business_id_business_id_fk": {
+          "name": "faq_business_id_business_id_fk",
+          "tableFrom": "faq",
+          "tableTo": "business",
           "columnsFrom": [
             "business_id"
           ],
@@ -407,8 +402,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_payment": {
-      "name": "VehicleRental_payment",
+    "public.payment": {
+      "name": "payment",
       "schema": "",
       "columns": {
         "id": {
@@ -538,10 +533,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_payment_rental_id_VehicleRental_rental_id_fk": {
-          "name": "VehicleRental_payment_rental_id_VehicleRental_rental_id_fk",
-          "tableFrom": "VehicleRental_payment",
-          "tableTo": "VehicleRental_rental",
+        "payment_rental_id_rental_id_fk": {
+          "name": "payment_rental_id_rental_id_fk",
+          "tableFrom": "payment",
+          "tableTo": "rental",
           "columnsFrom": [
             "rental_id"
           ],
@@ -551,10 +546,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "VehicleRental_payment_user_id_VehicleRental_user_id_fk": {
-          "name": "VehicleRental_payment_user_id_VehicleRental_user_id_fk",
-          "tableFrom": "VehicleRental_payment",
-          "tableTo": "VehicleRental_user",
+        "payment_user_id_user_id_fk": {
+          "name": "payment_user_id_user_id_fk",
+          "tableFrom": "payment",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -568,8 +563,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_rental": {
-      "name": "VehicleRental_rental",
+    "public.rental": {
+      "name": "rental",
       "schema": "",
       "columns": {
         "id": {
@@ -740,10 +735,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_rental_user_id_VehicleRental_user_id_fk": {
-          "name": "VehicleRental_rental_user_id_VehicleRental_user_id_fk",
-          "tableFrom": "VehicleRental_rental",
-          "tableTo": "VehicleRental_user",
+        "rental_user_id_user_id_fk": {
+          "name": "rental_user_id_user_id_fk",
+          "tableFrom": "rental",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -753,10 +748,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "VehicleRental_rental_vehicle_id_VehicleRental_vehicle_id_fk": {
-          "name": "VehicleRental_rental_vehicle_id_VehicleRental_vehicle_id_fk",
-          "tableFrom": "VehicleRental_rental",
-          "tableTo": "VehicleRental_vehicle",
+        "rental_vehicle_id_vehicle_id_fk": {
+          "name": "rental_vehicle_id_vehicle_id_fk",
+          "tableFrom": "rental",
+          "tableTo": "vehicle",
           "columnsFrom": [
             "vehicle_id"
           ],
@@ -766,10 +761,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "VehicleRental_rental_business_id_VehicleRental_business_id_fk": {
-          "name": "VehicleRental_rental_business_id_VehicleRental_business_id_fk",
-          "tableFrom": "VehicleRental_rental",
-          "tableTo": "VehicleRental_business",
+        "rental_business_id_business_id_fk": {
+          "name": "rental_business_id_business_id_fk",
+          "tableFrom": "rental",
+          "tableTo": "business",
           "columnsFrom": [
             "business_id"
           ],
@@ -783,8 +778,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_session": {
-      "name": "VehicleRental_session",
+    "public.session": {
+      "name": "session",
       "schema": "",
       "columns": {
         "session_token": {
@@ -824,10 +819,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_session_user_id_VehicleRental_user_id_fk": {
-          "name": "VehicleRental_session_user_id_VehicleRental_user_id_fk",
-          "tableFrom": "VehicleRental_session",
-          "tableTo": "VehicleRental_user",
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -841,8 +836,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_user": {
-      "name": "VehicleRental_user",
+    "public.user": {
+      "name": "user",
       "schema": "",
       "columns": {
         "id": {
@@ -954,8 +949,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_vehicle": {
-      "name": "VehicleRental_vehicle",
+    "public.vehicle": {
+      "name": "vehicle",
       "schema": "",
       "columns": {
         "id": {
@@ -1097,10 +1092,10 @@
         }
       },
       "foreignKeys": {
-        "VehicleRental_vehicle_business_id_VehicleRental_business_id_fk": {
-          "name": "VehicleRental_vehicle_business_id_VehicleRental_business_id_fk",
-          "tableFrom": "VehicleRental_vehicle",
-          "tableTo": "VehicleRental_business",
+        "vehicle_business_id_business_id_fk": {
+          "name": "vehicle_business_id_business_id_fk",
+          "tableFrom": "vehicle",
+          "tableTo": "business",
           "columnsFrom": [
             "business_id"
           ],
@@ -1114,8 +1109,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.VehicleRental_verification_token": {
-      "name": "VehicleRental_verification_token",
+    "public.verification_token": {
+      "name": "verification_token",
       "schema": "",
       "columns": {
         "identifier": {
@@ -1140,8 +1135,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "VehicleRental_verification_token_identifier_token_pk": {
-          "name": "VehicleRental_verification_token_identifier_token_pk",
+        "verification_token_identifier_token_pk": {
+          "name": "verification_token_identifier_token_pk",
           "columns": [
             "identifier",
             "token"
@@ -1191,8 +1186,7 @@
         "scooter",
         "e-scooter",
         "car",
-        "e-car",
-        "others"
+        "e-car"
       ]
     }
   },

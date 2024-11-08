@@ -27,7 +27,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
-      vendorSetupComplete?: boolean;
+      vendor_setup_complete: string | undefined | null;
       stripeCustomerId?: string | null;
     } & DefaultSession["user"];
   }
@@ -35,7 +35,7 @@ declare module "next-auth" {
   interface User {
     id: string;
     email: string;
-    vendorSetupComplete: boolean;
+    vendor_setup_complete: string | undefined | null;
     role: userRoleEnum;
     createdAt: Date;
     updatedAt: Date;
@@ -53,14 +53,12 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session: newData }) {
       token.id = token.sub;
 
-      // Set the initial vendorSetupComplete to false
-      token.vendorSetupComplete = false;
-
       if (trigger === "signUp" && user) {
         const roleCookie = cookies().get("role")?.value;
 
         if (roleCookie) {
           token.role = roleCookie;
+          token.vendor_setup_complete = false;
 
           const existingUser = await db.query.users.findFirst({
             where: eq(users.email, user.email),
@@ -80,15 +78,16 @@ export const authOptions: NextAuthOptions = {
       if (trigger === "update") {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         token.name = newData.user.name;
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         token.image = newData.user.picture;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        token.vendor_setup_complete = newData.user.vendor_setup_complete;
       }
 
-      // Set the vendorSetupComplete to true if the user's role is "VENDOR"
-      token.vendorSetupComplete = token.role === "VENDOR";
-
-      token.role = token.role ?? user.role ?? "USER";
+      token.role = token.role ?? user?.role ?? "USER";
+      token.vendor_setup_complete =
+        token.vendor_setup_complete ?? user?.vendor_setup_complete ?? false;
 
       return token;
     },
@@ -101,7 +100,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           image: (token.image as string | undefined) ?? session.user.image,
           email: token.email,
-          vendorSetupComplete: token.vendorSetupComplete,
+          vendor_setup_complete: token.vendor_setup_complete,
           role: token.role,
         },
       };

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { buttonVariants } from "~/components/ui/button";
 import {
   FormControl,
@@ -40,15 +40,18 @@ const GeneralInfo = () => {
     isUploading: isLogoUploading,
   } = useUploadFile("imageUploader");
 
+  const [logo, setLogo] = useState<string | null>(form.getValues("logo"));
+
   useEffect(() => {
     if (
       logoUploadedFile &&
       logoUploadedFile.length > 0 &&
       logoUploadedFile[0]?.url
     ) {
+      setLogo(logoUploadedFile[0].url);
       form.setValue("logo", logoUploadedFile[0].url);
     }
-  }, [logoUploadedFile]);
+  }, [logoUploadedFile, isLogoUploading]);
 
   return (
     <>
@@ -61,9 +64,10 @@ const GeneralInfo = () => {
               <FormLabel>Store Name</FormLabel>
               <FormControl>
                 <Input
+                  {...field}
                   placeholder="ABC Rental Store"
                   autoComplete="off"
-                  {...field}
+                  value={field.value ?? undefined}
                 />
               </FormControl>
               <FormMessage />
@@ -77,7 +81,7 @@ const GeneralInfo = () => {
         <div className="flex items-center gap-2">
           <div
             style={{
-              backgroundImage: `url(${form.getValues("logo")})`,
+              backgroundImage: `url(${logo})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { businesses, vehicles } from "~/server/db/schema";
+import { businesses, vehicles, vehicleTypeEnum } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const vehicleRouter = createTRPCRouter({
@@ -9,15 +9,7 @@ export const vehicleRouter = createTRPCRouter({
       z.object({
         businessId: z.string(),
         name: z.string(),
-        type: z.enum([
-          "bike",
-          "e-bike",
-          "scooter",
-          "e-scooter",
-          "car",
-          "e-car",
-          "others",
-        ]),
+        type: z.enum(vehicleTypeEnum.enumValues),
         images: z.array(z.string()),
         basePrice: z.number(),
         numberOfVehicles: z.number().default(1),

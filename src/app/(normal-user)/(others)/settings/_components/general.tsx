@@ -59,8 +59,6 @@ const GeneralSettings = ({
       user: {
         ...data!.user,
         ...rest,
-        vendorSetupComplete:
-          user.role === "VENDOR" ? true : data?.user.vendorSetupComplete,
         picture: form.getValues("image"),
       },
     });

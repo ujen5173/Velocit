@@ -59,7 +59,7 @@ export const users = createTable(
     image: varchar("image", { length: 255 }),
     role: userRoleEnum("role").default("USER"),
     deleted: boolean("deleted").default(false),
-    vendorSetupComplete: boolean("vendor_setup_complete").default(false),
+    vendor_setup_complete: boolean("vendor_setup_complete"),
     stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -78,11 +78,11 @@ export const businesses = createTable(
     id: varchar("id", { length: 36 })
       .notNull()
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .default(sql`gen_random_uuid()`),
     ownerId: varchar("owner_id", { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    name: varchar("name", { length: 100 }).notNull(),
+    name: varchar("name", { length: 100 }),
     location: jsonb("location")
       .notNull()
       .$type<{
@@ -99,14 +99,15 @@ export const businesses = createTable(
       .default(sql`'{}'::varchar[]`),
     businessHours: jsonb("business_hours")
       .$type<Record<string, { open: string; close: string } | null>>()
-      .notNull(),
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
     ratingCount: integer("rating_count").default(0),
     availableVehicleTypes: vehicleTypeEnum("available_vehicle_types")
       .array()
       .notNull()
       .default(sql`'{}'::vehicle_type[]`),
-    logo: text("logo").notNull(),
+    logo: text("logo"),
     images: text("shop_images")
       .array()
       .notNull()
