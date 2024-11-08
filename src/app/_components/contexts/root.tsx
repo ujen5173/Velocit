@@ -2,6 +2,7 @@
 
 import { type User } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { type ReactNode, createContext } from "react";
 
 type RootContextProps = {
@@ -15,6 +16,12 @@ export const Context = createContext<RootContextProps>({
 const RootContext = ({ children }: { children: ReactNode }) => {
   return (
     <SessionProvider>
+      <ProgressBar
+        height="4px"
+        color="#db2777"
+        options={{ showSpinner: true }}
+        shallowRouting
+      />
       <Context.Provider value={{ user: null }}>{children}</Context.Provider>
     </SessionProvider>
   );

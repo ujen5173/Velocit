@@ -1,3 +1,4 @@
+// general.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +18,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useUploadFile } from "~/hooks/useUploadthing";
+import { type userRoleEnum } from "~/server/server.types";
 import { api } from "~/trpc/react";
 
 const formSchema = z.object({
@@ -33,6 +35,7 @@ const GeneralSettings = ({
     name: string;
     email: string;
     image: string;
+    role: userRoleEnum;
   };
 }) => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,11 +53,14 @@ const GeneralSettings = ({
 
     const { image, ...rest } = form.getValues();
 
+    // this works
     void update({
       ...data,
       user: {
         ...data!.user,
         ...rest,
+        vendorSetupComplete:
+          user.role === "VENDOR" ? true : data?.user.vendorSetupComplete,
         picture: form.getValues("image"),
       },
     });
@@ -64,8 +70,8 @@ const GeneralSettings = ({
     useUploadFile("imageUploader");
 
   useEffect(() => {
-    if (uploadedFile) {
-      form.setValue("image", uploadedFile.url);
+    if (uploadedFile && uploadedFile.length > 0 && uploadedFile[0]?.url) {
+      form.setValue("image", uploadedFile[0].url);
     }
   }, [uploadedFile, form]);
 
@@ -104,7 +110,7 @@ const GeneralSettings = ({
             <div className="flex items-center gap-2">
               <div
                 style={{
-                  backgroundImage: `url(${uploadedFile?.url ?? user.image})`,
+                  backgroundImage: `url(${uploadedFile ? (uploadedFile[0]?.url ?? user.image) : (user.image ?? "")})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -130,10 +136,11 @@ const GeneralSettings = ({
               type="file"
               hidden
               id="image"
+              max={1}
               onChange={(e) => {
                 const files = e.target.files;
-                if (files?.[0]) {
-                  void uploadFiles(files[0]);
+                if (files) {
+                  void uploadFiles(Array.from(files));
                 }
               }}
             />

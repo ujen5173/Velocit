@@ -25,7 +25,6 @@ export const vehicleTypeEnum = pgEnum("vehicle_type", [
   "e-scooter",
   "car",
   "e-car",
-  "others",
 ]);
 
 export const rentalStatusEnum = pgEnum("rental_status", [
@@ -71,6 +70,7 @@ export const users = createTable(
   }),
 );
 
+// social media also...
 // Optimized businesses table
 export const businesses = createTable(
   "business",
@@ -83,24 +83,34 @@ export const businesses = createTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
-    location: jsonb("location").notNull(),
+    location: jsonb("location")
+      .notNull()
+      .$type<{
+        city?: string | undefined;
+        address?: string | undefined;
+        lat?: number | undefined;
+        lng?: number | undefined;
+        map?: string | undefined;
+      }>()
+      .default(sql`'{}'::jsonb`),
     phoneNumbers: varchar("phone_numbers", { length: 20 })
       .array()
       .notNull()
       .default(sql`'{}'::varchar[]`),
-    businessHours: jsonb("business_hours").notNull(),
+    businessHours: jsonb("business_hours")
+      .$type<Record<string, { open: string; close: string } | null>>()
+      .notNull(),
     rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
     ratingCount: integer("rating_count").default(0),
     availableVehicleTypes: vehicleTypeEnum("available_vehicle_types")
       .array()
+      .notNull()
       .default(sql`'{}'::vehicle_type[]`),
-    logo: text("logo"),
+    logo: text("logo").notNull(),
     images: text("shop_images")
       .array()
+      .notNull()
       .default(sql`'{}'::text[]`),
-    rentalAccessories: varchar("rental_accessories", { length: 100 })
-      .array()
-      .default(sql`'{}'::varchar[]`),
     stripeAccountId: varchar("stripe_account_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),

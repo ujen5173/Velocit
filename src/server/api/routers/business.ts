@@ -1,12 +1,17 @@
 import { TRPCError } from "@trpc/server";
-import { and, desc, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { z, ZodError } from "zod";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { businesses, vehicles } from "~/server/db/schema";
+import {
+  businesses,
+  users,
+  vehicles,
+  vehicleTypeEnum,
+} from "~/server/db/schema";
 
 // Helper function to calculate distance using Haversine formula
 const calculateDistance = (
@@ -31,6 +36,21 @@ const calculateDistance = (
 };
 
 export const businessRouter = createTRPCRouter({
+  getStoreName: protectedProcedure.query(async ({ ctx }) => {
+    const business = await ctx.db
+      .select({
+        name: businesses.name,
+      })
+      .from(businesses)
+      .where(eq(businesses.ownerId, ctx.session.user.id));
+
+    return business[0]?.name;
+  }),
+  current: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.query.businesses.findFirst({
+      where: eq(businesses.ownerId, ctx.session.user.id),
+    });
+  }),
   // Get popular shops based on rating
   getPopularShops: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db
@@ -55,20 +75,10 @@ export const businessRouter = createTRPCRouter({
     .input(
       z.object({
         query: z.string().optional(),
-        latitude: z.number().optional(),
-        longitude: z.number().optional(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
         maxDistance: z.number().default(10), // km
-        vehicleType: z
-          .enum([
-            "bike",
-            "e-bike",
-            "scooter",
-            "e-scooter",
-            "car",
-            "e-car",
-            "others",
-          ])
-          .optional(),
+        vehicleType: z.enum(vehicleTypeEnum.enumValues).optional(),
         hasAvailableVehicles: z.boolean().default(true),
       }),
     )
@@ -108,41 +118,41 @@ export const businessRouter = createTRPCRouter({
         );
 
       // Filter by distance if coordinates provided
-      if (input.latitude && input.longitude) {
+      if (input.lat && input.lng) {
         return shops
           .filter((shop) => {
             const shopLocation = shop.location as {
-              latitude: number;
-              longitude: number;
+              lat: number;
+              lng: number;
             };
             const distance = calculateDistance(
-              input.latitude!,
-              input.longitude!,
-              shopLocation.latitude,
-              shopLocation.longitude,
+              input.lat!,
+              input.lng!,
+              shopLocation.lat,
+              shopLocation.lng,
             );
             return distance <= input.maxDistance;
           })
           .sort((a, b) => {
             const aLocation = a.location as {
-              latitude: number;
-              longitude: number;
+              lat: number;
+              lng: number;
             };
             const bLocation = b.location as {
-              latitude: number;
-              longitude: number;
+              lat: number;
+              lng: number;
             };
             const distanceA = calculateDistance(
-              input.latitude!,
-              input.longitude!,
-              aLocation.latitude,
-              aLocation.longitude,
+              input.lat!,
+              input.lng!,
+              aLocation.lat,
+              aLocation.lng,
             );
             const distanceB = calculateDistance(
-              input.latitude!,
-              input.longitude!,
-              bLocation.latitude,
-              bLocation.longitude,
+              input.lat!,
+              input.lng!,
+              bLocation.lat,
+              bLocation.lng,
             );
             return distanceA - distanceB;
           });
@@ -211,40 +221,31 @@ export const businessRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
+        name: z.string().min(2).max(50),
         location: z.object({
-          latitude: z.number(),
-          longitude: z.number(),
-          address: z.string(),
-          map: z.string(),
+          map: z.string().url(),
+          lat: z.number(),
+          lng: z.number(),
+          address: z.string().min(2).max(50),
+          city: z.string().min(2).max(50),
         }),
-        phoneNumbers: z.string().array(),
-        businessHours: z.record(z.string(), z.set(z.string()).size(2)),
-        availableVehicleTypes: z.array(
-          z.enum([
-            "bike",
-            "e-bike",
-            "scooter",
-            "e-scooter",
-            "car",
-            "e-car",
-            "others",
-          ]),
+        phoneNumbers: z.array(z.string().min(10).max(15)),
+        businessHours: z.record(
+          z.string().min(2).max(50),
+          z.object({
+            open: z.string().min(2).max(50),
+            close: z.string().min(2).max(50),
+          }),
         ),
-        logo: z.string(),
-        images: z.string().array(),
+        availableVehicleTypes: z.array(z.enum(vehicleTypeEnum.enumValues)),
+        logo: z.string().url(),
+        images: z.array(z.string().url()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
         const business = await ctx.db.insert(businesses).values({
-          name: input.name,
-          location: input.location,
-          phoneNumbers: input.phoneNumbers,
-          businessHours: input.businessHours,
-          availableVehicleTypes: input.availableVehicleTypes,
-          logo: input.logo,
-          images: input.images,
+          ...input,
           ownerId: ctx.session.user.id,
         });
 
@@ -262,6 +263,62 @@ export const businessRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Unknown error",
+        });
+      }
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(2),
+        location: z.object({
+          map: z.string().url().optional(),
+          lat: z.number().optional(),
+          lng: z.number().optional(),
+          address: z.string().min(2).optional(),
+          city: z.string().min(2).optional(),
+        }),
+        phoneNumbers: z.array(z.string().min(10).max(15)).default([]),
+        businessHours: z.record(
+          z.string().min(2).max(50),
+          z
+            .object({
+              open: z.string().min(2).max(50),
+              close: z.string().min(2).max(50),
+            })
+            .nullable(),
+        ),
+        availableVehicleTypes: z
+          .array(z.enum(vehicleTypeEnum.enumValues))
+          .default([]),
+        logo: z.string().url(),
+        images: z.array(z.string().url()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const updatedBusiness = await ctx.db
+          .update(businesses)
+          .set({ ...input })
+          .where(eq(businesses.ownerId, ctx.session.user.id))
+          .returning();
+        await ctx.db
+          .update(users)
+          .set({ vendorSetupComplete: true })
+          .where(eq(users.id, ctx.session.user.id));
+        return updatedBusiness[0];
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid input data",
+            cause: error.issues,
+          });
+        }
+        console.error("Unexpected error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred",
         });
       }
     }),

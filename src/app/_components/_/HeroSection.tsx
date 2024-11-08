@@ -109,10 +109,10 @@ const HeroSection = () => {
       <div className="overlay" />
 
       <div className="absolute inset-0 flex h-full w-full items-end bg-[#7b7c7d08] sm:bg-transparent">
-        <div className="mx-auto max-w-[1440px] px-4 pb-10 pt-16 sm:py-16">
+        <div className="mx-auto max-w-[1440px] px-4 pb-5 pt-16 md:py-16">
           <h1
             className={cn(
-              "mb-5 text-4xl font-semibold text-slate-100 md:mb-10 md:text-5xl lg:text-6xl",
+              "mb-5 text-5xl font-semibold text-slate-100 md:mb-10 lg:text-6xl",
               chakra_petch.className,
             )}
           >
@@ -127,11 +127,11 @@ const HeroSection = () => {
                 <button
                   aria-expanded={open}
                   className={cn(
-                    "sn:text-slate-100 flex h-12 w-full flex-1 items-center gap-2 bg-slate-100 text-slate-600 sm:bg-slate-100/30 md:max-w-80",
-                    "rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-100 sm:bg-slate-100/30 sm:text-slate-100 md:max-w-80",
+                    "sn:text-slate-100 flex h-12 w-full flex-1 items-center gap-2 bg-slate-100 text-slate-600 md:max-w-80 md:bg-slate-100/30",
+                    "rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-100 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
                   )}
                 >
-                  <MapPin className="h-4 w-4 shrink-0 text-slate-600 sm:text-slate-100" />
+                  <MapPin className="h-4 w-4 shrink-0 text-slate-600 md:text-slate-100" />
                   <span className="line-clamp-1 w-full text-left">
                     {selectedLocation || "Search locations..."}
                   </span>
@@ -174,14 +174,14 @@ const HeroSection = () => {
               <PopoverTrigger asChild>
                 <button
                   className={cn(
-                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-600 sm:bg-slate-100/30 sm:text-slate-100 placeholder:sm:text-slate-100 md:max-w-80",
+                    "flex w-full flex-1 items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 text-base text-slate-600 outline-none placeholder:text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100 placeholder:md:text-slate-100",
                     `justify-between px-4 ${!date && "text-muted-foreground"}`,
                   )}
                 >
-                  <div className="flex items-center gap-2 text-slate-600 sm:text-slate-100">
+                  <div className="flex items-center gap-2 text-slate-600 md:text-slate-100">
                     <CalendarDays
                       size={18}
-                      className="text-slate-600 sm:text-slate-100"
+                      className="text-slate-600 md:text-slate-100"
                     />
                     <span className="line-clamp-1 w-full text-left">
                       {date?.from ? (
@@ -234,14 +234,14 @@ const HeroSection = () => {
             <Select onValueChange={(value) => setVehicleType(value)}>
               <SelectTrigger
                 className={cn(
-                  "w-full flex-1 border-none bg-slate-100 text-base text-slate-600 sm:bg-slate-100/30 sm:text-slate-100 md:max-w-80",
-                  "focus:ring-0 focus-visible:ring-0",
+                  "w-full flex-1 border-none bg-slate-100 text-base text-slate-600 md:max-w-80 md:bg-slate-100/30 md:text-slate-100",
+                  "h-12 focus:ring-0 focus-visible:ring-0",
                 )}
               >
                 <div className="flex items-center gap-2 p-1">
                   <SelectValue
                     placeholder="Select Vehicle Type"
-                    className="text-slate-100"
+                    className="py-2 text-slate-100"
                   />
                 </div>
               </SelectTrigger>

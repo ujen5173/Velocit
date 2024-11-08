@@ -4,11 +4,10 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { type Metadata } from "next";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "~/app/api/uploadthing/core";
+import { Toaster } from "~/components/ui/toaster";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
-import Footer from "./_components/_/Footer";
 import TailwindIndicator from "./_components/_/TailwindIndicator";
-import AuthContext from "./_components/contexts/authContext";
 import RootContext from "./_components/contexts/root";
 import { lato } from "./utils/font";
 import { constructMetadata } from "./utils/site";
@@ -21,15 +20,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${lato.className}`}>
-      <body>
+    <html lang="en">
+      <body className={`${lato.className}`}>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <TRPCReactProvider>
           <HydrateClient>
-            <RootContext>
-              <AuthContext>{children}</AuthContext>
-            </RootContext>
-            <Footer />
+            <RootContext>{children}</RootContext>
+            <Toaster />
           </HydrateClient>
         </TRPCReactProvider>
         <TailwindIndicator />

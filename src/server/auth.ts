@@ -52,8 +52,9 @@ export const authOptions: NextAuthOptions = {
 
     async jwt({ token, user, trigger, session: newData }) {
       token.id = token.sub;
-      token.vendorSetupComplete =
-        token.vendorSetupComplete ?? user.vendorSetupComplete ?? false;
+
+      // Set the initial vendorSetupComplete to false
+      token.vendorSetupComplete = false;
 
       if (trigger === "signUp" && user) {
         const roleCookie = cookies().get("role")?.value;
@@ -83,6 +84,9 @@ export const authOptions: NextAuthOptions = {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         token.image = newData.user.picture;
       }
+
+      // Set the vendorSetupComplete to true if the user's role is "VENDOR"
+      token.vendorSetupComplete = token.role === "VENDOR";
 
       token.role = token.role ?? user.role ?? "USER";
 

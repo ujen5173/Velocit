@@ -1,6 +1,6 @@
 "use client";
 import { differenceInDays, format } from "date-fns";
-import { CalendarDays, CircleCheck, Minus, Plus, X } from "lucide-react";
+import { CalendarDays, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import { type DateRange } from "react-day-picker";
@@ -420,25 +420,6 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                       Maximum available: {getMaxAllowedQuantity()} vehicles
                     </p>
                   )}
-                </div>
-
-                <div className="space-y-2 px-1">
-                  <Label>Free Accessories</Label>
-                  <div className="flex flex-wrap items-center gap-4">
-                    {["Helmet", "Lock", "Gloves", "Jacket", "Bag"].map(
-                      (accessory) => (
-                        <div
-                          key={accessory}
-                          className="flex items-center gap-1"
-                        >
-                          <CircleCheck size={16} className="text-green-600" />
-                          <span className="text-xs font-medium text-slate-700">
-                            {accessory}
-                          </span>
-                        </div>
-                      ),
-                    )}
-                  </div>
                 </div>
 
                 <Separator />

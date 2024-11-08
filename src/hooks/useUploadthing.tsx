@@ -17,25 +17,25 @@ export function useUploadFile(
   { defaultUploadedFile, ...props }: UseUploadFileProps = {},
 ) {
   const [uploadedFile, setUploadedFile] = React.useState<
-    UploadedFile | undefined
-  >(defaultUploadedFile);
+    UploadedFile[] | undefined
+  >([defaultUploadedFile].filter(Boolean) as UploadedFile[]);
   const [progresses, setProgresses] = React.useState<number>(0);
   const [isUploading, setIsUploading] = React.useState(false);
 
-  const uploadThings = async (file: File) => {
+  const uploadThings = async (files: File[]) => {
     setIsUploading(true);
 
     try {
       setUploadedFile(undefined);
       const res = await uploadFiles(endpoint, {
         ...props,
-        files: [file],
+        files: files,
         onUploadProgress: ({ progress }) => {
           setProgresses(progress);
         },
       });
 
-      setUploadedFile(res[0]);
+      setUploadedFile(res);
     } finally {
       setIsUploading(false);
     }

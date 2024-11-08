@@ -10,6 +10,9 @@ export default {
       center: true,
     },
     extend: {
+      transitionDuration: {
+        "1500": "1500ms",
+      },
       screens: {
         xs: "460px",
       },

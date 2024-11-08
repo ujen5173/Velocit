@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import React from "react";
 import { getServerAuthSession } from "~/server/auth";
+import Footer from "../_components/_/Footer";
 
 const NormalUserLayout = async ({
   children,
@@ -10,9 +11,14 @@ const NormalUserLayout = async ({
   const session = await getServerAuthSession();
 
   if (session?.user.role === "VENDOR" && !session?.user.vendorSetupComplete)
-    redirect("/vendor-setup");
+    redirect("/vendor/profile");
 
-  return <>{children}</>;
+  return (
+    <main>
+      {children}
+      <Footer />
+    </main>
+  );
 };
 
 export default NormalUserLayout;

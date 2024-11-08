@@ -43,7 +43,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                   all in one place.
                 </p>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col items-center gap-6 sm:flex-row">
                 <div className="flex flex-1 flex-col gap-2 text-center">
                   <p className="font-medium">Normal Use</p>
                   <Button
@@ -63,7 +63,10 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                     Continue with Google
                   </Button>
                 </div>
-                <Separator orientation="vertical" className="h-16" />
+                <Separator
+                  orientation="vertical"
+                  className="hidden h-16 sm:block"
+                />
                 <div className="flex flex-1 flex-col gap-2 text-center">
                   <p className="font-medium">For Businesses</p>
 
@@ -74,7 +77,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                         role: "VENDOR",
                       });
                       await signIn("google", {
-                        callbackUrl: "/vendor-setup",
+                        callbackUrl: "/vendor/profile",
                       });
                     }}
                     variant={"outline"}

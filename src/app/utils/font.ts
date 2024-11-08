@@ -24,6 +24,7 @@ export const lato = Lato({
   subsets: ["latin"],
   preload: true,
 });
+
 export const nunito = Nunito({
   weight: ["400", "700", "900", "500", "600", "200", "300"],
   style: "normal",

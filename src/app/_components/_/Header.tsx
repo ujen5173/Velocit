@@ -46,12 +46,7 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
         )}
       >
         <div className="flex h-auto flex-1 items-center space-x-6">
-          <Logo
-            tw={cn(
-              "h-6",
-              pth === "/" ? "fill-secondary sm:fill-white" : "fill-secondary",
-            )}
-          />
+          <Logo tw={cn("h-6", pth === "/" ? "fill-white" : "fill-secondary")} />
 
           <div className="hidden md:block">
             <ul className="flex items-center">
@@ -197,20 +192,18 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                         </DropdownMenuTrigger>
                       </div>
                       <DropdownMenuContent align="end" className="w-56">
-                        <div>
-                          <DropdownMenuLabel className="flex flex-col">
-                            <div className="">
-                              <span className={cn("text-sm font-semibold")}>
-                                {data.user.name}
-                              </span>
-                            </div>
-                            <div className="">
-                              <span className={cn("text-sm font-semibold")}>
-                                {data.user.email}
-                              </span>
-                            </div>
-                          </DropdownMenuLabel>
-                        </div>
+                        <DropdownMenuLabel className="flex flex-col">
+                          <div className="">
+                            <span className={cn("text-sm font-semibold")}>
+                              {data.user.name}
+                            </span>
+                          </div>
+                          <div className="">
+                            <span className={cn("text-sm font-normal")}>
+                              {data.user.email}
+                            </span>
+                          </div>
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <Link href="/vendor/profile">
                           <DropdownMenuItem>Business Profile</DropdownMenuItem>
@@ -287,10 +280,10 @@ const Header = async ({ pth = "/" }: { pth?: string }) => {
                 <LoginButton>
                   <Button
                     className={cn(
-                      "font-semibold uppercase hover:sm:text-foreground",
-                      pth === "/" ? "text-slate-100" : "text-slate-600",
+                      "font-semibold uppercase",
+                      pth === "/" && "text-slate-100 hover:sm:text-foreground",
                     )}
-                    variant={"outline-primary"}
+                    variant={pth === "/" ? "outline-primary" : "primary"}
                   >
                     Start Renting
                   </Button>

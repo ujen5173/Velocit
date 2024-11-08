@@ -5,10 +5,13 @@
 ✅  - signin as normal user -> redirect -> / 
 
 ✅ - profile settings
-- business profile
-- bookmarks
-- accessories page (shop gear page)
-- orders
-- get google map -> [TEMPORARY] -> react-leaflet
-- dashboard
-- change location api
+   - business profile
+   - bookmarks
+   - accessories page (shop gear page)
+   - orders
+   - get google map -> [TEMPORARY] -> react-leaflet
+   - dashboard
+   - change location api
+
+---- 
+   - prefetching all the items in the home page
