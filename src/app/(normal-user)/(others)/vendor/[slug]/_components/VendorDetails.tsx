@@ -1,16 +1,10 @@
-import {
-  Dot,
-  ExternalLink,
-  Globe,
-  Heart,
-  Phone,
-  Star,
-  Store,
-} from "lucide-react";
+import { Dot, Globe, MessageCircle, Phone, Star, Store } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import VehicleIndicatorIcon from "~/app/_components/_/VehicleIndicatorIcon";
+import { WEEK_DAYS } from "~/app/utils/helpers";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
@@ -21,9 +15,10 @@ import {
   CarouselPrevious,
 } from "~/components/ui/carousel";
 import { Separator } from "~/components/ui/separator";
-import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
 import Bookings from "./Bookings";
+import FavroiteButton from "./FavroiteButton";
+import { VendorContext } from "./VendorWrapper";
 
 const VendorDetails = () => {
   const [api, setApi] = useState<CarouselApi>();
@@ -47,6 +42,61 @@ const VendorDetails = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const { vendor } = useContext(VendorContext);
+
+  function checkBusinessHours(
+    businessHours: Record<string, { open: string; close: string } | null>,
+  ) {
+    const now = new Date();
+    const day = now.toLocaleDateString("en-US", { weekday: "long" });
+
+    if (businessHours[day]) {
+      const { open, close } = businessHours[day];
+      const [openHour, openMinute, openPeriod] = parseTime(open);
+      const [closeHour, closeMinute, closePeriod] = parseTime(close);
+
+      // Normalize the times to 24-hour format
+      const openDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        (openHour % 12) + (openPeriod === "PM" ? 12 : 0),
+        openMinute,
+      );
+      const closeDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        (closeHour % 12) + (closePeriod === "PM" ? 12 : 0),
+        closeMinute,
+      );
+
+      // Handle close time past midnight
+      if (
+        closeHour < openHour ||
+        (closeHour === openHour && closeMinute < openMinute)
+      ) {
+        closeDate.setDate(closeDate.getDate() + 1);
+      }
+
+      if (now < openDate || now > closeDate) {
+        return "closed";
+      }
+    } else {
+      return "closed";
+    }
+
+    return "open";
+  }
+
+  function parseTime(time: string): [number, number, "AM" | "PM"] {
+    const [hourMinute, period] = time.split(" ");
+    const [hour, minute] = hourMinute!.split(":").map(Number);
+    return [hour!, minute!, period === "AM" ? "AM" : "PM"];
+  }
+
+  if (!vendor) return null;
+
   return (
     <>
       <Bookings open={open} setOpen={setOpen} />
@@ -66,7 +116,7 @@ const VendorDetails = () => {
                     imageOrientation === "horizontal" ? "px-3" : "py-3",
                   )}
                 >
-                  {vendorDetail.shopImages.map((image, index) => (
+                  {vendor?.images.map((image, index) => (
                     <CarouselItem
                       key={index}
                       className="relative basis-auto px-1 pt-2"
@@ -76,7 +126,7 @@ const VendorDetails = () => {
                           onClick={() => {
                             api?.scrollTo(index);
                           }}
-                          alt={`${vendorDetail.name}'s Images`}
+                          alt={`${vendor.name!}'s Images`}
                           width={450}
                           height={450}
                           layout="fixed"
@@ -96,10 +146,10 @@ const VendorDetails = () => {
                 <CarouselPrevious />
                 <CarouselNext />
                 <CarouselContent className="h-full">
-                  {vendorDetail.shopImages.map((_, index) => (
+                  {vendor.images.map((_, index) => (
                     <CarouselItem key={index}>
                       <Image
-                        alt={`${vendorDetail.name}'s Images`}
+                        alt={`${vendor.name!}'s Images`}
                         width={950}
                         height={950}
                         layout="cover"
@@ -121,12 +171,12 @@ const VendorDetails = () => {
             <div className="mb-2 flex items-center">
               <Link href="/" className="block">
                 <h6 className="text-sm font-medium uppercase text-green-600 underline">
-                  {vendorDetail?.location[0]?.address}
+                  {vendor.location.address}
                 </h6>
               </Link>
             </div>
 
-            <h1 className="mb-4 text-3xl font-bold">{vendorDetail.name}</h1>
+            <h1 className="mb-4 text-3xl font-bold">{vendor.name}</h1>
 
             <div className="flex flex-1 flex-col justify-between">
               <div className="mb-4 flex items-center gap-1">
@@ -136,15 +186,14 @@ const VendorDetails = () => {
                     className="fill-yellow-500 stroke-yellow-500"
                   />
                   <span className="text-sm">
-                    {vendorDetail.rating} ({vendorDetail.ratingCount})
+                    {vendor.rating === 0 ? vendor.rating : "N/A"} (
+                    {vendor.ratingCount})
                   </span>
                 </div>
                 <Dot size={16} />
                 <div className="flex items-center gap-1">
                   <Phone size={16} className="text-foreground" />
-                  <span className="text-sm">
-                    {vendorDetail.phoneNumbers[0]}
-                  </span>
+                  <span className="text-sm">{vendor.phoneNumbers[0]}</span>
                 </div>
                 <Dot size={16} />
                 <div className="flex items-center gap-1">
@@ -159,39 +208,32 @@ const VendorDetails = () => {
                 </h3>
                 <div className="flex gap-4">
                   <div className="flex flex-1 items-center gap-2">
-                    <div className="flex size-20 flex-col items-center justify-between rounded-md bg-slate-100 p-2">
-                      <Image
-                        alt="Vechile"
-                        width={100}
-                        height={100}
-                        className="size-12 object-cover"
-                        src={"/images/vehicle/bicycle.png"}
-                      />
-                      <span className="text-xs">Bicycle</span>
-                    </div>
-                    <div className="flex size-20 flex-col items-center justify-between rounded-md bg-slate-100 p-2">
-                      <Image
-                        alt="Vechile"
-                        width={100}
-                        height={100}
-                        className="size-12 object-cover"
-                        src={"/images/vehicle/e-bicycle.png"}
-                      />
-                      <span className="text-xs">E-Cycle</span>
-                    </div>
+                    {vendor.availableVehicleTypes.map((vehicle, index) => (
+                      <VehicleIndicatorIcon vehicle={vehicle} key={index} />
+                    ))}
                   </div>
-                  <Separator orientation="vertical" className="h-[inherit]" />
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={"outline"}
-                      className="flex size-20 flex-col items-center justify-between rounded-md p-2"
-                    >
-                      <div className="flex h-12 w-12 items-center justify-center">
-                        <Store size={26} className="text-red-600" />
+                  {vendor.sellGears && (
+                    <>
+                      <Separator
+                        orientation="vertical"
+                        className="h-[inherit]"
+                      />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          asChild
+                          variant={"outline"}
+                          className="flex size-20 flex-col items-center justify-between rounded-md p-2"
+                        >
+                          <Link href={`/vendor/${vendor.name}/shop`}>
+                            <div className="flex h-12 w-12 items-center justify-center">
+                              <Store size={26} className="text-red-600" />
+                            </div>
+                            <span className="text-xs">Shop Gears</span>
+                          </Link>
+                        </Button>
                       </div>
-                      <span className="text-xs">Shop Gears</span>
-                    </Button>
-                  </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -201,24 +243,40 @@ const VendorDetails = () => {
                     Business Hours
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-red-600 underline">
-                      Closed
-                    </span>
+                    {checkBusinessHours(vendor.businessHours) === "open" ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-semibold text-green-600 underline">
+                          Open
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-semibold text-red-600 underline">
+                          Closed
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(vendorDetail.businessHours).map(
-                    ([key, value], index) => (
+                  {Object.entries(vendor.businessHours)
+                    .sort(
+                      ([a], [b]) => WEEK_DAYS.indexOf(a) - WEEK_DAYS.indexOf(b),
+                    )
+                    .map(([key, value], index) => (
                       <div key={index}>
-                        <h6 className="text-sm font-medium capitalize">
+                        <h6 className="text-base font-semibold capitalize text-slate-600">
                           {key}
                         </h6>
-                        <p className="text-sm text-slate-600">
-                          {value.open} - {value.close}
-                        </p>
+                        {value ? (
+                          <p className="text-sm text-slate-600">
+                            {value.open} - {value.close}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-slate-600">Closed</p>
+                        )}
                       </div>
-                    ),
-                  )}
+                    ))}
                 </div>
               </div>
 
@@ -233,13 +291,10 @@ const VendorDetails = () => {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button className="w-full" variant={"outline-secondary"}>
-                    <Heart size={16} className="mr-2" />
-                    Add to Favroite
-                  </Button>
+                  <FavroiteButton id={vendor.id} />
                   <Button className="w-full" variant={"outline"}>
-                    <ExternalLink size={16} className="mr-2" />
-                    Share
+                    <MessageCircle size={16} className="mr-2" />
+                    Chat with vendor
                   </Button>
                 </div>
               </div>

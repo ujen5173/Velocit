@@ -2,10 +2,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUser } from "~/app/_components/contexts/root";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -17,6 +19,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { toast } from "~/hooks/use-toast";
 import { useUploadFile } from "~/hooks/useUploadthing";
 import { type userRoleEnum } from "~/server/server.types";
 import { api } from "~/trpc/react";
@@ -45,22 +48,29 @@ const GeneralSettings = ({
 
   const { mutateAsync, status } = api.user.update.useMutation();
   const { data, update } = useSession();
+  const { setUser } = useUser();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await mutateAsync({
       ...values,
     });
 
-    const { image, ...rest } = form.getValues();
-
-    // this works
-    void update({
+    const newUser = {
       ...data,
       user: {
         ...data!.user,
-        ...rest,
-        picture: form.getValues("image"),
+        ...form.getValues(),
       },
+    } as Session | null;
+
+    // this works
+    void update(newUser);
+
+    setUser(newUser);
+
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been updated successfully",
     });
   }
 

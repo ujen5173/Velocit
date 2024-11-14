@@ -3,7 +3,6 @@ import { Dot, ListFilter, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
-import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { vendorDetail, vendorVehicles } from "~/lib/data";
 import { cn } from "~/lib/utils";
@@ -17,12 +16,7 @@ const Accessories = () => {
       <section className="bg-white px-4 py-10">
         <div className="mx-auto max-w-[1240px]">
           <div className="mb-10 flex items-center justify-between gap-10">
-            <h1
-              className={cn(
-                "text-2xl font-bold xs:text-3xl",
-                bricolage.className,
-              )}
-            >
+            <h1 className={cn("text-2xl font-bold xs:text-3xl")}>
               Accessories
             </h1>
             <Button variant={"outline"} className="hover:bg-slate-50">
@@ -81,12 +75,7 @@ const Accessories = () => {
                       Starting at
                     </h4>
                     <div className="flex items-end gap-2">
-                      <span
-                        className={cn(
-                          "text-xl font-semibold",
-                          bricolage.className,
-                        )}
-                      >
+                      <span className={cn("text-xl font-semibold")}>
                         रु {(vehicle.price_per_hour ?? 1) * 65}{" "}
                       </span>
                     </div>

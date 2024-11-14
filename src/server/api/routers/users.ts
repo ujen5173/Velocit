@@ -1,13 +1,62 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
+import { bookmarks, businesses, users } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   current: protectedProcedure.query(async ({ ctx }) => {
     return ctx.session.user;
+  }),
+
+  bookmark: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const alreadyBookmarked = await ctx.db.query.bookmarks.findFirst({
+        where: and(
+          eq(bookmarks.userId, ctx.session.user.id),
+          eq(bookmarks.businessId, input.id),
+        ),
+      });
+      if (alreadyBookmarked) {
+        await ctx.db
+          .delete(bookmarks)
+          .where(
+            and(
+              eq(bookmarks.userId, ctx.session.user.id),
+              eq(bookmarks.businessId, input.id),
+            ),
+          );
+      } else {
+        await ctx.db.insert(bookmarks).values({
+          userId: ctx.session.user.id,
+          businessId: input.id,
+        });
+      }
+      return true;
+    }),
+
+  getBookmarks: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.db
+      .select({
+        id: getTableColumns(businesses).id,
+        name: getTableColumns(businesses).name,
+        rating: getTableColumns(businesses).rating,
+        ratingCount: getTableColumns(businesses).ratingCount,
+        images: getTableColumns(businesses).images,
+        location: getTableColumns(businesses).location,
+        satisfiedCustomers: getTableColumns(businesses).satisfiedCustomers,
+        slug: getTableColumns(businesses).slug,
+        availableVehicleTypes:
+          getTableColumns(businesses).availableVehicleTypes,
+      })
+      .from(bookmarks)
+      .where(eq(bookmarks.userId, ctx.session.user.id))
+      .rightJoin(businesses, eq(businesses.id, bookmarks.businessId))
+      .orderBy(desc(bookmarks.createdAt));
+
+    return result;
   }),
 
   update: protectedProcedure

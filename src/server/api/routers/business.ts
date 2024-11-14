@@ -1,5 +1,6 @@
-import { TRPCError } from "@trpc/server";
+import { type inferRouterOutputs, TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import slugify from "slugify";
 import { z, ZodError } from "zod";
 import {
   createTRPCRouter,
@@ -69,6 +70,34 @@ export const businessRouter = createTRPCRouter({
       .orderBy(sql`(${businesses.rating} * ${businesses.ratingCount}) DESC`)
       .limit(8);
   }),
+
+  getVendor: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const [result] = await ctx.db
+        .select({
+          id: businesses.id,
+          sellGears: businesses.sellGears,
+          name: businesses.name,
+          slug: businesses.slug,
+          location: businesses.location,
+          rating: businesses.rating,
+          ratingCount: businesses.ratingCount,
+          logo: businesses.logo,
+          phoneNumbers: businesses.phoneNumbers,
+          businessHours: businesses.businessHours,
+          availableVehicleTypes: businesses.availableVehicleTypes,
+          images: businesses.images,
+        })
+        .from(businesses)
+        .where(eq(businesses.slug, input.slug));
+
+      return result;
+    }),
 
   // Search shops with location and availability
   search: publicProcedure
@@ -278,6 +307,14 @@ export const businessRouter = createTRPCRouter({
           address: z.string().min(2).optional(),
           city: z.string().min(2).optional(),
         }),
+        faqs: z.array(
+          z.object({
+            id: z.string(),
+            question: z.string(),
+            answer: z.string(),
+            order: z.number(),
+          }),
+        ),
         phoneNumbers: z.array(z.string().min(10).max(15)).default([]),
         businessHours: z.record(
           z.string().min(2).max(50),
@@ -299,12 +336,20 @@ export const businessRouter = createTRPCRouter({
       try {
         const updatedBusiness = await ctx.db
           .update(businesses)
-          .set({ ...input })
+          .set({
+            ...input,
+            slug: slugify(input.name!, {
+              lower: true,
+              replacement: "-",
+              strict: true,
+              trim: true,
+            }),
+          })
           .where(eq(businesses.ownerId, ctx.session.user.id))
           .returning();
         await ctx.db
           .update(users)
-          .set({ vendor_setup_complete: null })
+          .set({ vendor_setup_complete: true })
           .where(eq(users.id, ctx.session.user.id));
         return updatedBusiness[0];
       } catch (error) {
@@ -325,3 +370,4 @@ export const businessRouter = createTRPCRouter({
 });
 
 export type BusinessRouter = typeof businessRouter;
+export type GetVendorType = inferRouterOutputs<BusinessRouter>["getVendor"];

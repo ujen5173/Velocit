@@ -1,8 +1,7 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Map } from "lucide-react";
 import { useEffect, useState } from "react";
-import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
@@ -30,12 +29,7 @@ const ShopsAround = () => {
     <section className="w-full">
       <div className="mx-auto max-w-[1200px] px-4 py-16">
         <div className="mb-5 flex items-center justify-between gap-4">
-          <h2
-            className={cn(
-              "text-2xl font-bold xs:text-3xl",
-              bricolage.className,
-            )}
-          >
+          <h2 className={cn("text-2xl font-bold xs:text-3xl")}>
             Popular Shops
           </h2>
           <div className="flex gap-2">
@@ -77,7 +71,11 @@ const ShopsAround = () => {
               ))}
             </CarouselContent>
           </Carousel>
-          <Button variant="outline">Explore Shops Around you</Button>
+
+          <Button className="gap-1" variant="outline">
+            <Map size={18} className="text-slate-600" />
+            Explore Shops Around you
+          </Button>
         </div>
       </div>
     </section>

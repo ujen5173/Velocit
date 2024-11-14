@@ -1,6 +1,7 @@
 "use client";
 import { Clock, Moon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { WEEK_DAYS } from "~/app/utils/helpers";
 import {
   FormControl,
   FormField,
@@ -18,16 +19,6 @@ import {
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
 import useBusinessFormContext from "../hooks/useBusinessFormContext";
-
-const WEEK_DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
 const BusinessHours = () => {
   const { form, business } = useBusinessFormContext();

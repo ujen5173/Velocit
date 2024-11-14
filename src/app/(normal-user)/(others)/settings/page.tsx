@@ -1,3 +1,4 @@
+import HeaderHeight from "~/app/_components/_/HeaderHeight";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/server";
@@ -10,7 +11,8 @@ const Settings = async () => {
 
   return (
     <>
-      <div className={"h-16"}></div>
+      <HeaderHeight />
+
       <div className="w-full bg-slate-100 px-4 py-12">
         <Tabs defaultValue="general" className="container flex gap-5">
           <div className="h-min w-72 space-y-4">

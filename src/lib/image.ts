@@ -299,10 +299,24 @@ const getBase64Array = async (files: File[]): Promise<Base64String[]> => {
   }
 };
 
+async function urlToFile(
+  url: string,
+  fileName: string,
+  mimeType: string,
+): Promise<File> {
+  // Fetch the image data
+  const response = await fetch(url);
+  const blob = await response.blob(); // Convert response to blob
+
+  // Create a File from the blob
+  return new File([blob], fileName, { type: mimeType });
+}
+
 export {
   getBase64,
   getBase64Array,
   readFileAsBase64,
+  urlToFile,
   webpBase64ArrayToFiles,
   webpBase64ToFile,
   type Base64String,

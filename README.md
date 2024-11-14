@@ -66,7 +66,50 @@ cp .env.example .env
 bun db:push
 ```
 
-5. **Run the development server**
+5. **Setup supabase triggers**
+
+```bash
+CREATE OR REPLACE FUNCTION add_business_on_user_creation()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.role = 'VENDOR' THEN
+    INSERT INTO business (owner_id)
+    VALUES (NEW.id);
+
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_add_business_on_user_creation
+AFTER INSERT ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION add_business_on_user_creation();
+```
+
+6. **Script to RSL enabled for all tables**
+
+```bash
+DO
+$$
+DECLARE
+    tbl RECORD;
+BEGIN
+    -- Loop through each table in the public schema
+    FOR tbl IN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+    LOOP
+        -- Enable RLS on each table
+        EXECUTE 'ALTER TABLE public.' || tbl.tablename || ' ENABLE ROW LEVEL SECURITY;';
+    END LOOP;
+END;
+$$;
+```
+
+7. **Run the development server**
 
 ```bash
 bun dev

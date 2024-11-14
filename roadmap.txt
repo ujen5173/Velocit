@@ -5,13 +5,42 @@
 ✅  - signin as normal user -> redirect -> / 
 
 ✅ - profile settings
-   - business profile
-   - bookmarks
-   - accessories page (shop gear page)
-   - orders
-   - get google map -> [TEMPORARY] -> react-leaflet
-   - dashboard
-   - change location api
-
----- 
+✅ - business profile 
+✅ - accessories page (shop gear page)
+✅ - bookmarks
+✅ - dashboard + orders [faqs, locations]
+✅ - users past orders
+✅ - business profile logic
+✅ - vehicle creation page
+✅ - fix business hours logic
+✅ - remove upload button to be clicked when uploading images.
+✅ - loading for vendor page
+✅ - dynamic rental place
+   - renting logic
+   - dashboard logic
+   - order for offline user
+   - select any vehicle
+   - select vehicle from vehicles section
    - prefetching all the items in the home page
+   - change location api
+   - get google map -> [TEMPORARY] -> react-leaflet
+   - offline/onsite payment
+   - handle upload errors in uploadthing.
+   - draft data in updating settings.
+
+  -- Future features -- 
+   - events
+   - event participating 
+   - place search
+   - past events
+   - view event page
+   - add vendor accessories page
+   - add vendor event page
+
+
+
+   -- ongoing --
+✅ - fix ts shit in vehicles page 
+✅ - add vehicles edit page
+✅ - fix ts shit in add vehicles page
+✅ - custom table loading while fetching vehicles 

@@ -1,3 +1,4 @@
+import { type Slide } from "~/types";
 import { type ShopData } from "~/types/bookings";
 
 export const searchedData = [
@@ -325,14 +326,15 @@ export const searchedData = [
 
 export const slides = [
   {
-    name: "Bike Farm Nepal",
-    slug: "bike-farm-nepal",
+    id: "basi-rental-service",
+    name: "Basi Rental Service",
+    slug: "basi-rental-service",
     rating: 4.5,
-    perDay: {
-      bicycle: 100,
+    location: {
+      city: "Kathmandu, Nepal",
     },
+    availableVehicleTypes: ["bicycle", "bike"],
     satisfiedCustomers: 200,
-    address: "Kathmandu, Nepal",
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img3.jpg",
@@ -341,14 +343,15 @@ export const slides = [
     ],
   },
   {
+    id: "epic-mountian-bike",
     name: "Epic Mountain Bike",
     slug: "epic-mountian-bike",
     rating: 4.8,
-    perDay: {
-      bicycle: 120,
+    location: {
+      city: "New Road, Kathmandu",
     },
     satisfiedCustomers: 350,
-    address: "Pokhara, Nepal",
+    availableVehicleTypes: ["bike", "scooter"],
     images: [
       "/images/shops/img2.jpg",
       "/images/shops/img1.jpg",
@@ -357,36 +360,41 @@ export const slides = [
     ],
   },
   {
+    id: "saddle-bike-store",
     name: "Saddle Bike Store",
     slug: "saddle-bike-store",
     rating: 4.3,
-    perDay: {
-      bicycle: 110,
+    location: {
+      city: "Near Labim Mall, Lalitpur",
     },
+    availableVehicleTypes: ["bike", "e-bike"],
     satisfiedCustomers: 180,
     address: "Bhaktapur, Nepal",
     images: ["/images/shops/img1.jpg", "/images/shops/img3.jpg"],
   },
   {
+    id: "himalayan-single-track",
     name: "Himalayan Single Track",
     slug: "himalayan-single-track",
     rating: 4.7,
-    perDay: {
-      bicycle: 150,
+    location: {
+      city: "Jhamshikel, Kathmandu",
     },
     satisfiedCustomers: 400,
     address: "Kathmandu, Nepal",
     images: ["/images/shops/img4.jpg"],
+    availableVehicleTypes: ["scooter", "bicycle"],
   },
   {
+    id: "bb-cycle-center",
     name: "B.B Cycle Center",
     slug: "bb-cycle-center",
     rating: 4.5,
-    perDay: {
-      bicycle: 100,
-    },
+    availableVehicleTypes: ["car", "bike"],
     satisfiedCustomers: 200,
-    address: "Kathmandu, Nepal",
+    location: {
+      city: "Balkumari, Lalitpur",
+    },
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img3.jpg",
@@ -394,10 +402,10 @@ export const slides = [
       "/images/shops/img4.jpg",
     ],
   },
-];
+] as Slide[];
 
 export const vendorDetail = {
-  id: "1",
+  id: "af90f38d-2e8a-4fc8-b0ff-cec585cedbb0",
   ownerId: "1",
   name: "Epic Mountain Bike Nepal",
   location: [

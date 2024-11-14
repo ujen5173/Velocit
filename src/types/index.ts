@@ -1,6 +1,5 @@
 import { type ClientUploadedFileData } from "uploadthing/types";
-
-export type VehicleType = "bicycle" | "bike" | "scooter" | "car" | "e-bike";
+import { type vehicleTypeEnum } from "~/server/db/schema";
 
 export type VehicleUse = "rental" | "sale" | "both";
 
@@ -8,7 +7,7 @@ export type VehicleStatus = "available" | "rented" | "sold" | "maintenance";
 
 export interface Vehicle {
   id: string;
-  type: VehicleType;
+  type: (typeof vehicleTypeEnum.enumValues)[number];
   brand: string;
   model: string;
   year: number;
@@ -25,16 +24,20 @@ export interface Vehicle {
 }
 
 export interface Slide {
-  name: string;
-  rating: number;
-  slug: string;
-  perDay: {
-    bicycle: number;
-  };
-  satisfiedCustomers: number;
-  address: string;
+  id: string;
+  name: string | null;
+  rating: number | null;
   images: string[];
-  lonlat?: number[];
+  location: {
+    city?: string | undefined;
+    address?: string | undefined;
+    lat?: number | undefined;
+    lng?: number | undefined;
+    map?: string | undefined;
+  };
+  satisfiedCustomers: number | null;
+  slug: string | null;
+  availableVehicleTypes: (typeof vehicleTypeEnum.enumValues)[number][];
 }
 
 export type UploadedFile<T = unknown> = ClientUploadedFileData<T>;

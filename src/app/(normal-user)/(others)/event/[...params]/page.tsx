@@ -1,7 +1,9 @@
 "use client";
+
 import { Share, Users } from "lucide-react";
 import Image from "next/image";
-import { bricolage, nunito } from "~/app/utils/font";
+import HeaderHeight from "~/app/_components/_/HeaderHeight";
+import { nunito } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { eventDetail } from "~/lib/data";
@@ -10,16 +12,11 @@ import { cn } from "~/lib/utils";
 const EventPage = () => {
   return (
     <>
-      <div className="h-16 md:h-20"></div>
+      <HeaderHeight />
       <section className="relative">
         <div className="mx-auto max-w-[1440px] px-4 py-8">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:gap-10">
-            <h1
-              className={cn(
-                "mb-6 text-4xl font-bold lg:text-5xl",
-                bricolage.className,
-              )}
-            >
+            <h1 className={cn("mb-6 text-4xl font-bold lg:text-5xl")}>
               {eventDetail.title}
             </h1>
             <Button variant={"outline"} className="hidden md:flex">

@@ -12,7 +12,7 @@ export const rentalRouter = createTRPCRouter({
         startDate: z.date(),
         totalPrice: z.number(),
         endDate: z.date(),
-        numberOfVehicles: z.number().default(1),
+        inventory: z.number().default(1),
         paymentScreenshot: z.string(),
         notes: z.string().optional(),
       }),
@@ -36,10 +36,9 @@ export const rentalRouter = createTRPCRouter({
       const vehicle = await ctx.db
         .select({
           id: vehicles.id,
-          numberOfVehicles: vehicles.numberOfVehicles,
+          inventory: vehicles.inventory,
           unavailabilityDates: vehicles.unavailabilityDates,
           basePrice: vehicles.basePrice,
-          discountedPrice: vehicles.discountedPrice,
           businessId: vehicles.businessId,
         })
         .from(vehicles)
@@ -55,7 +54,7 @@ export const rentalRouter = createTRPCRouter({
       }
 
       // Check if requested number of vehicles is available
-      if (input.numberOfVehicles > vehicle.numberOfVehicles) {
+      if (input.inventory > vehicle.inventory) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Requested number of vehicles exceeds availability",
@@ -99,7 +98,7 @@ export const rentalRouter = createTRPCRouter({
           vehicleId: input.vehicleId,
           rentalStart: input.startDate,
           rentalEnd: input.endDate,
-          numberOfVehicles: input.numberOfVehicles,
+          inventory: input.inventory,
           status: rentalStatusEnum.enumValues[0],
           totalPrice: input.totalPrice,
           notes: input.notes,

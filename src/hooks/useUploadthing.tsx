@@ -27,17 +27,22 @@ export function useUploadFile(
 
     try {
       setUploadedFile(undefined);
+
       const res = await uploadFiles(endpoint, {
         ...props,
         files: files,
         onUploadProgress: ({ progress }) => {
-          setProgresses(progress);
+          if (progress >= 0 && progress <= 100) {
+            setProgresses(progress);
+          }
         },
       });
 
       setUploadedFile(res);
+      setProgresses(0);
     } finally {
       setIsUploading(false);
+      setProgresses(0);
     }
   };
 

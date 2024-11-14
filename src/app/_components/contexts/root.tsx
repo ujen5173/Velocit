@@ -1,19 +1,42 @@
 "use client";
 
-import { type User } from "next-auth";
+import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
-import { type ReactNode, createContext } from "react";
+import React, {
+  type ReactNode,
+  createContext,
+  useContext,
+  useState,
+} from "react";
+import { bricolage } from "~/app/utils/font";
 
 type RootContextProps = {
-  user: User | null;
+  user: Session | null;
+  setUser: React.Dispatch<React.SetStateAction<Session | null>>;
 };
 
 export const Context = createContext<RootContextProps>({
   user: null,
+  setUser: () => {
+    return null;
+  },
 });
 
-const RootContext = ({ children }: { children: ReactNode }) => {
+export const useUser = () => {
+  const ctx = useContext(Context);
+  return ctx;
+};
+
+const RootContext = ({
+  session,
+  children,
+}: {
+  session: Session | null;
+  children: ReactNode;
+}) => {
+  const [user, setUser] = useState<Session | null>(session);
+
   return (
     <SessionProvider>
       <ProgressBar
@@ -22,7 +45,9 @@ const RootContext = ({ children }: { children: ReactNode }) => {
         options={{ showSpinner: true }}
         shallowRouting
       />
-      <Context.Provider value={{ user: null }}>{children}</Context.Provider>
+      <Context.Provider value={{ user: user, setUser: setUser }}>
+        <main className={bricolage.className}>{children}</main>
+      </Context.Provider>
     </SessionProvider>
   );
 };

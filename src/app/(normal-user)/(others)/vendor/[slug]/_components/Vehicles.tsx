@@ -1,22 +1,18 @@
 "use client";
+
 import { ListFilter, Star } from "lucide-react";
 import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
-import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import { vendorDetail, vendorVehicles } from "~/lib/data";
 import { cn } from "~/lib/utils";
+
 const Vehicles = () => {
   return (
     <section>
-      <div className="mx-auto max-w-[1240px]">
+      <div className={cn("mx-auto max-w-[1240px]")}>
         <div className="mb-10 flex items-center justify-between gap-10">
-          <h1
-            className={cn(
-              "text-2xl font-bold xs:text-3xl",
-              bricolage.className,
-            )}
-          >
+          <h1 className={cn("text-2xl font-bold xs:text-3xl")}>
             Pick Your Ride
           </h1>
           <Button variant={"outline"} className="hover:bg-slate-50">
@@ -25,7 +21,11 @@ const Vehicles = () => {
           </Button>
         </div>
 
-        <section className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <section
+          className={cn(
+            "grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+          )}
+        >
           {vendorVehicles.map((vehicle) => (
             <div
               key={vehicle.id}
@@ -45,34 +45,29 @@ const Vehicles = () => {
                   {vehicle.status}
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold text-slate-700">
+              <div className="">
+                <h3 className="mb-4 line-clamp-1 text-xl font-semibold">
                   {vehicle.brand} {vehicle.model}
                 </h3>
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-2 flex items-center gap-1">
                   <Star
-                    size={16}
+                    size={20}
                     className="fill-yellow-500 stroke-yellow-500"
                   />
-                  <span className="text-sm">
-                    {vendorDetail.rating} ({vendorDetail.ratingCount})
+                  <span>
+                    <span className="text-lg font-medium">
+                      {vendorDetail.rating} ({vendorDetail.ratingCount})
+                    </span>
                   </span>
                 </div>
+
                 <div>
-                  <h4 className="mb-1 text-sm uppercase text-slate-600">
-                    Starting at
-                  </h4>
-                  <div className="flex items-end gap-2">
-                    <span
-                      className={cn(
-                        "text-xl font-semibold",
-                        bricolage.className,
-                      )}
-                    >
-                      रु {(vehicle.price_per_hour ?? 1) * 65}{" "}
-                      <span className="text-base font-normal">/day</span>
-                    </span>
-                  </div>
+                  <p className="text-base font-medium uppercase">Starting at</p>
+
+                  <h2 className="text-2xl font-semibold">
+                    रु {(vehicle.price_per_hour ?? 1) * 65}{" "}
+                    <span className="text-base font-normal">/day</span>
+                  </h2>
                 </div>
               </div>
             </div>

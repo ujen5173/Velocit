@@ -2,7 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { bricolage } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
@@ -93,20 +92,10 @@ const UpcomingEvent = () => {
     <section className="w-full bg-slate-50">
       <div className="mx-auto max-w-[1200px] px-4 py-16">
         <div className="mb-5 flex items-center justify-between gap-4">
-          <h2
-            className={cn(
-              "block text-2xl font-bold xs:hidden",
-              bricolage.className,
-            )}
-          >
+          <h2 className={cn("block text-2xl font-bold xs:hidden")}>
             Upcoming Events
           </h2>
-          <h2
-            className={cn(
-              "hidden text-2xl font-bold xs:block xs:text-3xl",
-              bricolage.className,
-            )}
-          >
+          <h2 className={cn("hidden text-2xl font-bold xs:block xs:text-3xl")}>
             Participate on Upcoming Events
           </h2>
 

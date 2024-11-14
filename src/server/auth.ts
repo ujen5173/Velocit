@@ -27,7 +27,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
-      vendor_setup_complete: string | undefined | null;
+      vendor_setup_complete: boolean;
       stripeCustomerId?: string | null;
     } & DefaultSession["user"];
   }
@@ -35,7 +35,7 @@ declare module "next-auth" {
   interface User {
     id: string;
     email: string;
-    vendor_setup_complete: string | undefined | null;
+    vendor_setup_complete: boolean;
     role: userRoleEnum;
     createdAt: Date;
     updatedAt: Date;
@@ -75,11 +75,12 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      token.image = token.image ?? token.picture;
       if (trigger === "update") {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         token.name = newData.user.name;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        token.image = newData.user.picture;
+        token.image = newData.user.image;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         token.vendor_setup_complete = newData.user.vendor_setup_complete;
@@ -89,7 +90,9 @@ export const authOptions: NextAuthOptions = {
       token.vendor_setup_complete =
         token.vendor_setup_complete ?? user?.vendor_setup_complete ?? false;
 
-      return token;
+      const { picture, ...rest } = token;
+
+      return rest; // returns token without picture from the token
     },
 
     async session({ session, token }) {

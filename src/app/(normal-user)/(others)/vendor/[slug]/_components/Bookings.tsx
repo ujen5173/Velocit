@@ -30,9 +30,12 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
+import { toast } from "~/hooks/use-toast";
+import { useUploadFile } from "~/hooks/useUploadthing";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { shopData } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import { api } from "~/trpc/react";
 import { type Vehicle } from "~/types/bookings";
 
 interface BookingsProps {
@@ -41,7 +44,6 @@ interface BookingsProps {
 }
 
 const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
-  console.log({ vt: shopData.vehicleTypes });
   const [selectedVehicleType, setSelectedVehicleType] = useState<string>(
     Object.keys(shopData.vehicleTypes)[0]!,
   );
@@ -52,7 +54,6 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [message, setMessage] = useState<string>("");
   const [showQR, setShowQR] = useState<boolean>(false);
-  const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null);
 
   // Helper function to get available quantity for a vehicle on specific dates
   const getAvailableQuantity = (
@@ -103,12 +104,6 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
 
   const handleCheckout = () => {
     setShowQR(true);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setPaymentScreenshot(e.target.files[0]);
-    }
   };
 
   const getCurrentVehicles = (): Vehicle[] => {
@@ -201,9 +196,62 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
   };
   const { width } = useWindowDimensions();
 
+  const { isUploading, progresses, uploadFiles, uploadedFile } =
+    useUploadFile("imageUploader");
+
+  const { mutateAsync, status } = api.rental.rent.useMutation();
+
+  const handleConfirmbBooking = async () => {
+    const selectedVehicleId = getSelectedVehicleId();
+    if (!selectedVehicleId || !date?.from || !date?.to) {
+      return;
+    }
+
+    if (!uploadedFile?.[0]?.url) {
+      toast({
+        title: "Upload Payment Screenshot",
+        description: "Please upload payment screenshot to confirm booking",
+      });
+      return;
+    }
+
+    const startDate = date.from;
+    const endDate = date.to;
+
+    const booking = {
+      vehicleId: selectedVehicleId,
+      startDate,
+      totalPrice: getSelectedVehiclePrice(),
+      endDate,
+      inventory: quantity,
+      paymentScreenshot: uploadedFile?.[0]?.url,
+      note: message,
+    };
+
+    await mutateAsync(booking);
+
+    setOpen(false);
+    setShowQR(false);
+    setSelectedVehicleType("");
+    setSelectedVehicleSubType("");
+    setSelectedModel("");
+    setDate(undefined);
+    setQuantity(1);
+    setMessage("");
+
+    toast({
+      title: "Booking Confirmed. Wait for confirmation",
+      description: "Your booking has been confirmed successfully",
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="flex h-[90vh] max-h-[800px] w-[90vw] flex-col gap-4 p-4 md:w-[80vw] lg:max-w-2xl">
+      <DialogContent
+        className={cn(
+          "flex h-[90vh] max-h-[800px] w-[90vw] flex-col gap-4 p-4 md:w-[80vw] lg:max-w-2xl",
+        )}
+      >
         {!showQR ? (
           <>
             <DialogHeader className="flex-none border-b border-border pb-2">
@@ -466,29 +514,15 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
           </>
         ) : (
           <div className="flex flex-col items-center gap-6 p-4">
-            <div className="flex w-full justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowQR(false)}
-                className="rounded-full"
-              >
-                <X className="size-4" />
-              </Button>
-            </div>
-
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex w-full flex-col items-center gap-4">
               <div className="text-center">
                 <h3 className="text-lg font-semibold">Booking Summary</h3>
-                <p className="text-sm text-muted-foreground">
-                  Please review your booking details before payment
-                </p>
               </div>
 
               <div className="w-full space-y-2 rounded-md border p-4">
                 <div className="flex justify-between">
                   <span>Vehicle:</span>
-                  <span className="font-medium">{selectedModel}</span>
+                  <span className="font-semibold">{selectedModel}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Dates:</span>
@@ -505,7 +539,7 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 <div className="flex justify-between">
                   <span>Total Amount:</span>
                   <span className="font-semibold">
-                    ${getSelectedVehiclePrice()}
+                    रु.{getSelectedVehiclePrice()} /-
                   </span>
                 </div>
               </div>
@@ -519,35 +553,53 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 className="rounded-lg object-contain"
                 priority
               />
-
-              {/* Dropzone */}
             </div>
 
             <div className="w-full space-y-4">
               <div className="space-y-2">
                 <Label>Upload Payment Screenshot</Label>
+                <div className="relative">
+                  <Input
+                    max="1"
+                    pattern="image/*"
+                    id="picture"
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files) {
+                        void uploadFiles(Array.from(files));
+                      }
+                    }}
+                    type="file"
+                    className="leading-[2.5!important]"
+                  />
+                  {isUploading && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white">
+                      <span className="text-xs text-secondary">{`Uploading... ${progresses}%`}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setShowQR(false)}>
+                <Button
+                  disabled={isUploading}
+                  variant="outline"
+                  onClick={() => setShowQR(false)}
+                >
                   Back
                 </Button>
                 <Button
                   variant="primary"
-                  disabled={!paymentScreenshot}
-                  onClick={() => {
-                    setOpen(false);
-                    setShowQR(false);
-                    setSelectedVehicleType("");
-                    setSelectedVehicleSubType("");
-                    setSelectedModel("");
-                    setDate(undefined);
-                    setQuantity(1);
-                    setMessage("");
-                    setPaymentScreenshot(null);
+                  disabled={isUploading || status === "pending"}
+                  onClick={async () => {
+                    await handleConfirmbBooking();
                   }}
                 >
-                  Confirm Payment
+                  {isUploading
+                    ? "Uploading File..."
+                    : status === "pending"
+                      ? "Confirming Booking..."
+                      : "Confirm Booking"}
                 </Button>
               </div>
             </div>

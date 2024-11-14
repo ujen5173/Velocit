@@ -1,9 +1,10 @@
-import { relations, sql } from "drizzle-orm";
+import { relations, sql, type InferInsertModel } from "drizzle-orm";
 import {
   boolean,
   decimal,
   index,
   integer,
+  json,
   jsonb,
   pgEnum,
   pgTableCreator,
@@ -14,13 +15,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
-
 export const createTable = pgTableCreator((name) => `${name}`);
 
 // Enums
 export const vehicleTypeEnum = pgEnum("vehicle_type", [
+  "bicycle",
+  "e-bicycle",
   "bike",
-  "e-bike",
   "scooter",
   "e-scooter",
   "car",
@@ -45,7 +46,6 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "refunded",
 ]);
 
-// Optimized users table
 export const users = createTable(
   "user",
   {
@@ -70,8 +70,6 @@ export const users = createTable(
   }),
 );
 
-// social media also...
-// Optimized businesses table
 export const businesses = createTable(
   "business",
   {
@@ -83,6 +81,7 @@ export const businesses = createTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }),
+    slug: varchar("slug", { length: 100 }),
     location: jsonb("location")
       .notNull()
       .$type<{
@@ -97,12 +96,24 @@ export const businesses = createTable(
       .array()
       .notNull()
       .default(sql`'{}'::varchar[]`),
+    socials: json("socials")
+      .$type<{
+        twitter?: string | undefined;
+        instagram?: string | undefined;
+      }>()
+      .notNull()
+      .default(sql`'{}'::json`),
+    sellGears: boolean("sell_gears").notNull().default(false),
     businessHours: jsonb("business_hours")
       .$type<Record<string, { open: string; close: string } | null>>()
       .notNull()
       .default(sql`'{}'::jsonb`),
-    rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
+    rating: decimal("rating", { precision: 3, scale: 2 })
+      .$type<number>()
+      .notNull()
+      .default(0.0),
     ratingCount: integer("rating_count").default(0),
+    satisfiedCustomers: integer("satisfied_customers").default(0),
     availableVehicleTypes: vehicleTypeEnum("available_vehicle_types")
       .array()
       .notNull()
@@ -112,6 +123,12 @@ export const businesses = createTable(
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
+    faqs: json("faqs")
+      .$type<
+        { question: string; answer: string; id: string; order: number }[]
+      >()
+      .notNull()
+      .default(sql`'{}'::json`),
     stripeAccountId: varchar("stripe_account_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -124,7 +141,24 @@ export const businesses = createTable(
   }),
 );
 
-// Optimized vehicles table with availability tracking
+export const bookmarks = createTable(
+  "bookmark",
+  {
+    userId: varchar("user_id", { length: 36 }).notNull(),
+    businessId: varchar("business_id", { length: 36 })
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.businessId, table.userId],
+    }),
+    userIdx: index("bookmark_user_idx").on(table.userId),
+    businessIdx: index("bookmark_business_idx").on(table.businessId),
+  }),
+);
+
 export const vehicles = createTable(
   "vehicle",
   {
@@ -137,25 +171,28 @@ export const vehicles = createTable(
       .references(() => businesses.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
     type: vehicleTypeEnum("type").notNull(),
+    category: varchar("category", { length: 100 }).notNull(),
     images: text("images")
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
     basePrice: integer("base_price").notNull(),
-    numberOfVehicles: integer("number_of_vehicles").notNull().default(1),
-    discountedPrice: integer("discounted_price"),
-    longRidesAvailable: boolean("long_rides_available").notNull().default(true),
+    inventory: integer("inventory").notNull().default(1),
+    features: jsonb("features")
+      .$type<
+        {
+          key: string;
+          value: string;
+        }[]
+      >()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     unavailabilityDates: timestamp("unavailability_dates", {
       mode: "date",
     })
       .array()
       .notNull()
       .default(sql`'{}'::timestamp[]`),
-
-    mileage: integer("mileage").default(0),
-    model: varchar("model", { length: 100 }).notNull(),
-    year: integer("year").notNull(),
-    features: jsonb("features").default(sql`'{}'::jsonb`),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -182,7 +219,7 @@ export const rentals = createTable(
       .references(() => businesses.id, { onDelete: "cascade" }),
     rentalStart: timestamp("rental_start").notNull(),
     rentalEnd: timestamp("rental_end").notNull(),
-    numberOfVehicles: integer("number_of_vehicles").notNull().default(1),
+    inventory: integer("number_of_vehicles").notNull().default(1),
     status: rentalStatusEnum("status").notNull().default("pending"),
     totalPrice: integer("total_price").notNull(),
     notes: text("notes"),
@@ -333,9 +370,17 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   rentals: many(rentals),
+  bookmarks: many(bookmarks),
   business: one(businesses, {
     fields: [users.id],
     references: [businesses.ownerId],
+  }),
+}));
+
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  business: one(users, {
+    fields: [bookmarks.businessId],
+    references: [users.id],
   }),
 }));
 
@@ -389,3 +434,10 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
+
+// zod types:
+export type businessesType = InferInsertModel<typeof businesses>;
+export type usersType = InferInsertModel<typeof users>;
+export type vehiclesType = InferInsertModel<typeof vehicles>;
+export type bookmarksType = InferInsertModel<typeof bookmarks>;
+export type rentalsType = InferInsertModel<typeof rentals>;

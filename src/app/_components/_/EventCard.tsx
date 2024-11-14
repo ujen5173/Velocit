@@ -1,6 +1,7 @@
 import { Calendar, Dot, IndianRupee, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { bricolage } from "~/app/utils/font";
 import { type EventSlide } from "./UpcomingEvent";
 
 type Props = {
@@ -9,7 +10,10 @@ type Props = {
 
 const EventCard = ({ event }: Props) => {
   return (
-    <Link href={`/event/${event.hostedBy}/${event.title}`}>
+    <Link
+      className={bricolage.className}
+      href={`/event/${event.hostedBy}/${event.title}`}
+    >
       <div className="relative mb-4">
         <Image
           width={800}

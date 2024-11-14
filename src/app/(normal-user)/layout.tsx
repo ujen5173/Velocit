@@ -9,7 +9,6 @@ const NormalUserLayout = async ({
   children: React.ReactNode;
 }) => {
   const session = await getServerAuthSession();
-  console.log({ session });
 
   if (session?.user.role === "VENDOR" && !session?.user.vendor_setup_complete)
     redirect("/vendor/profile");
