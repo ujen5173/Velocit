@@ -1,3 +1,5 @@
+"use client";
+
 import { Dot, Globe, MessageCircle, Phone, Star, Store } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,13 +18,26 @@ import {
 } from "~/components/ui/carousel";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
+import { api as trpc } from "~/trpc/react";
 import Bookings from "./Bookings";
 import FavroiteButton from "./FavroiteButton";
 import { VendorContext } from "./VendorWrapper";
 
 const VendorDetails = () => {
+  const { vendor } = useContext(VendorContext);
+
   const [api, setApi] = useState<CarouselApi>();
   const [open, setOpen] = useState(false);
+  const { data: bookingsDetails, isLoading } =
+    trpc.business.getBookingsDetails.useQuery(
+      {
+        businessId: vendor?.id ?? "",
+      },
+      {
+        enabled: !!vendor?.id,
+        refetchOnWindowFocus: false,
+      },
+    );
 
   const [imageOrientation, setImageOrientation] = useState<
     "horizontal" | "vertical"
@@ -41,8 +56,6 @@ const VendorDetails = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const { vendor } = useContext(VendorContext);
 
   function checkBusinessHours(
     businessHours: Record<string, { open: string; close: string } | null>,
@@ -99,7 +112,13 @@ const VendorDetails = () => {
 
   return (
     <>
-      <Bookings open={open} setOpen={setOpen} />
+      {!isLoading && bookingsDetails !== undefined && (
+        <Bookings
+          open={open}
+          setOpen={setOpen}
+          bookingsDetails={bookingsDetails}
+        />
+      )}
 
       <section className="px-4">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-5 py-6 md:flex-row md:py-10 lg:gap-10">

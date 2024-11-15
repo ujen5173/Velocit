@@ -201,6 +201,7 @@ export const vehicles = createTable(
     typeIdx: index("vehicle_type_idx").on(table.type),
   }),
 );
+
 export const rentals = createTable(
   "rental",
   {

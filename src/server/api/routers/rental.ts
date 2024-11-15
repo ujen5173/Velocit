@@ -19,14 +19,14 @@ export const rentalRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Validate dates
-      if (input.startDate >= input.endDate) {
+      if (input.startDate > input.endDate) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "End date must be after start date",
         });
       }
 
-      if (input.startDate < new Date()) {
+      if (new Date(input.startDate).getDate() < new Date().getDate()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Start date cannot be in the past",

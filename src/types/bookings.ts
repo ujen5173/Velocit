@@ -1,9 +1,9 @@
 // Updated TypeScript interfaces
 export interface Vehicle {
   id: string;
-  model: string;
-  count: number;
-  price: number;
+  name: string;
+  basePrice: number;
+  inventory: number;
 }
 
 export interface VehicleType {

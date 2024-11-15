@@ -1,9 +1,11 @@
 "use client";
+
 import { differenceInDays, format } from "date-fns";
 import { CalendarDays, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import { type DateRange } from "react-day-picker";
+import { inter } from "~/app/utils/font";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
@@ -33,19 +35,25 @@ import { Textarea } from "~/components/ui/textarea";
 import { toast } from "~/hooks/use-toast";
 import { useUploadFile } from "~/hooks/useUploadthing";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
-import { shopData } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import { type GetBookingsType } from "~/server/api/routers/business";
 import { api } from "~/trpc/react";
 import { type Vehicle } from "~/types/bookings";
 
 interface BookingsProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  bookingsDetails: GetBookingsType;
 }
 
-const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
+const Bookings: React.FC<BookingsProps> = ({
+  bookingsDetails,
+  open,
+  setOpen,
+}) => {
+  console.log({ bookingsDetails });
   const [selectedVehicleType, setSelectedVehicleType] = useState<string>(
-    Object.keys(shopData.vehicleTypes)[0]!,
+    Object.keys(bookingsDetails.vehicleTypes)[0]!,
   );
   const [selectedVehicleSubType, setSelectedVehicleSubType] =
     useState<string>("");
@@ -55,7 +63,21 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
   const [message, setMessage] = useState<string>("");
   const [showQR, setShowQR] = useState<boolean>(false);
 
-  // Helper function to get available quantity for a vehicle on specific dates
+  const getSelectedVehicleId = (): string | undefined => {
+    const vehicles = getCurrentVehicles();
+    const selectedVehicle = vehicles.find((v) => v.name === selectedModel);
+    return selectedVehicle?.id;
+  };
+
+  const getCurrentVehicles = (): Vehicle[] => {
+    if (!selectedVehicleType || !selectedVehicleSubType) return [];
+    const type = bookingsDetails.vehicleTypes[selectedVehicleType];
+    const subType = type?.types.find(
+      (t) => t.category === selectedVehicleSubType,
+    );
+    return subType?.vehicles ?? [];
+  };
+
   const getAvailableQuantity = (
     vehicleId: string,
     startDate: Date,
@@ -64,10 +86,10 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
     const vehicle = getCurrentVehicles().find((v) => v.id === vehicleId);
     if (!vehicle) return 0;
 
-    const totalCount = vehicle.count;
-    const overlappingBookings = shopData.bookings.filter((booking) => {
-      const bookingStart = new Date(booking.startDate);
-      const bookingEnd = new Date(booking.endDate);
+    const totalCount = vehicle.inventory;
+    const overlappingBookings = bookingsDetails.bookings.filter((booking) => {
+      const bookingStart = new Date(booking.rentalStart);
+      const bookingEnd = new Date(booking.rentalEnd);
       return (
         booking.vehicleId === vehicleId &&
         !(endDate < bookingStart || startDate > bookingEnd)
@@ -81,67 +103,13 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
     return totalCount - maxBooked;
   };
 
-  // Updated quantity change handler
-  const handleQuantityChange = (action: "increment" | "decrement") => {
-    const maxQuantity = getMaxAllowedQuantity();
-
-    if (action === "increment" && quantity < maxQuantity) {
-      setQuantity(quantity + 1);
-    } else if (action === "decrement" && quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  // Get maximum allowed quantity based on selected dates and vehicle
-  const getMaxAllowedQuantity = (): number => {
-    const selectedVehicleId = getSelectedVehicleId();
-    if (!selectedVehicleId || !date?.from || !date?.to) {
-      return 0;
-    }
-
-    return getAvailableQuantity(selectedVehicleId, date.from, date.to);
-  };
-
-  const handleCheckout = () => {
-    setShowQR(true);
-  };
-
-  const getCurrentVehicles = (): Vehicle[] => {
-    if (!selectedVehicleType || !selectedVehicleSubType) return [];
-    const type = shopData.vehicleTypes[selectedVehicleType];
-    const subType = type?.types.find((t) => t.name === selectedVehicleSubType);
-    return subType?.vehicles ?? [];
-  };
-
-  const getRentalDays = (): number => {
-    if (!date?.from || !date?.to) return 0;
-    return differenceInDays(date.to, date.from) + 1;
-  };
-
-  const getSelectedVehiclePrice = (): number => {
-    const vehicles = getCurrentVehicles();
-    const selectedVehicle = vehicles.find((v) => v.model === selectedModel);
-    const days = getRentalDays();
-    return selectedVehicle ? selectedVehicle.price * quantity * days : 0;
-  };
-
-  const getSelectedVehicleId = (): string | undefined => {
-    const vehicles = getCurrentVehicles();
-    const selectedVehicle = vehicles.find((v) => v.model === selectedModel);
-    return selectedVehicle?.id;
-  };
-
-  // Updated date disable logic
-  const isDateDisabled = (date: Date) => {
-    // Get the start of today
+  const isDateDisabled = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Get the date to check with time set to start of day
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
 
-    // Disallow past dates
     if (checkDate < today) {
       return true;
     }
@@ -151,32 +119,27 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
       return false;
     }
 
-    // Check if there are any available vehicles on this date
     const availableQuantity = getAvailableQuantity(
       selectedVehicleId,
       checkDate,
       checkDate,
     );
-
     return availableQuantity <= 0;
   };
 
-  // Add clear date handler
-  const handleClearDate = () => {
-    setDate(undefined);
-    setQuantity(1); // Reset quantity when date is cleared
+  const getRentalDays = (): number => {
+    if (!date?.from || !date?.to) return 0;
+    return differenceInDays(date.to, date.from) + 1;
   };
 
-  // Update vehicle selection handler
-  const handleModelSelect = (model: string) => {
-    setSelectedModel(model);
-    setDate(undefined); // Reset date when model changes
-    setQuantity(1); // Reset quantity when model changes
-  };
+  const getMaxAllowedQuantity = (): number => {
+    const selectedVehicleId = getSelectedVehicleId();
+    if (!selectedVehicleId || !date?.from || !date?.to) {
+      return 0;
+    }
 
-  const isDateSelectionDisabled = useMemo(() => {
-    return !selectedVehicleType || !selectedVehicleSubType || !selectedModel;
-  }, [selectedVehicleType, selectedVehicleSubType, selectedModel]);
+    return getAvailableQuantity(selectedVehicleId, date.from, date.to);
+  };
 
   const isCheckoutDisabled = useMemo(() => {
     if (!date?.from || !date?.to || getRentalDays() === 0) return true;
@@ -185,25 +148,46 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
     return maxQuantity === 0 || quantity > maxQuantity;
   }, [date, quantity]);
 
-  // Get available count text for vehicle selection
-  const getAvailableCountText = (vehicle: Vehicle): string => {
-    if (!date?.from || !date?.to) {
-      return `(${vehicle.count} total)`;
-    }
-
-    const availableCount = getAvailableQuantity(vehicle.id, date.from, date.to);
-    return `(${availableCount} available)`;
+  const handleModelSelect = (model: string) => {
+    setSelectedModel(model);
+    setDate(undefined); // Reset date when model changes
+    setQuantity(1); // Reset quantity when model changes
   };
-  const { width } = useWindowDimensions();
 
-  const { isUploading, progresses, uploadFiles, uploadedFile } =
-    useUploadFile("imageUploader");
+  const handleCheckout = () => {
+    setShowQR(true);
+  };
+
+  const getSelectedVehiclePrice = (): number => {
+    const vehicles = getCurrentVehicles();
+    const selectedVehicle = vehicles.find((v) => v.name === selectedModel);
+    const days = getRentalDays();
+    return selectedVehicle ? selectedVehicle.basePrice * quantity * days : 0;
+  };
+
+  const handleClearDate = () => {
+    setDate(undefined);
+    setQuantity(1); // Reset quantity when date is cleared
+  };
+
+  const isDateSelectionDisabled = useMemo(() => {
+    return !selectedVehicleType || !selectedVehicleSubType || !selectedModel;
+  }, [selectedVehicleType, selectedVehicleSubType, selectedModel]);
 
   const { mutateAsync, status } = api.rental.rent.useMutation();
 
-  const handleConfirmbBooking = async () => {
+  const handleConfirmBooking = async () => {
     const selectedVehicleId = getSelectedVehicleId();
     if (!selectedVehicleId || !date?.from || !date?.to) {
+      return;
+    }
+
+    const maxAllowedQuantity = getMaxAllowedQuantity();
+    if (quantity > maxAllowedQuantity) {
+      toast({
+        title: "Booking Exceeded Available Quantity",
+        description: `The maximum available quantity for the selected dates is ${maxAllowedQuantity}. Please adjust your booking.`,
+      });
       return;
     }
 
@@ -245,10 +229,27 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
     });
   };
 
+  // Updated quantity change handler
+  const handleQuantityChange = (action: "increment" | "decrement") => {
+    const maxQuantity = getMaxAllowedQuantity();
+
+    if (action === "increment" && quantity < maxQuantity) {
+      setQuantity(quantity + 1);
+    } else if (action === "decrement" && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const { width } = useWindowDimensions();
+
+  const { isUploading, progresses, uploadFiles, uploadedFile } =
+    useUploadFile("imageUploader");
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className={cn(
+          inter.className,
           "flex h-[90vh] max-h-[800px] w-[90vw] flex-col gap-4 p-4 md:w-[80vw] lg:max-w-2xl",
         )}
       >
@@ -266,7 +267,7 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                 <div className="mb-8 space-y-2 px-1">
                   <Label>Vehicle Type</Label>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-5 px-1 sm:grid-cols-3">
-                    {Object.entries(shopData.vehicleTypes).map(
+                    {Object.entries(bookingsDetails.vehicleTypes).map(
                       ([type, data]) => {
                         return (
                           <div
@@ -284,10 +285,14 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                               setQuantity(1);
                             }}
                           >
-                            <span className="text-sm font-medium">
+                            <span className="text-sm font-medium capitalize">
                               {data.label}
                             </span>
-                            <div className="absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50">
+                            <div
+                              className={cn(
+                                "absolute -bottom-[0.80rem] right-2 rounded-full bg-slate-600 px-3 py-1 text-[0.65rem] text-slate-50",
+                              )}
+                            >
                               From ${data.startingPrice}
                             </div>
                           </div>
@@ -314,11 +319,14 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {shopData.vehicleTypes[
+                          {bookingsDetails.vehicleTypes[
                             selectedVehicleType
                           ]?.types.map((type) => (
-                            <SelectItem key={type.name} value={type.name}>
-                              {type.name}
+                            <SelectItem
+                              key={type.category}
+                              value={type.category}
+                            >
+                              {type.category}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -336,8 +344,8 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                         </SelectTrigger>
                         <SelectContent>
                           {getCurrentVehicles().map((vehicle) => (
-                            <SelectItem key={vehicle.id} value={vehicle.model}>
-                              {vehicle.model} {getAvailableCountText(vehicle)}
+                            <SelectItem key={vehicle.id} value={vehicle.name}>
+                              {vehicle.name} (${vehicle.basePrice}/day)
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -592,7 +600,7 @@ const Bookings: React.FC<BookingsProps> = ({ open, setOpen }) => {
                   variant="primary"
                   disabled={isUploading || status === "pending"}
                   onClick={async () => {
-                    await handleConfirmbBooking();
+                    await handleConfirmBooking();
                   }}
                 >
                   {isUploading

@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { Bell, PanelLeft } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useUser } from "~/app/_components/contexts/root";
 import { Button } from "./button";
@@ -76,7 +77,14 @@ const CustomSidebarTriggerHeader = () => {
               <DropdownMenuItem>Dashboard</DropdownMenuItem>
               <DropdownMenuItem>Account Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  void signOut();
+                  window.location.href = "/";
+                }}
+              >
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

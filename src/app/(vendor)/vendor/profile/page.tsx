@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import EmailNotificaiton from "~/app/(normal-user)/(others)/settings/_components/email";
 import GeneralSettings from "~/app/(normal-user)/(others)/settings/_components/general";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -12,18 +13,7 @@ const VendorSetup = async () => {
   const [user, business] = await Promise.all([userDetails, businessDetails]);
 
   if (!business) {
-    return (
-      <section className="w-full px-2 py-4 sm:px-4 sm:py-6">
-        <div className="rounded-md border border-red-600 bg-red-50 p-4 text-red-600">
-          <p className="text-base font-semibold">
-            Setup your business information.
-          </p>
-          <p className="text-sm">
-            Before moving forward, please complete your business profile.
-          </p>
-        </div>
-      </section>
-    );
+    redirect("/");
   }
 
   return (

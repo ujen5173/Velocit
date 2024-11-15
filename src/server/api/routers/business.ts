@@ -9,6 +9,7 @@ import {
 } from "~/server/api/trpc";
 import {
   businesses,
+  rentals,
   users,
   vehicles,
   vehicleTypeEnum,
@@ -367,7 +368,145 @@ export const businessRouter = createTRPCRouter({
         });
       }
     }),
+
+  getBookingsDetails: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      // Fetch available vehicle types for the business
+      const [vehicleTypes] = await ctx.db
+        .select({ vehicleTypes: businesses.availableVehicleTypes })
+        .from(businesses)
+        .where(eq(businesses.id, input.businessId));
+
+      if (!vehicleTypes) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Vendor not found",
+        });
+      }
+
+      // Fetch all vehicles for the business
+      const allVendorVehicles = await ctx.db
+        .select({
+          id: vehicles.id,
+          name: vehicles.name,
+          type: vehicles.type,
+          category: vehicles.category,
+          basePrice: vehicles.basePrice,
+          inventory: vehicles.inventory,
+          unavailabilityDates: vehicles.unavailabilityDates,
+        })
+        .from(vehicles)
+        .where(eq(vehicles.businessId, input.businessId));
+
+      const rentedVehicles = await ctx.db
+        .select({
+          rentalStart: rentals.rentalStart,
+          rentalEnd: rentals.rentalEnd,
+          vehicleId: rentals.vehicleId,
+          quantity: rentals.inventory,
+        })
+        .from(rentals)
+        .where(
+          and(
+            eq(rentals.businessId, input.businessId),
+            eq(rentals.status, "approved"),
+          ),
+        );
+
+      // Create a map of the lowest base price for each vehicle type
+      const basePricesMap = Object.fromEntries(
+        (
+          await ctx.db
+            .select({
+              type: vehicles.type,
+              basePrice: vehicles.basePrice,
+            })
+            .from(vehicles)
+            .where(eq(vehicles.businessId, input.businessId))
+        ).map(({ type, basePrice }) => [
+          type,
+          { basePrice: typeof basePrice === "number" ? basePrice : undefined },
+        ]),
+      );
+
+      const vehicleTypesResult = Object.entries(basePricesMap).map(
+        ([type, { basePrice }]) => ({
+          [type]: {
+            label: type,
+            startingPrice: basePrice,
+            types: allVendorVehicles
+              .filter((vehicle) => vehicle.type === type)
+              .reduce(
+                (acc, vehicle) => {
+                  const { category, id, name, basePrice, inventory } = vehicle;
+                  const categoryIndex = acc.findIndex(
+                    (c) => c.category === category,
+                  );
+                  if (categoryIndex === -1) {
+                    acc.push({
+                      category,
+                      vehicles: [{ id, name, basePrice, inventory }],
+                    });
+                  } else if (acc[categoryIndex]) {
+                    acc[categoryIndex].vehicles.push({
+                      id,
+                      name,
+                      basePrice,
+                      inventory,
+                    });
+                  }
+                  return acc;
+                },
+                [] as {
+                  category: string;
+                  vehicles: {
+                    id: string;
+                    name: string;
+                    basePrice: number;
+                    inventory: number;
+                  }[];
+                }[],
+              ),
+          },
+        }),
+      );
+
+      return {
+        bookings: rentedVehicles,
+        vehicleTypes: Object.fromEntries(
+          vehicleTypesResult
+            .map((item) => Object.entries(item)[0])
+            .filter(
+              (
+                entry,
+              ): entry is [
+                string,
+                {
+                  label: string;
+                  startingPrice: number | undefined;
+                  types: {
+                    category: string;
+                    vehicles: {
+                      id: string;
+                      name: string;
+                      basePrice: number;
+                      inventory: number;
+                    }[];
+                  }[];
+                },
+              ] => entry !== undefined,
+            ),
+        ),
+      };
+    }),
 });
 
 export type BusinessRouter = typeof businessRouter;
 export type GetVendorType = inferRouterOutputs<BusinessRouter>["getVendor"];
+export type GetBookingsType =
+  inferRouterOutputs<BusinessRouter>["getBookingsDetails"];
