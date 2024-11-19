@@ -16,7 +16,7 @@ import { formatDate } from "date-fns";
 import { ChevronDown, Edit, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { toast } from "~/hooks/use-toast";
 import { cn } from "~/lib/utils";
 import { type GetBusinessVehicleType } from "~/server/api/routers/vehicle";
 import { type vehicleTypeEnum } from "~/server/db/schema";
@@ -58,7 +59,7 @@ export const columns: ColumnDef<Vehicle>[] = [
     header: () => <div className="w-max break-keep px-4 pl-4">UUID</div>,
     cell: ({ row }) => (
       <div className="w-max break-keep px-4 pl-4 capitalize">
-        {row.getValue("id")}
+        #...{row.getValue<string>("id").slice(-6)}
       </div>
     ),
   },
@@ -183,8 +184,12 @@ const transformApiData = (data: GetBusinessVehicleType = []): Vehicle[] =>
   }));
 
 const VehiclesTable = () => {
-  // TODO: fix the infinite loop...
-  const { data = [], isLoading } = api.vehicle.getBusinessVehicles.useQuery();
+  const {
+    data = [],
+    isLoading,
+    isError,
+  } = api.vehicle.getVendorVehicles.useQuery();
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -210,6 +215,15 @@ const VehiclesTable = () => {
       rowSelection,
     },
   });
+
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: "Something went wrong while getting orders. Try again later.",
+        variant: "destructive",
+      });
+    }
+  }, [isError]);
 
   return (
     <div className="w-full">

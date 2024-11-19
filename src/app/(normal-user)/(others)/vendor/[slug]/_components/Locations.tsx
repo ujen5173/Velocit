@@ -8,10 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import useVendorDetailsContext from "../hooks/useVendorDetails";
 
 const Locations = () => {
+  const { vendor } = useVendorDetailsContext();
+  console.log({ vendor });
+
   return (
     <section>
       <div className="mx-auto max-w-[1240px]">
@@ -37,12 +40,10 @@ const Locations = () => {
             </div>
             <div>
               <p className="text-base text-foreground">
-                Locations (<span className="underline">2</span>)
+                Locations (<span className="underline">1</span>)
               </p>
               <p className="text-base font-medium text-slate-600">
-                {vendorDetail.location
-                  .map((location) => location.address)
-                  .join(", ")}
+                {vendor?.location.address}
               </p>
             </div>
           </div>
@@ -53,11 +54,11 @@ const Locations = () => {
             <div>
               <p className="text-base text-foreground">Phone Number</p>
               <p className="text-base font-medium text-slate-600">
-                {vendorDetail.phoneNumbers.join(", ")}
+                {vendor?.phoneNumbers.join(", ")}
               </p>
             </div>
           </div>
-          {Object.values(vendorDetail.socials).length > 1 ? (
+          {Object.values(vendor?.socials ?? {}).length > 1 ? (
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="flex justify-start gap-4">
@@ -87,7 +88,7 @@ const Locations = () => {
               <div>
                 <p className="text-base text-foreground">Socials</p>
                 <p className="text-base font-medium text-slate-600">
-                  @epicmountainbike
+                  {Object.keys(vendor?.socials ?? {})[0] ?? "N/A"}
                 </p>
               </div>
             </div>
@@ -95,7 +96,7 @@ const Locations = () => {
         </div>
 
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d16874.946912213625!2d85.310581!3d27.678682!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1834531badcd%3A0x330b0c2fcb7ce7e!2sEpic%20Mountain%20Bike!5e1!3m2!1sen!2snp!4v1729510884714!5m2!1sen!2snp"
+          src={vendor?.location.map}
           className="h-[40rem] w-full rounded-md border-none"
           allowFullScreen
           loading="lazy"

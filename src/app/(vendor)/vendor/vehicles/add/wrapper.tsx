@@ -48,8 +48,10 @@ type EditData = {
 
 const Wrapper = ({
   editData,
+  allowedVehicles,
   type,
 }: {
+  allowedVehicles: (typeof vehicleTypeEnum.enumValues)[number][];
   type: "edit" | "new";
   editData: EditData | undefined;
 }) => {
@@ -57,7 +59,7 @@ const Wrapper = ({
 
   const { data: business } = api.business.current.useQuery();
   const [selectedVehicle, setSelectedVehicle] = useState<
-    (typeof vehicleTypeEnum.enumValues)[number] | undefined
+    (typeof allowedVehicles)[number] | undefined
   >(editData?.type);
   const { mutateAsync, status } = api.vehicle.create.useMutation();
   const [features, setFeatures] = useState<{ key: string; value: string }[]>(
@@ -127,11 +129,12 @@ const Wrapper = ({
     });
 
     toast({
-      title: "Vehicle added to your business",
+      title: `Vehicle ${type === "edit" ? "updated" : "added"} successfully`,
     });
 
     router.push("/vendor/vehicles");
   }
+
   return (
     <div className="w-full p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -221,7 +224,7 @@ const Wrapper = ({
               <div className="space-y-1">
                 <Label className="text-slate-600">Vehicle Type</Label>
                 <div className="flex flex-wrap gap-2">
-                  {vehicleTypeEnum.enumValues.map((vehicle, index) => {
+                  {allowedVehicles.map((vehicle, index) => {
                     return (
                       <VehicleIndicatorIcon
                         key={index}
@@ -349,9 +352,17 @@ const Wrapper = ({
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button disabled={status === "pending"} variant={"outline"}>
+                <Button
+                  onClick={() => {
+                    router.back();
+                  }}
+                  disabled={status === "pending"}
+                  type="button"
+                  variant={"outline"}
+                >
                   Cancel
                 </Button>
+
                 <Button disabled={status === "pending"} variant={"primary"}>
                   {status === "pending" ? (
                     <>

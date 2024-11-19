@@ -1,10 +1,14 @@
 "use client";
 
+// TODO: Not rendering the data from the url properly
+
 import { differenceInDays, format } from "date-fns";
 import { CalendarDays, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { type DateRange } from "react-day-picker";
+import { useUser } from "~/app/_components/contexts/root";
 import { inter } from "~/app/utils/font";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -51,10 +55,20 @@ const Bookings: React.FC<BookingsProps> = ({
   open,
   setOpen,
 }) => {
-  console.log({ bookingsDetails });
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type") ?? "";
+  const category = searchParams.get("category") ?? "";
+  const vehicle = searchParams.get("vehicle") ?? "";
+
+  const { user } = useUser();
+
   const [selectedVehicleType, setSelectedVehicleType] = useState<string>(
     Object.keys(bookingsDetails.vehicleTypes)[0]!,
   );
+
   const [selectedVehicleSubType, setSelectedVehicleSubType] =
     useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -62,19 +76,36 @@ const Bookings: React.FC<BookingsProps> = ({
   const [quantity, setQuantity] = useState<number>(1);
   const [message, setMessage] = useState<string>("");
   const [showQR, setShowQR] = useState<boolean>(false);
+  const [userName, setUserName] = useState<string>(user?.user.name ?? "");
+  const [userNumber, setUserNumber] = useState<string>("");
+  console.log({ selectedVehicleType, selectedVehicleSubType, selectedModel });
+  console.log({ type, category, vehicle, bookingsDetails });
+
+  useMemo(() => {
+    setSelectedVehicleType(
+      !!type
+        ? type.charAt(0) + type.slice(1)
+        : Object.keys(bookingsDetails.vehicleTypes)[0]!,
+    );
+    setSelectedVehicleSubType(category.trim());
+    setSelectedModel(vehicle.trim());
+  }, [type, category, vehicle]);
 
   const getSelectedVehicleId = (): string | undefined => {
     const vehicles = getCurrentVehicles();
-    const selectedVehicle = vehicles.find((v) => v.name === selectedModel);
-    return selectedVehicle?.id;
+    return vehicles.find((v) => v.name === selectedModel)?.id;
   };
 
   const getCurrentVehicles = (): Vehicle[] => {
     if (!selectedVehicleType || !selectedVehicleSubType) return [];
+
     const type = bookingsDetails.vehicleTypes[selectedVehicleType];
-    const subType = type?.types.find(
+    if (!type) return [];
+
+    const subType = type.types.find(
       (t) => t.category === selectedVehicleSubType,
     );
+
     return subType?.vehicles ?? [];
   };
 
@@ -246,7 +277,17 @@ const Bookings: React.FC<BookingsProps> = ({
     useUploadFile("imageUploader");
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(e) => {
+        if (!e) {
+          router.replace(pathname, {
+            scroll: false,
+          });
+        }
+        setOpen(e);
+      }}
+    >
       <DialogContent
         className={cn(
           inter.className,
@@ -480,8 +521,32 @@ const Bookings: React.FC<BookingsProps> = ({
 
                 <Separator />
 
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <div className="space-y-2 px-1">
+                    <Label>Username</Label>
+                    <Input
+                      value={userName}
+                      placeholder="John Doe"
+                      onChange={(e) => setUserName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2 px-1">
+                    <Label>Phone Number</Label>
+                    <Input
+                      value={userNumber}
+                      placeholder="98********"
+                      onChange={(e) => setUserNumber(e.target.value)}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2 px-1">
-                  <Label>Message to vendor</Label>
+                  <Label>
+                    Message to vendor
+                    <span className="text-xs italic text-slate-600">
+                      (Optional)
+                    </span>
+                  </Label>
                   <Textarea
                     className="h-32"
                     value={message}

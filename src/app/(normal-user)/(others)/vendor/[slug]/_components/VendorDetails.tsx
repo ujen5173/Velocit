@@ -24,10 +24,9 @@ import FavroiteButton from "./FavroiteButton";
 import { VendorContext } from "./VendorWrapper";
 
 const VendorDetails = () => {
-  const { vendor } = useContext(VendorContext);
+  const { open, setOpen, vendor } = useContext(VendorContext);
 
   const [api, setApi] = useState<CarouselApi>();
-  const [open, setOpen] = useState(false);
   const { data: bookingsDetails, isLoading } =
     trpc.business.getBookingsDetails.useQuery(
       {

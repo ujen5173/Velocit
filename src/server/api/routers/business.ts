@@ -1,4 +1,4 @@
-import { type inferRouterOutputs, TRPCError } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import slugify from "slugify";
 import { z, ZodError } from "zod";
@@ -14,6 +14,41 @@ import {
   vehicles,
   vehicleTypeEnum,
 } from "~/server/db/schema";
+
+// Define interfaces for better type safety
+interface Business {
+  id: string;
+  name: string;
+  createdAt: Date;
+}
+
+interface DashboardMetrics {
+  total_revenue: number;
+  orders_total: number;
+  orders_today: number;
+  orders_yesterday: number;
+  current_month_revenue: number;
+  current_month_orders: number;
+  previous_month_revenue: number;
+  previous_month_orders: number;
+}
+
+interface GrowthMetrics {
+  revenue_growth: number;
+  orders_growth: number;
+  daily_orders_growth: number;
+}
+
+interface ChartDataPoint {
+  date: string;
+  value: number;
+}
+
+interface DailyData {
+  date: string;
+  value: number;
+  orders: number;
+}
 
 // Helper function to calculate distance using Haversine formula
 const calculateDistance = (
@@ -71,6 +106,260 @@ export const businessRouter = createTRPCRouter({
       .orderBy(sql`(${businesses.rating} * ${businesses.ratingCount}) DESC`)
       .limit(8);
   }),
+  getDashboardInfo: protectedProcedure.query(async ({ ctx }) => {
+    const today = new Date();
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 1);
+    endDate.setHours(0, 0, 0, 0);
+
+    const business = await ctx.db.query.businesses.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        createdAt: true,
+      },
+      where: eq(businesses.ownerId, ctx.session.user.id),
+    });
+
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Vendor not found",
+      });
+    }
+
+    const signUpDate = new Date(business.createdAt);
+    signUpDate.setHours(0, 0, 0, 0);
+
+    const daysSinceSignUp = Math.floor(
+      (today.getTime() - signUpDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    signUpDate.setHours(0, 0, 0, 0);
+
+    const currentPeriodStart =
+      daysSinceSignUp <= 30
+        ? new Date(signUpDate)
+        : (() => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - 29);
+            return date;
+          })();
+
+    // For previous period
+    const previousPeriodStart = new Date(currentPeriodStart);
+    previousPeriodStart.setDate(previousPeriodStart.getDate() - 30);
+
+    // Format dates for SQL queries - convert to ISO string and take just the date part
+    const formatDateForSQL = (date: Date) => date.toISOString().split("T")[0];
+
+    const currentPeriodStartFormatted = sql`${formatDateForSQL(currentPeriodStart)}`;
+    const previousPeriodStartFormatted = sql`${formatDateForSQL(previousPeriodStart)}`;
+
+    // Get metrics including current and previous period data
+    const metrics = await ctx.db
+      .select({
+        total_revenue: sql<number>`COALESCE(SUM(${rentals.totalPrice}), 0)`,
+        orders_total: sql<number>`COUNT(*)`,
+        orders_today: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) = CURRENT_DATE 
+          THEN 1 ELSE 0 
+        END), 0)`,
+        orders_yesterday: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) = CURRENT_DATE - 1
+          THEN 1 ELSE 0 
+        END), 0)`,
+        current_month_revenue: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) >= ${currentPeriodStartFormatted}
+          AND DATE(${rentals.createdAt}) <= CURRENT_DATE
+          THEN ${rentals.totalPrice} ELSE 0 
+        END), 0)`,
+        current_month_orders: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) >= ${currentPeriodStartFormatted}
+          AND DATE(${rentals.createdAt}) <= CURRENT_DATE
+          THEN 1 ELSE 0 
+        END), 0)`,
+        previous_month_revenue: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) >= ${previousPeriodStartFormatted}
+          AND DATE(${rentals.createdAt}) < ${currentPeriodStartFormatted}
+          THEN ${rentals.totalPrice} ELSE 0 
+        END), 0)`,
+        previous_month_orders: sql<number>`COALESCE(SUM(CASE 
+          WHEN DATE(${rentals.createdAt}) >= ${previousPeriodStartFormatted}
+          AND DATE(${rentals.createdAt}) < ${currentPeriodStartFormatted}
+          THEN 1 ELSE 0 
+        END), 0)`,
+      })
+      .from(rentals)
+      .where(and(eq(rentals.businessId, business.id)))
+      .then((rows) => rows[0] as DashboardMetrics);
+
+    // Get daily aggregated data for charts
+    const dailyData = await ctx.db
+      .select({
+        date: sql<string>`DATE(${rentals.createdAt})::text`,
+        value: sql<number>`COALESCE(SUM(${rentals.totalPrice}), 0)`,
+        orders: sql<number>`COUNT(*)`,
+      })
+      .from(rentals)
+      .where(
+        and(
+          eq(rentals.businessId, business.id),
+          sql`${rentals.createdAt} >= ${currentPeriodStart.toISOString()}::timestamp`,
+          sql`${rentals.createdAt} < ${endDate.toISOString()}::timestamp`,
+        ),
+      )
+      .groupBy(sql`DATE(${rentals.createdAt})`)
+      .orderBy(sql`DATE(${rentals.createdAt})`);
+
+    // Update generateInitialChartData:
+    const generateInitialChartData = (): ChartDataPoint[] => {
+      const data: ChartDataPoint[] = [];
+      const currentDate = new Date(currentPeriodStart);
+
+      while (
+        currentDate.toISOString().split("T")[0] <=
+        today.toISOString().split("T")[0]
+      ) {
+        data.push({
+          date: currentDate.toISOString().split("T")[0],
+          value: 0,
+        });
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return data;
+    };
+
+    const mergeChartData = (
+      initialData: ChartDataPoint[],
+      actualData: DailyData[],
+      valueKey: keyof Pick<DailyData, "value" | "orders">,
+    ): ChartDataPoint[] => {
+      const dataMap = new Map(
+        actualData.map((item) => [item.date, item[valueKey]]),
+      );
+
+      return initialData.map((item) => ({
+        date: item.date,
+        value: +(dataMap.get(item.date) ?? 0),
+      }));
+    };
+
+    const calculateGrowth = (
+      current: number,
+      previous: number,
+      isNewVendor: boolean,
+    ): number => {
+      if (isNewVendor) {
+        return current > 0 ? 100 : 0;
+      }
+
+      if (previous === 0 && current === 0) return 0;
+      if (previous === 0) return 100;
+
+      const growth = ((current - previous) / previous) * 100;
+      if (growth > 100) return 100;
+      if (growth < -100) return -100;
+
+      return Number(growth.toFixed(2));
+    };
+
+    const isNewVendor = daysSinceSignUp <= 30;
+    const initialChartData = generateInitialChartData();
+
+    const store_revenue_chart_data = mergeChartData(
+      initialChartData,
+      dailyData,
+      "value",
+    );
+
+    const store_orders_chart_data = mergeChartData(
+      initialChartData,
+      dailyData,
+      "orders",
+    );
+
+    const growth_metrics: GrowthMetrics = {
+      revenue_growth: calculateGrowth(
+        metrics.current_month_revenue,
+        metrics.previous_month_revenue,
+        isNewVendor,
+      ),
+      orders_growth: calculateGrowth(
+        metrics.current_month_orders,
+        metrics.previous_month_orders,
+        isNewVendor,
+      ),
+      daily_orders_growth: calculateGrowth(
+        metrics.orders_today,
+        metrics.orders_yesterday,
+        false,
+      ),
+    };
+
+    return {
+      store: {
+        id: business.id,
+        name: business.name,
+      },
+      metrics: {
+        total_revenue: Math.max(metrics.total_revenue, 0),
+        orders_total: Math.max(metrics.orders_total, 0),
+        orders_today: Math.max(metrics.orders_today, 0),
+        orders_yesterday: Math.max(metrics.orders_yesterday, 0),
+        current_month_revenue: Math.max(metrics.current_month_revenue, 0),
+        current_month_orders: Math.max(metrics.current_month_orders, 0),
+        previous_month_revenue: Math.max(metrics.previous_month_revenue, 0),
+        previous_month_orders: Math.max(metrics.previous_month_orders, 0),
+      },
+      growth: growth_metrics,
+      store_revenue_chart_data,
+      store_orders_chart_data,
+    };
+  }),
+
+  getOrders: protectedProcedure.query(async ({ ctx }) => {
+    // Get business ID
+    const business = await ctx.db.query.businesses.findFirst({
+      columns: { id: true },
+      where: eq(businesses.ownerId, ctx.session.user.id),
+    });
+
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Vendor not found",
+      });
+    }
+
+    // Get all orders for the business
+    const orders = await ctx.db
+      .select({
+        order: rentals.id,
+        customer: users.name,
+        payment: rentals.paymentMethod,
+        payment_ss: rentals.paymentScreenshot,
+        status: rentals.status,
+        vehicle: vehicles.name,
+        vehicle_type: vehicles.type,
+        quantity: rentals.quantity,
+        amount: rentals.totalPrice,
+        date: {
+          start: rentals.rentalStart,
+          end: rentals.rentalEnd,
+        },
+        notes: rentals.notes,
+        num_of_days: rentals.num_of_days,
+        createdAt: rentals.createdAt,
+      })
+      .from(rentals)
+      .where(eq(rentals.businessId, business.id))
+      .leftJoin(vehicles, eq(vehicles.id, rentals.vehicleId))
+      .leftJoin(users, eq(users.id, rentals.userId))
+      .orderBy(desc(rentals.createdAt));
+
+    return orders;
+  }),
 
   getVendor: publicProcedure
     .input(
@@ -80,25 +369,23 @@ export const businessRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const [result] = await ctx.db
-        .select({
-          id: businesses.id,
-          sellGears: businesses.sellGears,
-          name: businesses.name,
-          slug: businesses.slug,
-          location: businesses.location,
-          rating: businesses.rating,
-          ratingCount: businesses.ratingCount,
-          logo: businesses.logo,
-          phoneNumbers: businesses.phoneNumbers,
-          businessHours: businesses.businessHours,
-          availableVehicleTypes: businesses.availableVehicleTypes,
-          images: businesses.images,
-        })
+        .select()
         .from(businesses)
         .where(eq(businesses.slug, input.slug));
 
       return result;
     }),
+
+  allowedVehicles: protectedProcedure.query(async ({ ctx }) => {
+    const [business] = await ctx.db
+      .select({
+        vehicleTypes: businesses.availableVehicleTypes,
+      })
+      .from(businesses)
+      .where(eq(businesses.ownerId, ctx.session.user.id));
+
+    return business?.vehicleTypes;
+  }),
 
   // Search shops with location and availability
   search: publicProcedure
@@ -408,7 +695,7 @@ export const businessRouter = createTRPCRouter({
           rentalStart: rentals.rentalStart,
           rentalEnd: rentals.rentalEnd,
           vehicleId: rentals.vehicleId,
-          quantity: rentals.inventory,
+          quantity: rentals.quantity,
         })
         .from(rentals)
         .where(
@@ -510,3 +797,4 @@ export type BusinessRouter = typeof businessRouter;
 export type GetVendorType = inferRouterOutputs<BusinessRouter>["getVendor"];
 export type GetBookingsType =
   inferRouterOutputs<BusinessRouter>["getBookingsDetails"];
+export type GetOrdersType = inferRouterOutputs<BusinessRouter>["getOrders"];

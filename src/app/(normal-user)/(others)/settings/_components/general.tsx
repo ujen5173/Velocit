@@ -27,6 +27,7 @@ import { api } from "~/trpc/react";
 const formSchema = z.object({
   username: z.string().min(2).max(50),
   name: z.string().min(2).max(50),
+  phoneNumber: z.string().max(11).optional().nullable(),
   email: z.string().email(),
   image: z.string().url(),
 });
@@ -38,6 +39,7 @@ const GeneralSettings = ({
     name: string;
     email: string;
     image: string;
+    phoneNumber: string | undefined | null;
     role: userRoleEnum;
   };
 }) => {
@@ -153,7 +155,26 @@ const GeneralSettings = ({
               }}
             />
           </div>
-          <div></div>
+          <div>
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="+977 9*********"
+                      autoComplete="off"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <div className="mt-10 flex justify-start gap-2">
             <Button
               disabled={status === "pending" || isUploading}

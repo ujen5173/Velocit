@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { Bell, PanelLeft } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useUser } from "~/app/_components/contexts/root";
 import { Button } from "./button";
 import {
@@ -74,8 +75,12 @@ const CustomSidebarTriggerHeader = () => {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>{data.user.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Dashboard</DropdownMenuItem>
-              <DropdownMenuItem>Account Settings</DropdownMenuItem>
+              <Link href="/dashboard">
+                <DropdownMenuItem>Dashboard</DropdownMenuItem>
+              </Link>
+              <Link href="/vendor/profile">
+                <DropdownMenuItem>Account Settings</DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {

@@ -102,6 +102,7 @@ const VendorSetup = async () => {
           <GeneralSettings
             user={{
               name: user.name!,
+              phoneNumber: user.phoneNumber,
               image: user.image!,
               email: user.email,
               role: user.role,

@@ -10,6 +10,7 @@ export const searchedData = [
       bicycle: 25,
     },
     satisfiedCustomers: 120,
+    category: "bicycle",
     address: "123 Trail Way, Adventure City, AC 12345",
     images: [
       "/images/shops/img1.jpg",
@@ -26,6 +27,7 @@ export const searchedData = [
       bicycle: 15,
     },
     satisfiedCustomers: 95,
+    category: "bicycle",
     address: "456 City Lane, Metropolis, MP 67890",
     images: [
       "/images/shops/img3.jpg",
@@ -42,6 +44,7 @@ export const searchedData = [
       bicycle: 20,
     },
     satisfiedCustomers: 150,
+    category: "bicycle",
     address: "789 Green St, Eco City, EC 54321",
     images: [
       "/images/shops/img-2.jpg",
@@ -58,6 +61,7 @@ export const searchedData = [
       bicycle: 30,
     },
     satisfiedCustomers: 80,
+    category: "bicycle",
     address: "101 Ocean Blvd, Seaside Town, ST 98765",
     images: [
       "/images/shops/img4.jpg",
@@ -74,6 +78,7 @@ export const searchedData = [
       bicycle: 25,
     },
     satisfiedCustomers: 120,
+    category: "bicycle",
     address: "123 Trail Way, Adventure City, AC 12345",
     images: [
       "/images/shops/img1.jpg",
@@ -90,6 +95,7 @@ export const searchedData = [
       bicycle: 15,
     },
     satisfiedCustomers: 95,
+    category: "bicycle",
     address: "456 City Lane, Metropolis, MP 67890",
     images: [
       "/images/shops/img3.jpg",
@@ -106,6 +112,7 @@ export const searchedData = [
       bicycle: 20,
     },
     satisfiedCustomers: 150,
+    category: "bicycle",
     address: "789 Green St, Eco City, EC 54321",
     images: [
       "/images/shops/img-2.jpg",
@@ -122,6 +129,7 @@ export const searchedData = [
       bicycle: 30,
     },
     satisfiedCustomers: 80,
+    category: "bicycle",
     address: "101 Ocean Blvd, Seaside Town, ST 98765",
     images: [
       "/images/shops/img4.jpg",
@@ -138,6 +146,7 @@ export const searchedData = [
       bicycle: 25,
     },
     satisfiedCustomers: 120,
+    category: "bicycle",
     address: "123 Trail Way, Adventure City, AC 12345",
     images: [
       "/images/shops/img1.jpg",
@@ -154,6 +163,7 @@ export const searchedData = [
       bicycle: 15,
     },
     satisfiedCustomers: 95,
+    category: "bicycle",
     address: "456 City Lane, Metropolis, MP 67890",
     images: [
       "/images/shops/img3.jpg",
@@ -170,6 +180,7 @@ export const searchedData = [
       bicycle: 20,
     },
     satisfiedCustomers: 150,
+    category: "bicycle",
     address: "789 Green St, Eco City, EC 54321",
     images: [
       "/images/shops/img-2.jpg",
@@ -186,6 +197,7 @@ export const searchedData = [
       bicycle: 30,
     },
     satisfiedCustomers: 80,
+    category: "bicycle",
     address: "101 Ocean Blvd, Seaside Town, ST 98765",
     images: [
       "/images/shops/img4.jpg",
@@ -202,6 +214,7 @@ export const searchedData = [
       bicycle: 28,
     },
     satisfiedCustomers: 200,
+    category: "bicycle",
     address: "202 Adventure Rd, Explore City, EC 12345",
     images: [
       "/images/shops/img-1.jpg",
@@ -218,6 +231,7 @@ export const searchedData = [
       bicycle: 18,
     },
     satisfiedCustomers: 110,
+    category: "bicycle",
     address: "303 Urban Ave, Downtown City, DC 87654",
     images: [
       "/images/shops/img4.jpg",
@@ -234,6 +248,7 @@ export const searchedData = [
       bicycle: 27,
     },
     satisfiedCustomers: 140,
+    category: "bicycle",
     address: "404 Mountain Rd, Boulder Town, BT 34567",
     images: [
       "/images/shops/img1.jpg",
@@ -250,6 +265,7 @@ export const searchedData = [
       bicycle: 22,
     },
     satisfiedCustomers: 175,
+    category: "bicycle",
     address: "505 Pedal St, Cyclersville, CY 65432",
     images: [
       "/images/shops/img-3.jpg",
@@ -266,6 +282,7 @@ export const searchedData = [
       bicycle: 20,
     },
     satisfiedCustomers: 165,
+    category: "bicycle",
     address: "606 Eco Dr, Green City, GC 43210",
     images: [
       "/images/shops/img2.jpg",
@@ -282,6 +299,7 @@ export const searchedData = [
       bicycle: 19,
     },
     satisfiedCustomers: 130,
+    category: "bicycle",
     address: "707 Speed Ave, Fast City, FC 76543",
     images: [
       "/images/shops/img-2.jpg",
@@ -298,6 +316,7 @@ export const searchedData = [
       bicycle: 21,
     },
     satisfiedCustomers: 115,
+    category: "bicycle",
     address: "808 Cycle Way, Ride City, RC 87654",
     images: [
       "/images/shops/img3.jpg",
@@ -314,6 +333,7 @@ export const searchedData = [
       bicycle: 26,
     },
     satisfiedCustomers: 190,
+    category: "bicycle",
     address: "909 Downtown Blvd, Big City, BC 76543",
     images: [
       "/images/shops/img-4.jpg",
@@ -335,6 +355,7 @@ export const slides = [
     },
     availableVehicleTypes: ["bicycle", "bike"],
     satisfiedCustomers: 200,
+    category: "bicycle",
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img3.jpg",
@@ -351,6 +372,7 @@ export const slides = [
       city: "New Road, Kathmandu",
     },
     satisfiedCustomers: 350,
+    category: "bicycle",
     availableVehicleTypes: ["bike", "scooter"],
     images: [
       "/images/shops/img2.jpg",
@@ -369,6 +391,7 @@ export const slides = [
     },
     availableVehicleTypes: ["bike", "e-bike"],
     satisfiedCustomers: 180,
+    category: "bicycle",
     address: "Bhaktapur, Nepal",
     images: ["/images/shops/img1.jpg", "/images/shops/img3.jpg"],
   },
@@ -381,6 +404,7 @@ export const slides = [
       city: "Jhamshikel, Kathmandu",
     },
     satisfiedCustomers: 400,
+    category: "bicycle",
     address: "Kathmandu, Nepal",
     images: ["/images/shops/img4.jpg"],
     availableVehicleTypes: ["scooter", "bicycle"],
@@ -392,6 +416,7 @@ export const slides = [
     rating: 4.5,
     availableVehicleTypes: ["car", "bike"],
     satisfiedCustomers: 200,
+    category: "bicycle",
     location: {
       city: "Balkumari, Lalitpur",
     },
@@ -507,9 +532,10 @@ export const vendorDetail = {
 export const vendorVehicles = [
   {
     id: "1f45a2d1-4c9b-4e8b-a348-9e15d3b2c1a2",
-    type: "bicycle",
+    type: "bike",
     brand: "Trek",
-    model: "Domane SL 6",
+    category: "Sports Bike",
+    model: "Yamaha YZF-R15",
     year: 2023,
     use: "rental",
     price_per_hour: 5.0,
@@ -531,8 +557,9 @@ export const vendorVehicles = [
   },
   {
     id: "e3a8f5d9-4bce-44e9-82ba-7cbce71e6f4b",
-    type: "bike",
+    type: "car",
     brand: "Yamaha",
+    category: "Mountain bike",
     model: "MT-15",
     year: 2022,
     use: "rental",
@@ -557,6 +584,7 @@ export const vendorVehicles = [
     id: "d9fa3f2a-123f-4569-bd1b-5d7c7e4d8a3b",
     type: "scooter",
     brand: "Honda",
+    category: "Mountain bike",
     model: "Activa 6G",
     year: 2021,
     use: "rental",
@@ -578,6 +606,7 @@ export const vendorVehicles = [
     id: "3b54de4f-6d28-432f-973a-8c5f23b9a7f9",
     type: "car",
     brand: "Hyundai",
+    category: "Mountain bike",
     model: "Creta",
     year: 2023,
     use: "rental",
@@ -602,6 +631,7 @@ export const vendorVehicles = [
     id: "4c16d2a1-beb7-4c5b-922d-6a84c543abc8",
     type: "e-bike",
     brand: "Lectric",
+    category: "Mountain bike",
     model: "XP 3.0",
     year: 2023,
     use: "rental",
@@ -621,8 +651,9 @@ export const vendorVehicles = [
   },
   {
     id: "5a24b13e-948f-4d4c-a681-ea4e86569d8c",
-    type: "bicycle",
+    type: "bike",
     brand: "Giant",
+    category: "Mountain bike",
     model: "Escape 3",
     year: 2022,
     use: "sale",
@@ -644,6 +675,7 @@ export const vendorVehicles = [
     id: "6b75f1e2-9b1d-42b3-876b-4b84a9d8b9e7",
     type: "car",
     brand: "Toyota",
+    category: "Mountain bike",
     model: "Corolla Altis",
     year: 2021,
     use: "both",
@@ -665,6 +697,7 @@ export const vendorVehicles = [
     id: "7e13b7c1-9b8d-4f7f-85b7-1cda0a948f7e",
     type: "scooter",
     brand: "Vespa",
+    category: "Mountain bike",
     model: "GTS 300",
     year: 2022,
     use: "rental",
@@ -689,6 +722,7 @@ export const vendorVehicles = [
     id: "8b32f7c2-4c3f-4976-b5c6-124deea9a7f3",
     type: "bike",
     brand: "Royal Enfield",
+    category: "Mountain bike",
     model: "Classic 350",
     year: 2021,
     use: "rental",
@@ -713,6 +747,7 @@ export const vendorVehicles = [
     id: "9c43e9c3-543b-4d4c-99b1-2d89d8f8c7a5",
     type: "car",
     brand: "Ford",
+    category: "Mountain bike",
     model: "Mustang GT",
     year: 2023,
     use: "both",

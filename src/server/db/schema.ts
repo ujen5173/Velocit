@@ -59,6 +59,7 @@ export const users = createTable(
     image: varchar("image", { length: 255 }),
     role: userRoleEnum("role").default("USER"),
     deleted: boolean("deleted").default(false),
+    phoneNumber: varchar("phone_number", { length: 20 }),
     vendor_setup_complete: boolean("vendor_setup_complete"),
     stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -170,6 +171,7 @@ export const vehicles = createTable(
       .notNull()
       .references(() => businesses.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }).notNull(),
+    slug: varchar("slug", { length: 100 }).notNull(),
     type: vehicleTypeEnum("type").notNull(),
     category: varchar("category", { length: 100 }).notNull(),
     images: text("images")
@@ -220,9 +222,15 @@ export const rentals = createTable(
       .references(() => businesses.id, { onDelete: "cascade" }),
     rentalStart: timestamp("rental_start").notNull(),
     rentalEnd: timestamp("rental_end").notNull(),
-    inventory: integer("number_of_vehicles").notNull().default(1),
+    quantity: integer("quantity").notNull().default(1),
+    phone_number: varchar("phone_number", { length: 20 }),
     status: rentalStatusEnum("status").notNull().default("pending"),
+    paymentMethod: varchar("payment_method", {
+      enum: ["online", "onsite"],
+      length: 100,
+    }),
     totalPrice: integer("total_price").notNull(),
+    num_of_days: integer("num_of_days").notNull().default(1),
     notes: text("notes"),
     paymentScreenshot: text("payment_screenshot"),
     createdAt: timestamp("created_at").notNull().defaultNow(),

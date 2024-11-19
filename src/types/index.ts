@@ -28,6 +28,7 @@ export interface Slide {
   name: string | null;
   rating: number | null;
   images: string[];
+  category: string | null;
   location: {
     city?: string | undefined;
     address?: string | undefined;

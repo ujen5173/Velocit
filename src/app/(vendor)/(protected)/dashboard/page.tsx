@@ -1,16 +1,13 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import { lato } from "~/app/utils/font";
 import { cn } from "~/lib/utils";
+import { api } from "~/trpc/server";
 import { Chart } from "./Chart";
 import OrdersTable from "./OrdersTable";
 
 const Dashboard = async () => {
+  const data = await api.business.getDashboardInfo();
+
   return (
     <main className={cn("w-full bg-white")}>
       <div className="px-4 py-6">
@@ -18,34 +15,8 @@ const Dashboard = async () => {
           <div className="mb-4 flex items-center justify-end">
             <div className="flex-1">
               <h1 className={cn("text-2xl font-semibold md:text-3xl")}>
-                Epic Mountain Bike Rental
+                {data.store.name}
               </h1>
-            </div>
-            <div className="hidden items-center gap-2 sm:flex">
-              <div className="w-28">
-                <Select value={"today"}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem className="" value="today">
-                      Today
-                    </SelectItem>
-                    <SelectItem className="" value="week">
-                      This week
-                    </SelectItem>
-                    <SelectItem className="" value="month">
-                      This month
-                    </SelectItem>
-                    <SelectItem className="" value="year">
-                      This year
-                    </SelectItem>
-                    <SelectItem className="" value="all">
-                      All
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
           <div
@@ -59,19 +30,31 @@ const Dashboard = async () => {
                 <p className="mb-2 text-base font-medium text-slate-500">
                   Orders Today
                 </p>
-                <h1 className="text-3xl font-semibold text-slate-800">5 -</h1>
+                <h1
+                  className={cn(
+                    "mb-2 text-3xl font-semibold text-slate-800",
+                    lato.className,
+                  )}
+                >
+                  {data.metrics.orders_today} -
+                </h1>
               </div>
             </div>
             <div className="hover: relative rounded-xl border border-slate-200 p-4 hover:shadow-md">
               <p className="mb-2 text-base font-medium text-slate-500">
                 Store Views
               </p>
-              <h1 className="mb-2 text-3xl font-semibold text-slate-800">
+              <h1
+                className={cn(
+                  "mb-2 text-3xl font-semibold text-slate-800",
+                  lato.className,
+                )}
+              >
                 50k -
               </h1>
-              <div className="relative z-30 flex items-center gap-2 font-medium text-slate-500">
+              <div className="relative z-30 flex items-center gap-2 text-sm font-medium text-slate-500">
                 <TrendingDown size={16} className="text-red-600" />
-                <span>12% last week</span>
+                <span>12% from last month</span>
               </div>
               <div className="chart-container absolute bottom-4 right-0 w-1/2 min-w-36">
                 <div className="chart-blur-bottom absolute bottom-0 z-20 h-6 w-full"></div>
@@ -79,20 +62,20 @@ const Dashboard = async () => {
                 <Chart
                   chartColor="hsl(var(--color-2))"
                   chartData={[
-                    { date: "2024-01-01", cd: 100 },
-                    { date: "2024-01-14", cd: 220 },
-                    { date: "2024-01-28", cd: 210 },
-                    { date: "2024-02-10", cd: 190 },
-                    { date: "2024-02-24", cd: 230 },
-                    { date: "2024-03-09", cd: 240 },
-                    { date: "2024-03-23", cd: 250 },
-                    { date: "2024-04-06", cd: 215 },
-                    { date: "2024-04-20", cd: 205 },
-                    { date: "2024-05-04", cd: 180 },
-                    { date: "2024-05-18", cd: 220 },
-                    { date: "2024-06-01", cd: 210 },
-                    { date: "2024-06-15", cd: 225 },
-                    { date: "2024-06-29", cd: 240 },
+                    { date: "2024-01-01", value: 100 },
+                    { date: "2024-01-14", value: 220 },
+                    { date: "2024-01-28", value: 210 },
+                    { date: "2024-02-10", value: 190 },
+                    { date: "2024-02-24", value: 230 },
+                    { date: "2024-03-09", value: 240 },
+                    { date: "2024-03-23", value: 250 },
+                    { date: "2024-04-06", value: 215 },
+                    { date: "2024-04-20", value: 205 },
+                    { date: "2024-05-04", value: 180 },
+                    { date: "2024-05-18", value: 220 },
+                    { date: "2024-06-01", value: 210 },
+                    { date: "2024-06-15", value: 225 },
+                    { date: "2024-06-29", value: 240 },
                   ]}
                 />
               </div>
@@ -101,34 +84,30 @@ const Dashboard = async () => {
               <p className="mb-2 text-base font-medium text-slate-500">
                 Total Revenue
               </p>
-              <h1 className="mb-2 text-3xl font-semibold text-slate-800">
-                रु 48.5k -
+              <h1
+                className={cn(
+                  "mb-2 text-3xl font-semibold text-slate-800",
+                  lato.className,
+                )}
+              >
+                {new Intl.NumberFormat("en-IN", {
+                  maximumSignificantDigits: 3,
+                  style: "currency",
+                  currency: "NPR",
+                  notation: "standard",
+                }).format(data.metrics.total_revenue)}
+                -
               </h1>
-              <div className="relative z-30 flex items-center gap-2 font-medium text-slate-500">
+              <div className="relative z-30 flex items-center gap-2 text-sm font-medium text-slate-500">
                 <TrendingUp size={16} className="text-green-600" />
-                <span>12.5% last week</span>
+                <span>{data.growth.revenue_growth}% from last month</span>
               </div>
               <div className="chart-container absolute bottom-4 right-0 w-1/2 min-w-36">
                 <div className="chart-blur-bottom absolute bottom-0 z-20 h-6 w-full"></div>
                 <div className="chart-blur-right absolute right-2 z-20 h-12 w-6"></div>
                 <Chart
                   chartColor="hsl(var(--color-3))"
-                  chartData={[
-                    { date: "2024-01-01", cd: 2100 },
-                    { date: "2024-01-14", cd: 2250 },
-                    { date: "2024-01-28", cd: 2400 },
-                    { date: "2024-02-10", cd: 2350 },
-                    { date: "2024-02-24", cd: 2500 },
-                    { date: "2024-03-09", cd: 2650 },
-                    { date: "2024-03-23", cd: 2700 },
-                    { date: "2024-04-06", cd: 2550 },
-                    { date: "2024-04-20", cd: 2400 },
-                    { date: "2024-05-04", cd: 2300 },
-                    { date: "2024-05-18", cd: 2450 },
-                    { date: "2024-06-01", cd: 2600 },
-                    { date: "2024-06-15", cd: 2550 },
-                    { date: "2024-06-29", cd: 2700 },
-                  ]}
+                  chartData={data.store_revenue_chart_data}
                 />
               </div>
             </div>
@@ -136,34 +115,27 @@ const Dashboard = async () => {
               <p className="mb-2 text-base font-medium text-slate-500">
                 Total Orders
               </p>
-              <h1 className="mb-2 text-3xl font-semibold text-slate-800">
-                6.2k -
+              <h1
+                className={cn(
+                  "mb-2 text-3xl font-semibold text-slate-800",
+                  lato.className,
+                )}
+              >
+                {new Intl.NumberFormat("en-IN", {}).format(
+                  data.metrics.orders_total,
+                )}
+                -
               </h1>
-              <div className="relative z-30 flex items-center gap-2 font-medium text-slate-500">
+              <div className="relative z-30 flex items-center gap-2 text-sm font-medium text-slate-500">
                 <TrendingUp size={16} className="text-green-600" />
-                <span>32% last week</span>
+                <span>{data.growth.orders_growth}% from last month</span>
               </div>
               <div className="chart-container absolute bottom-4 right-0 w-1/2 min-w-36">
                 <div className="chart-blur-bottom absolute bottom-0 z-20 h-6 w-full"></div>
                 <div className="chart-blur-right absolute right-2 z-20 h-12 w-6"></div>
                 <Chart
                   chartColor="hsl(var(--color-4))"
-                  chartData={[
-                    { date: "2024-01-01", cd: 12500 },
-                    { date: "2024-01-14", cd: 13500 },
-                    { date: "2024-01-28", cd: 14000 },
-                    { date: "2024-02-10", cd: 13800 },
-                    { date: "2024-02-24", cd: 14500 },
-                    { date: "2024-03-09", cd: 15500 },
-                    { date: "2024-03-23", cd: 16000 },
-                    { date: "2024-04-06", cd: 15000 },
-                    { date: "2024-04-20", cd: 14500 },
-                    { date: "2024-05-04", cd: 14000 },
-                    { date: "2024-05-18", cd: 15000 },
-                    { date: "2024-06-01", cd: 15500 },
-                    { date: "2024-06-15", cd: 15800 },
-                    { date: "2024-06-29", cd: 16500 },
-                  ]}
+                  chartData={data.store_orders_chart_data}
                 />
               </div>
             </div>

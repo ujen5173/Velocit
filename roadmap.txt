@@ -17,17 +17,21 @@
 ✅ - loading for vendor page
 ✅ - dynamic rental place
 ✅ - renting logic
-   - dashboard logic
-   - order for offline user
+✅ - dashboard logic
+✅ - adding phone number
+✅ - order for offline user: TODO: user phone number
+✅ - choose the vehicle from the vehicles section in the vendor page
+   - offline/onsite payment
+   - socials of the vendor
    - select any vehicle
    - select vehicle from vehicles section
    - prefetching all the items in the home page
    - change location api
    - get google map -> [TEMPORARY] -> react-leaflet
-   - offline/onsite payment
    - handle upload errors in uploadthing.
    - draft data in updating settings.
    - draft saving for bookings.
+   - store views
 
   -- Future features -- 
    - events
@@ -37,4 +41,8 @@
    - view event page
    - add vendor accessories page
    - add vendor event page
- 
+
+
+   -- ONGOING --
+   customer name and number in rental database
+   refactor the dashboard code

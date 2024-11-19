@@ -50,6 +50,7 @@ export const vehicleRouter = createTRPCRouter({
           return updated;
         } else {
           const vehicle = await ctx.db.insert(vehicles).values({
+            // due to new schema pushed...
             ...data,
           });
 
@@ -78,7 +79,7 @@ export const vehicleRouter = createTRPCRouter({
       }
     }),
 
-  getBusinessVehicles: protectedProcedure.query(async ({ ctx }) => {
+  getVendorVehicles: protectedProcedure.query(async ({ ctx }) => {
     try {
       const businessId = await ctx.db.query.businesses.findFirst({
         where: eq(businesses.ownerId, ctx.session.user.id),
@@ -97,6 +98,41 @@ export const vehicleRouter = createTRPCRouter({
       console.log({ error });
     }
   }),
+
+  getBusinessVehicles: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const vehicles = await ctx.db.query.businesses.findFirst({
+          where: eq(businesses.slug, input.slug),
+          columns: {},
+          with: {
+            vehicles: {
+              columns: {
+                images: true,
+                id: true,
+                name: true,
+                // slug: true,
+                basePrice: true,
+                type: true,
+                category: true,
+              },
+            },
+          },
+        });
+
+        if (!vehicles) {
+          throw new Error("Business not found");
+        }
+        return vehicles.vehicles;
+      } catch (error) {
+        console.log({ error });
+      }
+    }),
 });
 
 export type GetSingleVehicleType = inferRouterOutputs<
@@ -104,4 +140,4 @@ export type GetSingleVehicleType = inferRouterOutputs<
 >["getSingle"];
 export type GetBusinessVehicleType = inferRouterOutputs<
   typeof vehicleRouter
->["getBusinessVehicles"];
+>["getVendorVehicles"];

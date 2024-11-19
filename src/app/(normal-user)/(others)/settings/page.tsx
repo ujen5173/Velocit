@@ -61,6 +61,7 @@ const Settings = async () => {
                 email: userDetails.email,
                 image: userDetails.image!,
                 role: userDetails.role,
+                phoneNumber: userDetails.phoneNumber,
               }}
             />
           </TabsContent>

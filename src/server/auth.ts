@@ -27,6 +27,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
+      phoneNumber?: string | null;
       vendor_setup_complete: boolean;
       stripeCustomerId?: string | null;
     } & DefaultSession["user"];
@@ -34,6 +35,8 @@ declare module "next-auth" {
 
   interface User {
     id: string;
+    name: string;
+    phoneNumber: string | undefined;
     email: string;
     vendor_setup_complete: boolean;
     role: userRoleEnum;

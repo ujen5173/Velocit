@@ -8,11 +8,18 @@ const VehicleCreatePage = async ({
   searchParams: { edit: string } | undefined;
 }) => {
   let data: GetSingleVehicleType = undefined;
+  const businessVehicles = await api.business.allowedVehicles();
   if (searchParams?.edit) {
     data = await api.vehicle.getSingle({ id: searchParams.edit });
   }
 
-  return <Wrapper editData={data} type={searchParams?.edit ? "edit" : "new"} />;
+  return (
+    <Wrapper
+      allowedVehicles={businessVehicles ?? []}
+      editData={data}
+      type={searchParams?.edit ? "edit" : "new"}
+    />
+  );
 };
 
 export default VehicleCreatePage;

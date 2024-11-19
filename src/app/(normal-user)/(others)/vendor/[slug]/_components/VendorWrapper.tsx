@@ -13,10 +13,20 @@ import VendorDetails from "./VendorDetails";
 
 export const VendorContext = createContext<{
   vendor?: GetVendorType;
-}>({});
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  open: false,
+  setOpen: () => {
+    // do nothing
+  },
+});
 
 const VendorWrapper = ({ data }: { data: GetVendorType }) => {
+  console.log({ data });
+
   const [isVisible, setIsVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleScroll = () => {
     const scrollY = window.scrollY;
@@ -36,7 +46,13 @@ const VendorWrapper = ({ data }: { data: GetVendorType }) => {
   }, []);
 
   return (
-    <VendorContext.Provider value={{ vendor: data }}>
+    <VendorContext.Provider
+      value={{
+        open: open,
+        setOpen: setOpen,
+        vendor: data,
+      }}
+    >
       <main className="relative w-full">
         {/* Share Button */}
         <motion.div

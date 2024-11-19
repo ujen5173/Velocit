@@ -7,10 +7,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
-import { vendorDetail } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import useVendorDetailsContext from "../hooks/useVendorDetails";
 
 const Faqs = () => {
+  const { vendor } = useVendorDetailsContext();
+
   return (
     <section>
       <div className="mx-auto max-w-[1240px]">
@@ -31,14 +33,22 @@ const Faqs = () => {
 
         <div>
           <Accordion type="multiple">
-            {vendorDetail.faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
+            {(vendor?.faqs ?? []).length > 0 ? (
+              vendor?.faqs?.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-left">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent>{faq.answer}</AccordionContent>
+                </AccordionItem>
+              ))
+            ) : (
+              <div className="py-10">
+                <p className="text-center text-lg text-slate-600">
+                  No FAQs available
+                </p>
+              </div>
+            )}
           </Accordion>
         </div>
       </div>

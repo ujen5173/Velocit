@@ -1,7 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { rentals, rentalStatusEnum, vehicles } from "~/server/db/schema";
+import {
+  businesses,
+  rentals,
+  rentalStatusEnum,
+  vehicles,
+} from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const rentalRouter = createTRPCRouter({
@@ -12,7 +17,7 @@ export const rentalRouter = createTRPCRouter({
         startDate: z.date(),
         totalPrice: z.number(),
         endDate: z.date(),
-        inventory: z.number().default(1),
+        quantity: z.number().default(1),
         paymentScreenshot: z.string(),
         notes: z.string().optional(),
       }),
@@ -26,7 +31,12 @@ export const rentalRouter = createTRPCRouter({
         });
       }
 
-      if (new Date(input.startDate).getDate() < new Date().getDate()) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const startDate = new Date(input.startDate);
+      startDate.setHours(0, 0, 0, 0);
+
+      if (startDate < now) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Start date cannot be in the past",
@@ -37,7 +47,6 @@ export const rentalRouter = createTRPCRouter({
         .select({
           id: vehicles.id,
           inventory: vehicles.inventory,
-          unavailabilityDates: vehicles.unavailabilityDates,
           basePrice: vehicles.basePrice,
           businessId: vehicles.businessId,
         })
@@ -45,7 +54,6 @@ export const rentalRouter = createTRPCRouter({
         .where(eq(vehicles.id, input.vehicleId))
         .then((results) => results[0]);
 
-      // Check if vehicle exists
       if (!vehicle) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -53,15 +61,37 @@ export const rentalRouter = createTRPCRouter({
         });
       }
 
-      // Check if requested number of vehicles is available
-      if (input.inventory > vehicle.inventory) {
+      // Check if requested quantity exceeds total inventory
+      if (input.quantity > vehicle.inventory) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Requested number of vehicles exceeds availability",
+          message: "Requested number of vehicles exceeds total inventory",
         });
       }
 
-      // Generate array of dates between start and end date
+      // Get all existing rentals for this vehicle that overlap with the requested period
+      const existingRentals = await ctx.db
+        .select({
+          quantity: rentals.quantity,
+          rentalStart: rentals.rentalStart,
+          rentalEnd: rentals.rentalEnd,
+          status: rentals.status,
+        })
+        .from(rentals)
+        .where(eq(rentals.vehicleId, input.vehicleId));
+
+      // Filter active rentals that overlap with requested dates
+      const activeStatuses = ["pending", "confirmed", "ongoing"];
+      const overlappingRentals = existingRentals.filter(
+        (rental) =>
+          activeStatuses.includes(rental.status) &&
+          !(
+            rental.rentalEnd < input.startDate ||
+            rental.rentalStart > input.endDate
+          ),
+      );
+
+      // Calculate maximum vehicles rented for each day in the requested period
       const getDatesInRange = (start: Date, end: Date) => {
         const dates: Date[] = [];
         const current = new Date(start);
@@ -74,20 +104,34 @@ export const rentalRouter = createTRPCRouter({
 
       const requestedDates = getDatesInRange(input.startDate, input.endDate);
 
-      // Check if any requested dates conflict with unavailability dates
-      const hasConflict = requestedDates.some((date) =>
-        vehicle.unavailabilityDates.some(
-          (unavailableDate) =>
-            new Date(unavailableDate).toDateString() === date.toDateString(),
-        ),
-      );
-
-      if (hasConflict) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Vehicle is not available for the selected dates",
+      for (const date of requestedDates) {
+        const rentalsOnDate = overlappingRentals.filter((rental) => {
+          const rentalStart = new Date(rental.rentalStart);
+          const rentalEnd = new Date(rental.rentalEnd);
+          return date >= rentalStart && date <= rentalEnd;
         });
+
+        const totalRentedOnDate = rentalsOnDate.reduce(
+          (sum, rental) => sum + rental.quantity,
+          0,
+        );
+
+        const availableOnDate = vehicle.inventory - totalRentedOnDate;
+
+        if (availableOnDate < input.quantity) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `Not enough vehicles available on ${date.toLocaleDateString()}. Only ${availableOnDate} vehicle(s) available.`,
+          });
+        }
       }
+
+      // Calculate number of days
+      const numOfDays =
+        Math.floor(
+          (input.endDate.getTime() - input.startDate.getTime()) /
+            (1000 * 60 * 60 * 24),
+        ) + 1;
 
       // Create rental record
       const rental = await ctx.db
@@ -98,26 +142,72 @@ export const rentalRouter = createTRPCRouter({
           vehicleId: input.vehicleId,
           rentalStart: input.startDate,
           rentalEnd: input.endDate,
-          inventory: input.inventory,
           status: rentalStatusEnum.enumValues[0],
           totalPrice: input.totalPrice,
           notes: input.notes,
+          paymentMethod: input.paymentScreenshot ? "online" : "onsite",
+          quantity: input.quantity,
+          num_of_days: numOfDays,
           paymentScreenshot: input.paymentScreenshot,
         })
         .returning();
 
-      // Update vehicle unavailability dates
-      await ctx.db
-        .update(vehicles)
-        .set({
-          unavailabilityDates: [
-            ...vehicle.unavailabilityDates,
-            ...requestedDates,
-          ],
-          updatedAt: new Date(),
-        })
-        .where(eq(vehicles.id, input.vehicleId));
-
       return rental;
+    }),
+
+  updatedStatus: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        status: z.enum(rentalStatusEnum.enumValues),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const businessId = await ctx.db.query.businesses.findFirst({
+        where: eq(businesses.ownerId, ctx.session.user.id),
+      });
+
+      if (!businessId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "User is not a business owner",
+        });
+      }
+
+      const rental = await ctx.db
+        .select({
+          status: rentals.status,
+        })
+        .from(rentals)
+        .where(
+          and(
+            eq(rentals.id, input.orderId),
+            eq(rentals.businessId, businessId.id),
+          ),
+        )
+        .then((results) => results[0]);
+
+      if (!rental) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Rental not found",
+        });
+      }
+
+      if (rental.status === input.status) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Rental is already in this status",
+        });
+      }
+
+      await ctx.db
+        .update(rentals)
+        .set({
+          status: input.status,
+        })
+        .where(eq(rentals.id, input.orderId));
+
+      return true;
     }),
 });
