@@ -26,8 +26,6 @@ const Vehicles = () => {
     );
   const { setOpen } = useContext(VendorContext);
 
-  console.log({ vehicles, isLoading });
-
   return (
     <section>
       <div className={cn("mx-auto max-w-[1240px]")}>

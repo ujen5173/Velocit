@@ -2,6 +2,7 @@ import { type inferRouterOutputs, TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import slugify from "slugify";
 import { z, ZodError } from "zod";
+import { slugifyDefault } from "~/lib/helpers";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -214,17 +215,21 @@ export const businessRouter = createTRPCRouter({
       .groupBy(sql`DATE(${rentals.createdAt})`)
       .orderBy(sql`DATE(${rentals.createdAt})`);
 
-    // Update generateInitialChartData:
-    const generateInitialChartData = (): ChartDataPoint[] => {
+    const formatDateToString = (date: Date): string => {
+      const isoString = date.toISOString();
+      return isoString.split("T")[0]!;
+    };
+
+    const generateInitialChartData = (
+      currentPeriodStart: Date,
+      today: Date,
+    ): ChartDataPoint[] => {
       const data: ChartDataPoint[] = [];
       const currentDate = new Date(currentPeriodStart);
 
-      while (
-        currentDate.toISOString().split("T")[0] <=
-        today.toISOString().split("T")[0]
-      ) {
+      while (formatDateToString(currentDate) <= formatDateToString(today)) {
         data.push({
-          date: currentDate.toISOString().split("T")[0],
+          date: formatDateToString(currentDate),
           value: 0,
         });
         currentDate.setDate(currentDate.getDate() + 1);
@@ -267,7 +272,10 @@ export const businessRouter = createTRPCRouter({
     };
 
     const isNewVendor = daysSinceSignUp <= 30;
-    const initialChartData = generateInitialChartData();
+    const initialChartData = generateInitialChartData(
+      currentPeriodStart,
+      today,
+    );
 
     const store_revenue_chart_data = mergeChartData(
       initialChartData,
@@ -641,12 +649,7 @@ export const businessRouter = createTRPCRouter({
           .update(businesses)
           .set({
             ...input,
-            slug: slugify(input.name!, {
-              lower: true,
-              replacement: "-",
-              strict: true,
-              trim: true,
-            }),
+            slug: slugify(input.name!, slugifyDefault),
           })
           .where(eq(businesses.ownerId, ctx.session.user.id))
           .returning();

@@ -1,6 +1,8 @@
 import { type inferRouterOutputs } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import slugify from "slugify";
 import { z } from "zod";
+import { slugifyDefault } from "~/lib/helpers";
 import { businesses, vehicles, vehicleTypeEnum } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -50,8 +52,8 @@ export const vehicleRouter = createTRPCRouter({
           return updated;
         } else {
           const vehicle = await ctx.db.insert(vehicles).values({
-            // due to new schema pushed...
             ...data,
+            slug: slugify(data.name, slugifyDefault),
           });
 
           return vehicle;
@@ -116,7 +118,7 @@ export const vehicleRouter = createTRPCRouter({
                 images: true,
                 id: true,
                 name: true,
-                // slug: true,
+                slug: true,
                 basePrice: true,
                 type: true,
                 category: true,

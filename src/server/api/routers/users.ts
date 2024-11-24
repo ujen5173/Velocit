@@ -42,13 +42,13 @@ export const userRouter = createTRPCRouter({
       .select({
         id: getTableColumns(businesses).id,
         name: getTableColumns(businesses).name,
+        slug: getTableColumns(businesses).slug,
         rating: getTableColumns(businesses).rating,
         ratingCount: getTableColumns(businesses).ratingCount,
         images: getTableColumns(businesses).images,
         location: getTableColumns(businesses).location,
         satisfiedCustomers: getTableColumns(businesses).satisfiedCustomers,
-        slug: getTableColumns(businesses).slug,
-        availableVehicleTypes:
+        availableVehiclesTypes:
           getTableColumns(businesses).availableVehicleTypes,
       })
       .from(bookmarks)
