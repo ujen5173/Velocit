@@ -161,7 +161,12 @@ const GeneralSettings = ({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel className="flex justify-between">
+                    Phone Number
+                    <span className="text-xs italic text-slate-500">
+                      (Will be used while booking)
+                    </span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="+977 9*********"

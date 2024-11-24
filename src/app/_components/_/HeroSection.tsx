@@ -119,7 +119,8 @@ const HeroSection = () => {
           >
             <div className="hidden md:flex">
               <Balancer>
-                Rent Cycles, Cars, and Scooters from Local Shops Around You
+                Rent Cycles, Bikes, Cars, and Scooters from Local Shops Around
+                You
               </Balancer>
             </div>
             <div className="flex md:hidden">

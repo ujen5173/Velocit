@@ -389,7 +389,7 @@ export const slides = [
     location: {
       city: "Near Labim Mall, Lalitpur",
     },
-    availableVehicleTypes: ["bike", "e-bike"],
+    availableVehicleTypes: ["bike", "e-bicycle", "e-car"],
     satisfiedCustomers: 180,
     category: "bicycle",
     address: "Bhaktapur, Nepal",

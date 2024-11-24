@@ -34,9 +34,16 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --color-2: 255, 92%, 76%;
+    --color-2: 255 92% 76%;
     --color-3: 142 69% 58%;
     --color-4: 213 94% 68%;
+
+    --car: 0 72% 51%;
+    --e-car: 0 72% 51%;
+    --bike: 142 76% 36%;
+    --cycle: 221 83% 53%;
+    --e-cycle: 221 83% 53%;
+    --scooter: 333 71% 51%;
   }
   .dark {
     --sidebar-background: 240 5.9% 10%;

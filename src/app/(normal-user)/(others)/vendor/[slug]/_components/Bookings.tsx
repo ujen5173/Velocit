@@ -78,8 +78,6 @@ const Bookings: React.FC<BookingsProps> = ({
   const [showQR, setShowQR] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>(user?.user.name ?? "");
   const [userNumber, setUserNumber] = useState<string>("");
-  console.log({ selectedVehicleType, selectedVehicleSubType, selectedModel });
-  console.log({ type, category, vehicle, bookingsDetails });
 
   useMemo(() => {
     setSelectedVehicleType(

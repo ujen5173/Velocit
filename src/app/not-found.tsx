@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "~/components/ui/button";
 
 const NotFound = () => {
@@ -11,8 +12,22 @@ const NotFound = () => {
       </p>
 
       <div className="flex gap-2">
-        <Button variant={"outline"}>Retry</Button>
-        <Button variant={"primary"}>Back to Homepage</Button>
+        <Button
+          onClick={() => {
+            window.location.reload();
+          }}
+          variant={"outline"}
+        >
+          Retry
+        </Button>
+        <Button
+          variant={"primary"}
+          onClick={() => {
+            window.location.href = "/";
+          }}
+        >
+          Back to Homepage
+        </Button>
       </div>
     </div>
   );

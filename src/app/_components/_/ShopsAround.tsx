@@ -9,14 +9,19 @@ import {
   CarouselContent,
   CarouselItem,
 } from "~/components/ui/carousel";
-import { slides } from "~/lib/data";
 import { cn } from "~/lib/utils";
+import { type GetPopularShops } from "~/server/api/routers/business";
+import { api as trpc } from "~/trpc/react";
 import VendorCard from "./VendorCard";
 
-const ShopsAround = () => {
+const ShopsAround = ({ initialData }: { initialData: GetPopularShops }) => {
   const [api, setApi] = useState<CarouselApi | undefined>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+
+  void trpc.business.getMultiple.usePrefetchQuery({
+    ids: (initialData ?? []).map((shop) => shop.id),
+  });
 
   useEffect(() => {
     if (!api) return;
@@ -61,7 +66,7 @@ const ShopsAround = () => {
             opts={{ align: "start" }}
           >
             <CarouselContent>
-              {slides.map((shop, index) => (
+              {initialData.map((shop, index) => (
                 <CarouselItem
                   key={index}
                   className="basis-full space-y-4 xs:basis-1/2 md:basis-1/3 lg:basis-1/4"

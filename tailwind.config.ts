@@ -29,6 +29,12 @@ export default {
         "color-2": "hsl(var(--color-2))",
         "color-3": "hsl(var(--color-3))",
         "color-4": "hsl(var(--color-4))",
+        "car-color": "hsl(var(--car))",
+        "e-car-color": "hsl(var(--e-car))",
+        "bike-color": "hsl(var(--bike))",
+        "cycle-color": "hsl(var(--cycle))",
+        "e-cycle-color": "hsl(var(--e-cycle))",
+        "scooter-color": "hsl(var(--scooter))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

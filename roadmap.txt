@@ -21,19 +21,23 @@
 ✅ - adding phone number
 ✅ - order for offline user: TODO: user phone number
 ✅ - choose the vehicle from the vehicles section in the vendor page
-   - offline/onsite payment
-   - socials of the vendor
-   - select any vehicle
-   - select vehicle from vehicles section
-   - prefetching all the items in the home page
+✅ - select vehicle from vehicles section
+✅ - prefetching all the items in the home page 
+   - authentication error handling
+   - change UI/UX of login model
    - change location api
    - get google map -> [TEMPORARY] -> react-leaflet
    - handle upload errors in uploadthing.
+   
+   - offline/onsite payment
+   - socials of the vendor
    - draft data in updating settings.
    - draft saving for bookings.
    - store views
 
   -- Future features -- 
+   - selection of currency based on location
+   - select any vehicle
    - events
    - event participating 
    - place search
@@ -42,7 +46,4 @@
    - add vendor accessories page
    - add vendor event page
 
-
-   -- ONGOING --
-   customer name and number in rental database
-   refactor the dashboard code
+ 

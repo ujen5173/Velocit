@@ -1,12 +1,12 @@
 import HeroSection from "~/app/_components/_/HeroSection";
-import ShopsAround from "~/app/_components/_/ShopsAround";
+import ShopsAroundWrapper from "~/app/_components/_/ShopsAroundWrapper";
 import UpcomingEvent from "~/app/_components/_/UpcomingEvent";
 
 const Home = () => {
   return (
     <>
       <HeroSection />
-      <ShopsAround />
+      <ShopsAroundWrapper />
       {/* <Shops /> */}
       <UpcomingEvent />
     </>

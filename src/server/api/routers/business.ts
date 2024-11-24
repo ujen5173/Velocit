@@ -1,4 +1,4 @@
-import { TRPCError } from "@trpc/server";
+import { type inferRouterOutputs, TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import slugify from "slugify";
 import { z, ZodError } from "zod";
@@ -94,10 +94,12 @@ export const businessRouter = createTRPCRouter({
       .select({
         id: businesses.id,
         name: businesses.name,
-        location: businesses.location,
+        slug: businesses.slug,
         rating: businesses.rating,
-        ratingCount: businesses.ratingCount,
-        logo: businesses.logo,
+        location: businesses.location,
+        availableVehiclesTypes: businesses.availableVehicleTypes,
+        satisfiedCustomers: businesses.satisfiedCustomers,
+        images: businesses.images,
       })
       .from(businesses)
       .where(
@@ -478,6 +480,19 @@ export const businessRouter = createTRPCRouter({
       return shops;
     }),
 
+  getMultiple: publicProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string()),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db
+        .select()
+        .from(businesses)
+        .where(sql`${businesses.id} = ANY(${input.ids})`);
+    }),
+
   // Get all shops with infinite query
   getAll: publicProcedure
     .input(
@@ -798,3 +813,5 @@ export type GetVendorType = inferRouterOutputs<BusinessRouter>["getVendor"];
 export type GetBookingsType =
   inferRouterOutputs<BusinessRouter>["getBookingsDetails"];
 export type GetOrdersType = inferRouterOutputs<BusinessRouter>["getOrders"];
+export type GetPopularShops =
+  inferRouterOutputs<BusinessRouter>["getPopularShops"];

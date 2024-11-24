@@ -11,10 +11,10 @@ import {
 } from "~/components/ui/carousel";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
-import { type Slide } from "~/types";
+import { type GetPopularShops } from "~/server/api/routers/business";
 
 type Props = {
-  shop: Slide;
+  shop: GetPopularShops[number];
   separatorColor?: string;
   separatorHeight?: string;
 };
@@ -54,7 +54,7 @@ const VendorCard = ({ separatorHeight, separatorColor, shop }: Props) => {
               <div className="flex items-center gap-1">
                 <Star size={18} className="fill-yellow-500 stroke-yellow-500" />
                 <span className="text-sm">
-                  {+shop.rating! <= 0 ? "N/A" : +shop.rating!}
+                  {+shop.rating <= 0 ? "N/A" : +shop.rating}
                 </span>
               </div>
               <Dot size={18} />
@@ -68,59 +68,41 @@ const VendorCard = ({ separatorHeight, separatorColor, shop }: Props) => {
             <div>
               <h4 className="mb-1 text-sm uppercase">Available Vehicles</h4>
               <div className="flex flex-1 items-center gap-2">
-                {shop.availableVehicleTypes.map((type, index) => {
-                  switch (type) {
-                    case "bicycle":
-                      return (
-                        <div
-                          key={index + shop.id}
-                          className="flex items-center gap-1 rounded-sm border border-green-500 bg-green-50 px-2 py-1 font-medium"
-                        >
-                          <div className="size-1.5 rounded-full bg-green-500"></div>
-                          <span className="text-xs">Bicycle</span>
-                        </div>
-                      );
-                    case "bike":
-                      return (
-                        <div
-                          key={index + shop.id}
-                          className="flex items-center gap-1 rounded-sm border border-rose-500 bg-rose-50 px-2 py-1 font-medium"
-                        >
-                          <div className="size-1.5 rounded-full bg-rose-500"></div>
-                          <span className="text-xs">Bike</span>
-                        </div>
-                      );
-                    case "e-bicycle":
-                      return (
-                        <div
-                          key={index + shop.id}
-                          className="flex items-center gap-1 rounded-sm border border-orange-500 bg-orange-50 px-2 py-1 font-medium"
-                        >
-                          <div className="size-1.5 rounded-full bg-orange-500"></div>
-                          <span className="text-xs">E-Bicycle</span>
-                        </div>
-                      );
-                    case "car":
-                      return (
-                        <div
-                          key={index + shop.id}
-                          className="flex items-center gap-1 rounded-sm border border-blue-500 bg-blue-50 px-2 py-1 font-medium"
-                        >
-                          <div className="size-1.5 rounded-full bg-blue-500"></div>
-                          <span className="text-xs">Car</span>
-                        </div>
-                      );
-                    case "scooter":
-                      return (
-                        <div
-                          key={index + shop.id}
-                          className="flex items-center gap-1 rounded-sm border border-yellow-500 bg-yellow-50 px-2 py-1 font-medium"
-                        >
-                          <div className="size-1.5 rounded-full bg-yellow-500"></div>
-                          <span className="text-xs">Car</span>
-                        </div>
-                      );
-                  }
+                {shop.availableVehiclesTypes.map((type, index) => {
+                  return (
+                    <div
+                      key={index + shop.id}
+                      className={cn(
+                        "flex items-center gap-1 rounded-sm border px-2 py-1 font-medium",
+                        {
+                          "border-car-color/50 bg-car-color/20 text-car-color":
+                            type === "car",
+                          "border-e-car-color/50 bg-e-car-color/20 text-e-car-color":
+                            type === "e-car",
+                          "border-bike-color/50 bg-bike-color/20 text-bike-color":
+                            type === "bike",
+                          "border-cycle-color/50 bg-cycle-color/20 text-cycle-color":
+                            type === "bicycle",
+                          "border-e-cycle-color/50 bg-e-cycle-color/20 text-e-cycle-color":
+                            type === "e-bicycle",
+                          "border-scooter-color/50 bg-scooter-color/20 text-scooter-color":
+                            type === "scooter",
+                        },
+                      )}
+                    >
+                      <div
+                        className={cn("size-1.5 rounded-full", {
+                          "bg-car-color": type === "car",
+                          "bg-e-car-color": type === "e-car",
+                          "bg-bike-color": type === "bike",
+                          "bg-cycle-color": type === "bicycle",
+                          "bg-e-cycle-color": type === "e-bicycle",
+                          "bg-scooter-color": type === "scooter",
+                        })}
+                      ></div>
+                      <span className="text-xs uppercase">{type}</span>
+                    </div>
+                  );
                 })}
               </div>
             </div>
