@@ -113,6 +113,8 @@ const VendorDetails = () => {
     <>
       {!isLoading && bookingsDetails !== undefined && (
         <Bookings
+          paymentId={vendor.phoneNumbers[0]!}
+          paymentMethod={"PhonePay"}
           open={open}
           setOpen={setOpen}
           bookingsDetails={bookingsDetails}

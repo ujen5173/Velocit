@@ -1,11 +1,11 @@
 "use client";
 
-import L, { type LatLngExpression, type Map as LeafletMap } from "leaflet";
+import L, { type Map as LeafletMap } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useRef } from "react";
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import React, { useCallback, useMemo, useRef } from "react";
+import { MapContainer, Marker, TileLayer, ZoomControl } from "react-leaflet";
 import { v4 as uuidv4 } from "uuid";
 
 interface Place {
@@ -25,7 +25,7 @@ interface MapProps {
       >[];
     }>
   >;
-  location?: LatLngExpression;
+  location?: [number, number];
   places: Place[];
   setPlaces: React.Dispatch<React.SetStateAction<Place[]>>;
 }
@@ -41,83 +41,25 @@ const LeafletMapComponent: React.FC<MapProps> = ({
   places,
   setPlaces,
 }) => {
-  const DEFAULT_CENTER = location ?? [51.505, -0.09];
   const mapRef = useRef<LeafletMap | null>(null);
 
-  useEffect(() => {
-    if (mapRef.current && location) {
-      mapRef.current.setView(location);
-    }
-  }, [location]);
-
-  const getData = async (markers: MapBounds[]) => {
-    // Fetching data
-    console.log("Fetching data", markers);
-  };
-
-  const getBounds = (map: LeafletMap | null) => {
+  // Memoize getBounds to prevent unnecessary re-renders
+  const getBounds = useCallback((map: LeafletMap | null) => {
     const bounds = map?.getBounds();
     if (!bounds) return;
 
-    const northWest = bounds.getNorthWest();
-    const northEast = bounds.getNorthEast();
-    const southWest = bounds.getSouthWest();
-    const southEast = bounds.getSouthEast();
-
     const markers: MapBounds[] = [
-      {
-        lat: northWest.lat,
-        lng: northWest.lng,
-      },
-      {
-        lat: northEast.lat,
-        lng: northEast.lng,
-      },
-      {
-        lat: southWest.lat,
-        lng: southWest.lng,
-      },
-      {
-        lat: southEast.lat,
-        lng: southEast.lng,
-      },
+      { lat: bounds.getNorthWest().lat, lng: bounds.getNorthWest().lng },
+      { lat: bounds.getNorthEast().lat, lng: bounds.getNorthEast().lng },
+      { lat: bounds.getSouthWest().lat, lng: bounds.getSouthWest().lng },
+      { lat: bounds.getSouthEast().lat, lng: bounds.getSouthEast().lng },
     ];
-    void getData(markers);
-  };
-
-  const getLngAndLat = () => {
-    if (mapRef.current) {
-      getBounds(mapRef.current);
-    }
-  };
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (map) {
-      map.on("moveend", getLngAndLat);
-
-      return () => {
-        map.off("moveend", getLngAndLat);
-      };
-    }
   }, []);
 
-  return (
-    <MapContainer
-      ref={mapRef} // Type assertion needed due to react-leaflet typing limitations
-      style={{ width: "100%", height: "100%" }}
-      center={DEFAULT_CENTER}
-      zoom={8}
-      whenReady={() => {
-        getBounds(mapRef.current);
-      }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        noWrap={true}
-      />
-      {places.map((place) => (
+  // Use useMemo for marker generation
+  const memoizedMarkers = useMemo(
+    () =>
+      places.map((place) => (
         <Marker
           key={uuidv4()}
           position={[place.lat, place.lng]}
@@ -130,7 +72,34 @@ const LeafletMapComponent: React.FC<MapProps> = ({
             className: "custom-div-icon",
           })}
         />
-      ))}
+      )),
+    [places],
+  );
+
+  return (
+    <MapContainer
+      key={JSON.stringify(location)}
+      ref={mapRef}
+      style={{ width: "100%", height: "100%" }}
+      center={location}
+      zoom={16}
+      zoomAnimation={true}
+      zoomAnimationThreshold={50}
+      zoomControl={false}
+      zoomSnap={0.5}
+      scrollWheelZoom={true}
+      wheelPxPerZoomLevel={500}
+      whenReady={() => {
+        getBounds(mapRef.current);
+      }}
+    >
+      <ZoomControl position="bottomright" />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        noWrap={true}
+      />
+      {memoizedMarkers}
     </MapContainer>
   );
 };

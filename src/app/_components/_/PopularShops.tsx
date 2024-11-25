@@ -1,27 +1,24 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Map } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Carousel,
-  type CarouselApi,
   CarouselContent,
   CarouselItem,
+  type CarouselApi,
 } from "~/components/ui/carousel";
 import { cn } from "~/lib/utils";
-import { type GetPopularShops } from "~/server/api/routers/business";
 import { api as trpc } from "~/trpc/react";
 import VendorCard from "./VendorCard";
 
-const ShopsAround = ({ initialData }: { initialData: GetPopularShops }) => {
+const PopularShops = () => {
   const [api, setApi] = useState<CarouselApi | undefined>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  void trpc.business.getMultiple.usePrefetchQuery({
-    ids: (initialData ?? []).map((shop) => shop.id),
-  });
+  const { data: initialData } = trpc.business.getPopularShops.useQuery();
 
   useEffect(() => {
     if (!api) return;
@@ -66,7 +63,7 @@ const ShopsAround = ({ initialData }: { initialData: GetPopularShops }) => {
             opts={{ align: "start" }}
           >
             <CarouselContent>
-              {initialData.map((shop, index) => (
+              {initialData?.map((shop, index) => (
                 <CarouselItem
                   key={index}
                   className="basis-full space-y-4 xs:basis-1/2 md:basis-1/3 lg:basis-1/4"
@@ -77,14 +74,14 @@ const ShopsAround = ({ initialData }: { initialData: GetPopularShops }) => {
             </CarouselContent>
           </Carousel>
 
-          <Button className="gap-1" variant="outline">
+          {/* <Button className="gap-1" variant="outline">
             <Map size={18} className="text-slate-600" />
             Explore Shops Around you
-          </Button>
+          </Button> */}
         </div>
       </div>
     </section>
   );
 };
 
-export default ShopsAround;
+export default PopularShops;

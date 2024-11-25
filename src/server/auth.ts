@@ -46,6 +46,37 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
+  ],
+
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }) as Adapter,
+
+  session: {
+    strategy: "jwt",
+  },
+
+  secret: env.NEXTAUTH_SECRET,
+
+  pages: {
+    signIn: "/auth/signin",
+  },
+
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
@@ -112,24 +143,7 @@ export const authOptions: NextAuthOptions = {
       };
     },
   },
-
-  session: {
-    strategy: "jwt",
-  },
-
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }) as Adapter,
-
-  providers: [
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    }),
-  ],
+  debug: process.env.NODE_ENV === "development",
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

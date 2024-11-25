@@ -28,6 +28,14 @@ export const vehicleTypeEnum = pgEnum("vehicle_type", [
   "e-car",
 ]);
 
+export const businessStatusEnum = pgEnum("business_status", [
+  "suspended",
+  "active",
+  "inactive",
+  "closed",
+  "de-active",
+]);
+
 export const rentalStatusEnum = pgEnum("rental_status", [
   "pending",
   "approved",
@@ -109,6 +117,7 @@ export const businesses = createTable(
       .$type<Record<string, { open: string; close: string } | null>>()
       .notNull()
       .default(sql`'{}'::jsonb`),
+    vehiclesCount: integer("vehicles_count").default(0),
     rating: decimal("rating", { precision: 3, scale: 2 })
       .$type<number>()
       .notNull()
@@ -125,11 +134,13 @@ export const businesses = createTable(
       .notNull()
       .default(sql`'{}'::text[]`),
     faqs: json("faqs")
+      .array()
       .$type<
         { question: string; answer: string; id: string; order: number }[]
       >()
       .notNull()
-      .default(sql`'{}'::json`),
+      .default(sql`'{}'::json[]`),
+    status: businessStatusEnum("status").notNull().default("inactive"),
     stripeAccountId: varchar("stripe_account_id", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -181,14 +192,14 @@ export const vehicles = createTable(
     basePrice: integer("base_price").notNull(),
     inventory: integer("inventory").notNull().default(1),
     features: jsonb("features")
+      .notNull()
       .$type<
         {
           key: string;
           value: string;
         }[]
       >()
-      .notNull()
-      .default(sql`'[]'::jsonb`),
+      .default(sql`'{}'::jsonb[]`),
     unavailabilityDates: timestamp("unavailability_dates", {
       mode: "date",
     })
@@ -227,7 +238,6 @@ export const rentals = createTable(
     status: rentalStatusEnum("status").notNull().default("pending"),
     paymentMethod: varchar("payment_method", {
       enum: ["online", "onsite"],
-      length: 100,
     }),
     totalPrice: integer("total_price").notNull(),
     num_of_days: integer("num_of_days").notNull().default(1),
@@ -445,7 +455,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 // zod types:
-export type businessesType = InferInsertModel<typeof businesses>;
+export type businessesType = InferInsertModel<typeof businesses>["faqs"];
 export type usersType = InferInsertModel<typeof users>;
 export type vehiclesType = InferInsertModel<typeof vehicles>;
 export type bookmarksType = InferInsertModel<typeof bookmarks>;

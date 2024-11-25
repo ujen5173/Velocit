@@ -23,8 +23,14 @@
 ✅ - choose the vehicle from the vehicles section in the vendor page
 ✅ - select vehicle from vehicles section
 ✅ - prefetching all the items in the home page 
+✅ - sign in and sign up page
+✅ - vehicle type hard coded.
+✅ - change UI/UX of login model
+✅ - setting business status
+   - search header in all pages except the home page
+   - order in the images of the vendor page
+   - fix the fucking huge chunk of re-renders in the setup vendor paged
    - authentication error handling
-   - change UI/UX of login model
    - change location api
    - get google map -> [TEMPORARY] -> react-leaflet
    - handle upload errors in uploadthing.
@@ -36,7 +42,6 @@
    - store views
 
   -- Future features -- 
-   - selection of currency based on location
    - select any vehicle
    - events
    - event participating 
@@ -46,4 +51,10 @@
    - add vendor accessories page
    - add vendor event page
 
- 
+   -- Feature deprecated --
+   - selection of currency based on location
+
+
+
+-- in progress --
+   - multiple image upload without re-uploading uploaded file.

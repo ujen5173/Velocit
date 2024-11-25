@@ -14,6 +14,7 @@ import { WEEK_DAYS } from "~/app/utils/helpers";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { toast } from "~/hooks/use-toast";
+import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { type AppRouter } from "~/server/api/root";
 import { vehicleTypeEnum } from "~/server/db/schema";
 import { api } from "~/trpc/react";
@@ -72,6 +73,8 @@ export const BusinessFormContext = createContext({});
 
 const BusinessProfile = ({ business }: { business: CurrentBusinessType }) => {
   const { update, data } = useSession(); // to update the user in the session
+  const { width, height } = useWindowDimensions();
+  const [success, setSuccess] = useState(false);
   const { setUser } = useUser(); // session user
   const router = useRouter();
 
@@ -110,14 +113,22 @@ const BusinessProfile = ({ business }: { business: CurrentBusinessType }) => {
         },
       } as Session | null;
 
+      if (data?.user.vendor_setup_complete === false) {
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+        }, 2500);
+      }
+
+      toast({
+        title: "Profile Updated. Redirecting to Vehicles Page...",
+        description: "Your profile has been updated successfully",
+      });
+
       await update(newUser);
       setUser(newUser);
 
-      toast({
-        title: "Profile updated successfully. Redirecting to Dashboard...",
-        description: "Your profile has been updated successfully",
-      });
-      router.push("/dashboard");
+      router.push("/vendor/vehicles");
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({

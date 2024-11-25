@@ -7,15 +7,14 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
-  MessageCircle,
+  MessageCircleMore,
   PanelLeft,
   Settings,
   ShoppingCart,
-  Store,
 } from "lucide-react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -38,42 +37,43 @@ const items = [
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
-  },
-
-  {
-    title: "Stores",
-    url: "/stores",
-    icon: Store,
+    disabled: false,
   },
   {
     title: "Vehicles",
     url: "/vendor/vehicles",
     icon: Bike,
+    disabled: false,
   },
   {
     title: "Accessories",
     url: "/accessories",
     icon: ShoppingCart,
+    disabled: false,
   },
   {
     title: "Events",
     url: "/vendor/events",
     icon: CalendarDays,
+    disabled: true,
   },
   {
     title: "Messages",
     url: "/chats",
-    icon: MessageCircle,
+    icon: MessageCircleMore,
+    disabled: true,
   },
   {
     title: "Accounts",
     url: "/vendor/profile",
     icon: Settings,
+    disabled: false,
   },
 ];
 
 export function AppSidebar() {
   const { toggleSidebar } = useSidebar();
+  const router = useRouter();
   const path = usePathname();
 
   const sideBarExtraItems = [
@@ -128,18 +128,19 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      href={item.url}
-                      className={cn(
-                        path === item.url
-                          ? "text-primary-500 block border border-border bg-white shadow-sm hover:bg-slate-50"
-                          : "text-slate-600",
-                      )}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
+                  <SidebarMenuButton
+                    className={cn(
+                      path === item.url
+                        ? "text-primary-500 block border border-border bg-white shadow-sm hover:bg-slate-50"
+                        : "text-slate-600",
+                    )}
+                    onClick={() => {
+                      void router.push(item.url);
+                    }}
+                    disabled={item.disabled}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

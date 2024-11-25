@@ -14,21 +14,18 @@ import MultipleSelector from "~/components/ui/multi-select";
 import { InputTags as TagsInput } from "~/components/ui/tags-input";
 import { useUploadFile } from "~/hooks/useUploadthing";
 import { cn } from "~/lib/utils";
+import { vehicleTypeEnum } from "~/server/db/schema";
 import useBusinessFormContext from "../hooks/useBusinessFormContext";
 
 type Option = {
   label: string;
-  value: "bike" | "e-bike" | "scooter" | "e-scooter" | "car" | "e-car";
+  value: (typeof vehicleTypeEnum.enumValues)[number];
 };
 
-const OPTIONS: Option[] = [
-  { label: "Bike", value: "bike" },
-  { label: "E-Bike", value: "e-bike" },
-  { label: "Scooter", value: "scooter" },
-  { label: "E-Scooter", value: "e-scooter" },
-  { label: "Car", value: "car" },
-  { label: "E-Car", value: "e-car" },
-];
+const OPTIONS: Option[] = vehicleTypeEnum.enumValues.map((value) => ({
+  label: value.charAt(0).toUpperCase() + value.slice(1),
+  value: value,
+}));
 
 const GeneralInfo = () => {
   const { form } = useBusinessFormContext();
@@ -158,6 +155,8 @@ const GeneralInfo = () => {
                     )
                   }
                   defaultOptions={OPTIONS}
+                  className="capitalize"
+                  badgeClassName="capitalize"
                   placeholder="Vechicle Types you offer"
                   emptyIndicator={
                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

@@ -1,5 +1,5 @@
 import { type inferRouterOutputs } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import { z } from "zod";
 import { slugifyDefault } from "~/lib/helpers";
@@ -55,6 +55,13 @@ export const vehicleRouter = createTRPCRouter({
             ...data,
             slug: slugify(data.name, slugifyDefault),
           });
+
+          await ctx.db
+            .update(businesses)
+            .set({
+              vehiclesCount: sql`${businesses.vehiclesCount} + 1`,
+            })
+            .where(eq(businesses.id, data.businessId));
 
           return vehicle;
         }

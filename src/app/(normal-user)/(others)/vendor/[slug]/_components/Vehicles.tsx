@@ -52,7 +52,7 @@ const Vehicles = () => {
               <Skeleton className="h-48" />
             </>
           ) : (
-            vehicles?.map((vehicle) => (
+            (vehicles ?? [])?.map((vehicle) => (
               <Link
                 href={{
                   query: {
@@ -109,6 +109,13 @@ const Vehicles = () => {
             ))
           )}
         </section>
+        {!isLoading && vehicles?.length === 0 && (
+          <div className="flex h-52 items-center justify-center">
+            <p className="text-lg font-medium text-slate-600">
+              No vehicles published yet. Please check back later.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

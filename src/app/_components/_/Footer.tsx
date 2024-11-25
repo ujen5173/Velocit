@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dot,
   Facebook,
@@ -7,14 +9,35 @@ import {
   Youtube,
 } from "lucide-react";
 import Link from "next/link";
+import { useContext } from "react";
 import Balancer from "react-wrap-balancer";
 import { chakra_petch } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { cn } from "~/lib/utils";
 import Logo from "~/svg/logo";
+import { Context } from "../contexts/root";
 
 const Footer = () => {
+  const { currentCurrency, setCurrentCurrency } = useContext(Context);
+
   return (
     <section className="w-full bg-tertiary">
       <div className="mx-auto max-w-[1440px] px-4">
@@ -193,7 +216,42 @@ const Footer = () => {
 
         <div className="flex flex-col items-center justify-between gap-8 py-10 md:flex-row">
           <div className="text-center">
-            <Button variant={"outline"}>रु Nepali Ruppee (NPR)</Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant={"outline"} disabled>
+                  {currentCurrency.label}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Change Currency</DialogTitle>
+                  <DialogDescription>
+                    All prices wil be shown in the selected currency.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a Currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="usd">USD</SelectItem>
+                        <SelectItem value="npr">NPR</SelectItem>
+                        <SelectItem value="euro">EURO</SelectItem>
+                        <SelectItem value="yen">YEN</SelectItem>
+                        <SelectItem value="won">WON</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <DialogFooter>
+                  <Button type="submit" variant={"secondary"}>
+                    Save changes
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <ul className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-100 sm:flex-nowrap sm:justify-normal sm:gap-0">

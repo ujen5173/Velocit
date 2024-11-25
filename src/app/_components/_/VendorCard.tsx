@@ -67,7 +67,7 @@ const VendorCard = ({ separatorHeight, separatorColor, shop }: Props) => {
             </div>
             <div>
               <h4 className="mb-1 text-sm uppercase">Available Vehicles</h4>
-              <div className="flex flex-1 items-center gap-2">
+              <div className="flex flex-1 flex-wrap items-center gap-2">
                 {shop.availableVehiclesTypes.map((type, index) => {
                   return (
                     <div

@@ -1,17 +1,18 @@
+import { type vehicleTypeEnum } from "~/server/db/schema";
 import { type Slide } from "~/types";
 import { type ShopData } from "~/types/bookings";
 
 export const searchedData = [
   {
+    id: "1",
     name: "Mountain Biker's Haven",
-    rating: 4.8,
     slug: "mountain-bikers-haven",
-    perDay: {
-      bicycle: 25,
+    rating: 4.8,
+    location: {
+      city: "123 Trail Way, Adventure City, AC 12345",
     },
     satisfiedCustomers: 120,
-    category: "bicycle",
-    address: "123 Trail Way, Adventure City, AC 12345",
+    availableVehiclesTypes: ["bicycle", "bike"],
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img2.jpg",
@@ -20,15 +21,15 @@ export const searchedData = [
     lonlat: [34.0522, -118.2437],
   },
   {
+    id: "2",
     name: "Urban Cycling Co.",
-    rating: 4.5,
     slug: "urban-cycling-co",
-    perDay: {
-      bicycle: 15,
+    rating: 4.5,
+    location: {
+      city: "456 City Lane, Metropolis, MP 67890",
     },
     satisfiedCustomers: 95,
-    category: "bicycle",
-    address: "456 City Lane, Metropolis, MP 67890",
+    availableVehiclesTypes: ["bicycle", "e-bicycle"],
     images: [
       "/images/shops/img3.jpg",
       "/images/shops/img-1.jpg",
@@ -37,15 +38,15 @@ export const searchedData = [
     lonlat: [40.7128, -74.006],
   },
   {
+    id: "3",
     name: "Eco-Friendly Rentals",
-    rating: 4.7,
     slug: "eco-friendly-rentals",
-    perDay: {
-      bicycle: 20,
+    rating: 4.7,
+    location: {
+      city: "789 Green St, Eco City, EC 54321",
     },
     satisfiedCustomers: 150,
-    category: "bicycle",
-    address: "789 Green St, Eco City, EC 54321",
+    availableVehiclesTypes: ["bicycle", "e-bicycle"],
     images: [
       "/images/shops/img-2.jpg",
       "/images/shops/img1.jpg",
@@ -54,15 +55,15 @@ export const searchedData = [
     lonlat: [37.7749, -122.4194],
   },
   {
+    id: "4",
     name: "Beachside Bikes",
-    rating: 4.6,
     slug: "beachside-bikes",
-    perDay: {
-      bicycle: 30,
+    rating: 4.6,
+    location: {
+      city: "101 Ocean Blvd, Seaside Town, ST 98765",
     },
     satisfiedCustomers: 80,
-    category: "bicycle",
-    address: "101 Ocean Blvd, Seaside Town, ST 98765",
+    availableVehiclesTypes: ["bicycle", "bike"],
     images: [
       "/images/shops/img4.jpg",
       "/images/shops/img3.jpg",
@@ -71,151 +72,15 @@ export const searchedData = [
     lonlat: [36.7783, -119.4179],
   },
   {
-    name: "Mountain Biker's Haven",
-    rating: 4.8,
-    slug: "mountain-bikers-haven",
-    perDay: {
-      bicycle: 25,
-    },
-    satisfiedCustomers: 120,
-    category: "bicycle",
-    address: "123 Trail Way, Adventure City, AC 12345",
-    images: [
-      "/images/shops/img1.jpg",
-      "/images/shops/img2.jpg",
-      "/images/shops/img4.jpg",
-    ],
-    lonlat: [34.0522, -118.2437],
-  },
-  {
-    name: "Urban Cycling Co.",
-    rating: 4.5,
-    slug: "urban-cycling-co",
-    perDay: {
-      bicycle: 15,
-    },
-    satisfiedCustomers: 95,
-    category: "bicycle",
-    address: "456 City Lane, Metropolis, MP 67890",
-    images: [
-      "/images/shops/img3.jpg",
-      "/images/shops/img-1.jpg",
-      "/images/shops/img-3.jpg",
-    ],
-    lonlat: [40.7128, -74.006],
-  },
-  {
-    name: "Eco-Friendly Rentals",
-    rating: 4.7,
-    slug: "eco-friendly-rentals",
-    perDay: {
-      bicycle: 20,
-    },
-    satisfiedCustomers: 150,
-    category: "bicycle",
-    address: "789 Green St, Eco City, EC 54321",
-    images: [
-      "/images/shops/img-2.jpg",
-      "/images/shops/img1.jpg",
-      "/images/shops/img-4.jpg",
-    ],
-    lonlat: [37.7749, -122.4194],
-  },
-  {
-    name: "Beachside Bikes",
-    rating: 4.6,
-    slug: "beachside-bikes",
-    perDay: {
-      bicycle: 30,
-    },
-    satisfiedCustomers: 80,
-    category: "bicycle",
-    address: "101 Ocean Blvd, Seaside Town, ST 98765",
-    images: [
-      "/images/shops/img4.jpg",
-      "/images/shops/img3.jpg",
-      "/images/shops/img2.jpg",
-    ],
-    lonlat: [36.7783, -119.4179],
-  },
-  {
-    name: "Mountain Biker's Haven",
-    rating: 4.8,
-    slug: "mountain-bikers-haven",
-    perDay: {
-      bicycle: 25,
-    },
-    satisfiedCustomers: 120,
-    category: "bicycle",
-    address: "123 Trail Way, Adventure City, AC 12345",
-    images: [
-      "/images/shops/img1.jpg",
-      "/images/shops/img2.jpg",
-      "/images/shops/img4.jpg",
-    ],
-    lonlat: [34.0522, -118.2437],
-  },
-  {
-    name: "Urban Cycling Co.",
-    rating: 4.5,
-    slug: "urban-cycling-co",
-    perDay: {
-      bicycle: 15,
-    },
-    satisfiedCustomers: 95,
-    category: "bicycle",
-    address: "456 City Lane, Metropolis, MP 67890",
-    images: [
-      "/images/shops/img3.jpg",
-      "/images/shops/img-1.jpg",
-      "/images/shops/img-3.jpg",
-    ],
-    lonlat: [40.7128, -74.006],
-  },
-  {
-    name: "Eco-Friendly Rentals",
-    rating: 4.7,
-    slug: "eco-friendly-rentals",
-    perDay: {
-      bicycle: 20,
-    },
-    satisfiedCustomers: 150,
-    category: "bicycle",
-    address: "789 Green St, Eco City, EC 54321",
-    images: [
-      "/images/shops/img-2.jpg",
-      "/images/shops/img1.jpg",
-      "/images/shops/img-4.jpg",
-    ],
-    lonlat: [37.7749, -122.4194],
-  },
-  {
-    name: "Beachside Bikes",
-    rating: 4.6,
-    slug: "beachside-bikes",
-    perDay: {
-      bicycle: 30,
-    },
-    satisfiedCustomers: 80,
-    category: "bicycle",
-    address: "101 Ocean Blvd, Seaside Town, ST 98765",
-    images: [
-      "/images/shops/img4.jpg",
-      "/images/shops/img3.jpg",
-      "/images/shops/img2.jpg",
-    ],
-    lonlat: [36.7783, -119.4179],
-  },
-  {
+    id: "5",
     name: "Cycle Explorers",
-    rating: 4.9,
     slug: "cycle-explorers",
-    perDay: {
-      bicycle: 28,
+    rating: 4.9,
+    location: {
+      city: "202 Adventure Rd, Explore City, EC 12345",
     },
     satisfiedCustomers: 200,
-    category: "bicycle",
-    address: "202 Adventure Rd, Explore City, EC 12345",
+    availableVehiclesTypes: ["bicycle", "e-bicycle"],
     images: [
       "/images/shops/img-1.jpg",
       "/images/shops/img-3.jpg",
@@ -224,15 +89,15 @@ export const searchedData = [
     lonlat: [34.0522, -118.2437],
   },
   {
+    id: "6",
     name: "City Cycle Rentals",
-    rating: 4.4,
     slug: "city-cycle-rentals",
-    perDay: {
-      bicycle: 18,
+    rating: 4.4,
+    location: {
+      city: "303 Urban Ave, Downtown City, DC 87654",
     },
     satisfiedCustomers: 110,
-    category: "bicycle",
-    address: "303 Urban Ave, Downtown City, DC 87654",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "scooter"],
     images: [
       "/images/shops/img4.jpg",
       "/images/shops/img-4.jpg",
@@ -241,15 +106,15 @@ export const searchedData = [
     lonlat: [51.5074, -0.1278],
   },
   {
+    id: "7",
     name: "Adventure Bike Rentals",
-    rating: 4.8,
     slug: "adventure-bike-rentals",
-    perDay: {
-      bicycle: 27,
+    rating: 4.8,
+    location: {
+      city: "404 Mountain Rd, Boulder Town, BT 34567",
     },
     satisfiedCustomers: 140,
-    category: "bicycle",
-    address: "404 Mountain Rd, Boulder Town, BT 34567",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "bike"],
     images: [
       "/images/shops/img1.jpg",
       "/images/shops/img-1.jpg",
@@ -258,15 +123,15 @@ export const searchedData = [
     lonlat: [39.7392, -104.9903],
   },
   {
+    id: "8",
     name: "Pedal Power",
-    rating: 4.9,
     slug: "pedal-power",
-    perDay: {
-      bicycle: 22,
+    rating: 4.9,
+    location: {
+      city: "505 Pedal St, Cyclersville, CY 65432",
     },
     satisfiedCustomers: 175,
-    category: "bicycle",
-    address: "505 Pedal St, Cyclersville, CY 65432",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "bike"],
     images: [
       "/images/shops/img-3.jpg",
       "/images/shops/img4.jpg",
@@ -275,15 +140,15 @@ export const searchedData = [
     lonlat: [48.8566, 2.3522],
   },
   {
+    id: "9",
     name: "Eco Pedals",
-    rating: 4.7,
     slug: "eco-pedals",
-    perDay: {
-      bicycle: 20,
+    rating: 4.7,
+    location: {
+      city: "606 Eco Dr, Green City, GC 43210",
     },
     satisfiedCustomers: 165,
-    category: "bicycle",
-    address: "606 Eco Dr, Green City, GC 43210",
+    availableVehiclesTypes: ["bicycle", "e-bicycle"],
     images: [
       "/images/shops/img2.jpg",
       "/images/shops/img-4.jpg",
@@ -292,15 +157,15 @@ export const searchedData = [
     lonlat: [52.52, 13.405],
   },
   {
+    id: "10",
     name: "BikeTime Rentals",
-    rating: 4.6,
     slug: "biketime-rentals",
-    perDay: {
-      bicycle: 19,
+    rating: 4.6,
+    location: {
+      city: "707 Speed Ave, Fast City, FC 76543",
     },
     satisfiedCustomers: 130,
-    category: "bicycle",
-    address: "707 Speed Ave, Fast City, FC 76543",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "scooter"],
     images: [
       "/images/shops/img-2.jpg",
       "/images/shops/img-3.jpg",
@@ -309,15 +174,15 @@ export const searchedData = [
     lonlat: [55.7558, 37.6173],
   },
   {
+    id: "11",
     name: "Tour de Cycle",
-    rating: 4.5,
     slug: "tour-de-cycle",
-    perDay: {
-      bicycle: 21,
+    rating: 4.5,
+    location: {
+      city: "808 Cycle Way, Ride City, RC 87654",
     },
     satisfiedCustomers: 115,
-    category: "bicycle",
-    address: "808 Cycle Way, Ride City, RC 87654",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "scooter"],
     images: [
       "/images/shops/img3.jpg",
       "/images/shops/img1.jpg",
@@ -326,15 +191,15 @@ export const searchedData = [
     lonlat: [41.9028, 12.4964],
   },
   {
+    id: "12",
     name: "Urban Wheelers",
-    rating: 4.7,
     slug: "urban-wheelers",
-    perDay: {
-      bicycle: 26,
+    rating: 4.7,
+    location: {
+      city: "909 Downtown Blvd, Big City, BC 76543",
     },
     satisfiedCustomers: 190,
-    category: "bicycle",
-    address: "909 Downtown Blvd, Big City, BC 76543",
+    availableVehiclesTypes: ["bicycle", "e-bicycle", "scooter", "e-car"],
     images: [
       "/images/shops/img-4.jpg",
       "/images/shops/img2.jpg",
@@ -342,7 +207,19 @@ export const searchedData = [
     ],
     lonlat: [35.6895, 139.6917],
   },
-];
+] as {
+  id: string;
+  name: string;
+  slug: string;
+  rating: number;
+  location: {
+    city?: string;
+  };
+  satisfiedCustomers: number;
+  availableVehiclesTypes: (typeof vehicleTypeEnum.enumValues)[number][];
+  images: string[];
+  lonlat: number[];
+}[];
 
 export const slides = [
   {

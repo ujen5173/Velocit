@@ -1,14 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Plus, Trash, X } from "lucide-react";
+import {} from "cmdk";
+import { Check, ChevronsUpDown, Loader, Plus, Trash, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import FileUploaderWrapper from "~/app/_components/_/FileUploaderWrapper";
-import VehicleIndicatorIcon from "~/app/_components/_/VehicleIndicatorIcon";
 import { Button } from "~/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "~/components/ui/command";
 import {
   Form,
   FormControl,
@@ -19,9 +27,17 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { Separator } from "~/components/ui/separator";
 import { toast } from "~/hooks/use-toast";
 import { useUploadFile } from "~/hooks/useUploadthing";
 import { cn } from "~/lib/utils";
+import { VEHICLE_CATEGORY } from "~/lib/vehicle-category";
 import { vehicleTypeEnum } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 
@@ -58,9 +74,7 @@ const Wrapper = ({
   const router = useRouter();
 
   const { data: business } = api.business.current.useQuery();
-  const [selectedVehicle, setSelectedVehicle] = useState<
-    (typeof allowedVehicles)[number] | undefined
-  >(editData?.type);
+
   const { mutateAsync, status } = api.vehicle.create.useMutation();
   const [features, setFeatures] = useState<{ key: string; value: string }[]>(
     editData?.features ?? [],
@@ -119,7 +133,6 @@ const Wrapper = ({
       data: {
         ...rest,
         features,
-        type: selectedVehicle,
         inventory: inventory,
         images: [...pastImages, ...values.images],
         businessId: business.id,
@@ -135,6 +148,8 @@ const Wrapper = ({
     router.push("/vendor/vehicles");
   }
 
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="w-full p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -143,7 +158,7 @@ const Wrapper = ({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex w-full flex-col gap-10 lg:flex-row">
+          <div className="flex w-full flex-col gap-10 space-y-2 lg:flex-row">
             <div className="flex-[2]">
               <FormLabel className="text-slate-600">
                 Media (Upload vehicle images)
@@ -205,45 +220,103 @@ const Wrapper = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-600">
-                        Vehicle Category
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Sports Car" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-slate-600">Vehicle Type</Label>
-                <div className="flex flex-wrap gap-2">
-                  {allowedVehicles.map((vehicle, index) => {
-                    return (
-                      <VehicleIndicatorIcon
-                        key={index}
-                        vehicle={vehicle}
-                        props={{
-                          className: cn(
-                            "cursor-pointer",
-                            selectedVehicle === vehicle
-                              ? "ring-2 ring-secondary"
-                              : "",
-                          ),
-                          event: () => {
-                            form.setValue("type", vehicle);
-                            setSelectedVehicle(vehicle);
-                          },
-                        }}
-                      />
-                    );
-                  })}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem className="">
+                        <FormLabel className="text-slate-600">
+                          Vehicle Category
+                        </FormLabel>
+                        <FormControl>
+                          <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open}
+                                className="w-full justify-between px-4"
+                              >
+                                {field.value
+                                  ? field.value
+                                  : "Select category..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-full p-0"
+                              align="start"
+                            >
+                              <Command className="w-full">
+                                <CommandInput placeholder="Search category..." />
+                                <ScrollArea className="h-80 w-full">
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      No category found.
+                                    </CommandEmpty>
+                                    <CommandGroup>
+                                      {Object.entries(VEHICLE_CATEGORY).map(
+                                        ([type, categories], typeIndex) => (
+                                          <div key={type}>
+                                            <CommandItem
+                                              className="px-2 py-1.5 font-semibold uppercase text-slate-950"
+                                              disabled
+                                            >
+                                              {type}
+                                            </CommandItem>
+                                            {categories.map((category) => (
+                                              <CommandItem
+                                                key={category}
+                                                value={category}
+                                                onSelect={() => {
+                                                  form.setValue(
+                                                    field.name,
+                                                    category,
+                                                  );
+                                                  form.setValue(
+                                                    "type",
+                                                    (category.includes(
+                                                      "Electric",
+                                                    )
+                                                      ? `e-${type}`
+                                                      : type) as (typeof vehicleTypeEnum.enumValues)[number],
+                                                  );
+                                                  setOpen(false);
+                                                }}
+                                                className="pl-4"
+                                              >
+                                                {category}
+                                                <Check
+                                                  className={cn(
+                                                    "ml-auto h-4 w-4",
+                                                    field.value === category
+                                                      ? "opacity-100"
+                                                      : "opacity-0",
+                                                  )}
+                                                />
+                                              </CommandItem>
+                                            ))}
+                                            {typeIndex !==
+                                              Object.entries(VEHICLE_CATEGORY)
+                                                .length -
+                                                1 && (
+                                              <Separator className="my-1" />
+                                            )}
+                                          </div>
+                                        ),
+                                      )}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </ScrollArea>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -292,7 +365,7 @@ const Wrapper = ({
                   )}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label>Add Vehicle Features</Label>
                 <div className="mb-2 space-y-2">
                   {features.map((feature, idx) => (
@@ -302,6 +375,7 @@ const Wrapper = ({
                           value={feature.key}
                           className="h-10"
                           placeholder="Frame"
+                          autoFocus
                           onChange={(e) => {
                             const updatedFeatures = [...features];
                             if (updatedFeatures[idx]) {
@@ -344,9 +418,9 @@ const Wrapper = ({
                   }}
                   type="button"
                   size="sm"
-                  variant={"ghost"}
+                  variant={"outline"}
                 >
-                  <Plus size={15} className="mr-2 text-slate-600" />
+                  <Plus size={15} className="mr-1 text-slate-600" />
                   Add Feature
                 </Button>
               </div>

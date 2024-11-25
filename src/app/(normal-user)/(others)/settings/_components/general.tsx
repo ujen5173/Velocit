@@ -80,6 +80,15 @@ const GeneralSettings = ({
     useUploadFile("imageUploader");
 
   useEffect(() => {
+    if (uploadedFile) {
+      toast({
+        title: "Image uploaded",
+        description: "Image uploaded successfully",
+      });
+    }
+  }, [uploadedFile]);
+
+  useEffect(() => {
     if (uploadedFile && uploadedFile.length > 0 && uploadedFile[0]?.url) {
       form.setValue("image", uploadedFile[0].url);
     }

@@ -3,7 +3,7 @@
 // TODO: Not rendering the data from the url properly
 
 import { differenceInDays, format } from "date-fns";
-import { CalendarDays, Minus, Plus, X } from "lucide-react";
+import { CalendarDays, Clipboard, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
@@ -48,12 +48,16 @@ interface BookingsProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   bookingsDetails: GetBookingsType;
+  paymentId: string;
+  paymentMethod: string;
 }
 
 const Bookings: React.FC<BookingsProps> = ({
   bookingsDetails,
   open,
   setOpen,
+  paymentMethod,
+  paymentId,
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -590,7 +594,7 @@ const Bookings: React.FC<BookingsProps> = ({
                 <h3 className="text-lg font-semibold">Booking Summary</h3>
               </div>
 
-              <div className="w-full space-y-2 rounded-md border p-4">
+              <div className="w-full space-y-2 rounded-md border p-4 shadow-sm">
                 <div className="flex justify-between">
                   <span>Vehicle:</span>
                   <span className="font-semibold">{selectedModel}</span>
@@ -627,6 +631,28 @@ const Bookings: React.FC<BookingsProps> = ({
             </div>
 
             <div className="w-full space-y-4">
+              <div className="flex gap-2 rounded-md border border-border px-4 py-2 shadow-sm">
+                <div className="flex flex-1 items-center">
+                  <p className="text-base font-medium text-slate-600">
+                    {paymentMethod}: {paymentId}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(paymentId);
+                    toast({
+                      title: "Payment ID Copied",
+                      description: "Payment ID copied to clipboard",
+                    });
+                  }}
+                  size={"sm"}
+                  variant={"outline"}
+                >
+                  <Clipboard size={15} className="mr-1 text-slate-700" />
+                  Copy to clipboard
+                </Button>
+              </div>
               <div className="space-y-2">
                 <Label>Upload Payment Screenshot</Label>
                 <div className="relative">

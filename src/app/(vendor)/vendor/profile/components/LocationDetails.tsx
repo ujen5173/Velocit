@@ -220,7 +220,7 @@ const LocationDetails = () => {
             />
           )}
         />
-        <div className="h-40 rounded-md border border-border bg-slate-50">
+        <div className="h-96 rounded-md border border-border bg-slate-50">
           {form.getValues("location.map") ? (
             <iframe
               src={form.getValues("location.map")}

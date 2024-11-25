@@ -2,6 +2,8 @@
 
 import { MapIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import HeaderHeight from "~/app/_components/_/HeaderHeight";
+import VendorCard from "~/app/_components/_/VendorCard";
 import { Button } from "~/components/ui/button";
 import { searchedData } from "~/lib/data";
 import { cn } from "~/lib/utils";
@@ -30,14 +32,13 @@ const Search = () => {
 
   return (
     <>
-      <div className={"h-16 md:h-20"}></div>
       <section className="relative w-full">
         <div className="fixed bottom-4 left-1/2 z-[100] block -translate-x-1/2 lg:hidden">
           <Button
             onClick={() =>
               setShowingArea(showingArea === "places" ? "map" : "places")
             }
-            variant={"primary"}
+            variant={"black"}
             rounded={"full"}
           >
             <MapIcon size={18} />
@@ -56,6 +57,8 @@ const Search = () => {
               "px-8 py-4 md:p-4",
             )}
           >
+            <HeaderHeight />
+
             {/* Keep the original content as is */}
             <div className="mb-2">
               <span
@@ -68,7 +71,7 @@ const Search = () => {
               </span>
             </div>
             <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-              {/* {[].map((shop:) => (
+              {searchedData.map(({ lonlat, ...shop }) => (
                 <div
                   className={cn("relative", chakra_petch.className)}
                   key={shop.slug}
@@ -79,17 +82,17 @@ const Search = () => {
                     separatorHeight="h-[3px]"
                   />
                 </div>
-              ))} */}
+              ))}
             </div>
           </div>
           <div
             className={cn(
-              "relative z-40 h-auto min-h-[calc(100vh-64px)] flex-1 md:min-h-[calc(100vh-80px)]",
+              "relative z-30 h-auto min-h-screen flex-1",
               showingArea === "places" ? "hidden" : "block",
               showingArea === "both" ? "block" : "",
             )}
           >
-            <div className="sticky inset-0 left-0 top-[64px] h-[calc(100vh-64px)] md:top-[80px] md:h-[calc(100vh-80px)]">
+            <div className="sticky inset-0 left-0 top-0 h-screen">
               <MapArea />
             </div>
           </div>

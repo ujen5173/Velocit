@@ -16,13 +16,6 @@ import {
   vehicleTypeEnum,
 } from "~/server/db/schema";
 
-// Define interfaces for better type safety
-interface Business {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
-
 interface DashboardMetrics {
   total_revenue: number;
   orders_total: number;
@@ -104,7 +97,10 @@ export const businessRouter = createTRPCRouter({
       })
       .from(businesses)
       .where(
-        and(sql`${businesses.rating} > 0`, sql`${businesses.ratingCount} > 0`),
+        and(
+          sql`${businesses.rating} >= 0`,
+          sql`${businesses.ratingCount} >= 0`,
+        ),
       )
       .orderBy(sql`(${businesses.rating} * ${businesses.ratingCount}) DESC`)
       .limit(8);

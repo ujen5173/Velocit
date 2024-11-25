@@ -1,8 +1,10 @@
 "use client";
 
-import { type LatLngExpression } from "leaflet";
+import axios from "axios";
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast } from "~/hooks/use-toast";
 
 const Map = dynamic(() => import("./Map"), {
   ssr: false,
@@ -14,7 +16,17 @@ interface Place {
   hovered?: boolean;
 }
 
+interface GeocodeResponse {
+  lat: string;
+  lon: string;
+}
+
 const MapArea = () => {
+  const locationName = useSearchParams().get("location");
+  const from = useSearchParams().get("from");
+  const to = useSearchParams().get("to");
+  const vehicleType = useSearchParams().get("vehicleType");
+
   const [data, setData] = useState<{
     loading: boolean;
     results: Record<
@@ -25,9 +37,6 @@ const MapArea = () => {
     loading: true,
     results: [],
   });
-  const [location, setLocation] = useState<LatLngExpression | undefined>(
-    undefined,
-  );
   const [places, setPlaces] = useState<Place[]>([
     { lat: 27.7172, lng: 85.324 }, // Kathmandu
     { lat: 27.6946, lng: 85.2976 }, // Lalitpur
@@ -83,10 +92,40 @@ const MapArea = () => {
     { lat: 28.2176, lng: 83.9836 },
   ]);
 
+  const [position, setPosition] = useState<[number, number]>([27.7172, 85.324]);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (!locationName) {
+        toast({
+          title: "Location not found",
+          description: "Please provide a valid location",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        const response = await axios.get<GeocodeResponse[]>(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
+        );
+
+        if (response.data && response.data.length > 0 && response.data[0]) {
+          const { lat, lon } = response.data[0];
+          setPosition([parseFloat(lat), parseFloat(lon)]);
+        }
+      } catch (error) {
+        console.error("Error fetching location:", error);
+      }
+    };
+
+    void fetchLocation();
+  }, [locationName]);
+
   return (
     <Map
       setData={setData}
-      location={location}
+      location={position}
       places={places}
       setPlaces={setPlaces}
     />

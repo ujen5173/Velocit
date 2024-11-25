@@ -1,4 +1,5 @@
 "use client";
+
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -45,7 +46,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
               </div>
               <div className="flex flex-col items-center gap-6 sm:flex-row">
                 <div className="flex flex-1 flex-col gap-2 text-center">
-                  <p className="font-medium">Normal Use</p>
+                  <p className="font-medium">Personal Account</p>
                   <Button
                     className="w-full"
                     onClick={async () => {
@@ -55,6 +56,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
 
                       await signIn("google", {
                         callbackUrl: "/",
+                        redirect: true,
                       });
                     }}
                     variant={"outline"}
@@ -68,7 +70,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                   className="hidden h-16 sm:block"
                 />
                 <div className="flex flex-1 flex-col gap-2 text-center">
-                  <p className="font-medium">For Businesses</p>
+                  <p className="font-medium">Business Acccount</p>
 
                   <Button
                     className="w-full"
@@ -78,6 +80,7 @@ const LoginButton = ({ children }: { children: React.ReactNode }) => {
                       });
                       await signIn("google", {
                         callbackUrl: "/vendor/profile",
+                        redirect: true,
                       });
                     }}
                     variant={"outline"}
