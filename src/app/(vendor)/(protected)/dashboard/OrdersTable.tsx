@@ -363,6 +363,8 @@ const OrdersTable = () => {
           open={open}
           setOpen={setOpen}
           bookingsDetails={bookingsDetails}
+          paymentMethod={"PhonePay"}
+          paymentId={"98xxxxxxxx"}
         />
       )}
       <div className="max-w-1440px mx-auto">
