@@ -9,7 +9,6 @@ import {
   Youtube,
 } from "lucide-react";
 import Link from "next/link";
-import { useContext } from "react";
 import Balancer from "react-wrap-balancer";
 import { chakra_petch } from "~/app/utils/font";
 import { Button } from "~/components/ui/button";
@@ -33,11 +32,8 @@ import {
 } from "~/components/ui/select";
 import { cn } from "~/lib/utils";
 import Logo from "~/svg/logo";
-import { Context } from "../contexts/root";
 
 const Footer = () => {
-  const { currentCurrency, setCurrentCurrency } = useContext(Context);
-
   return (
     <section className="w-full bg-tertiary">
       <div className="mx-auto max-w-[1440px] px-4">
@@ -219,7 +215,7 @@ const Footer = () => {
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant={"outline"} disabled>
-                  {currentCurrency.label}
+                  रु Nepali Ruppee (NPR)
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">

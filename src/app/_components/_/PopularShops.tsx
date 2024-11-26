@@ -18,7 +18,14 @@ const PopularShops = () => {
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  const { data: initialData } = trpc.business.getPopularShops.useQuery();
+  const { data: initialData } = trpc.business.getPopularShops.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  console.log({ popularShops: initialData });
 
   useEffect(() => {
     if (!api) return;
